@@ -6,7 +6,7 @@
 const SLIDES = [
   {
     stage: 1,
-    badge: "STAGE 01 / 10",
+    badge: "STAGE 01 / 12",
     title: "Hi Nanna Case Study: Autosomal Recessive Inheritance & Chromosome 7",
     speakerNotes: `
       <h4>Slide 1: Clinical Genetics & Hi Nanna Pedigree</h4>
@@ -20,7 +20,7 @@ const SLIDES = [
   },
   {
     stage: 2,
-    badge: "STAGE 02 / 10",
+    badge: "STAGE 02 / 12",
     title: "Macro Pulmonary Anatomy & CFTR Defect",
     speakerNotes: `
       <h4>Slide 2: Whole Lung Overview</h4>
@@ -33,7 +33,7 @@ const SLIDES = [
   },
   {
     stage: 3,
-    badge: "STAGE 03 / 10",
+    badge: "STAGE 03 / 12",
     title: "Airway Lining: Ciliary Collapse & Thick Mucus",
     speakerNotes: `
       <h4>Slide 3: Airway Tissue & Mucociliary Dysfunction</h4>
@@ -46,7 +46,7 @@ const SLIDES = [
   },
   {
     stage: 4,
-    badge: "STAGE 04 / 10",
+    badge: "STAGE 04 / 12",
     title: "Microbial Colonization: Pseudomonas Breeding Ground",
     speakerNotes: `
       <h4>Slide 4: Microbial Pathogens & Biofilms</h4>
@@ -59,7 +59,7 @@ const SLIDES = [
   },
   {
     stage: 5,
-    badge: "STAGE 05 / 10",
+    badge: "STAGE 05 / 12",
     title: "Immune Response: Blood Vessel to Mucus Diapedesis",
     speakerNotes: `
       <h4>Slide 5: Neutrophil Recruitment (Diapedesis)</h4>
@@ -72,7 +72,7 @@ const SLIDES = [
   },
   {
     stage: 6,
-    badge: "STAGE 06 / 10",
+    badge: "STAGE 06 / 12",
     title: "Phagocytosis, Multiple WBC Death & DNA Mesh Formation",
     speakerNotes: `
       <h4>Slide 6: The Microscopic Battle, Phagocytosis & NETosis</h4>
@@ -86,7 +86,7 @@ const SLIDES = [
   },
   {
     stage: 7,
-    badge: "STAGE 07 / 10",
+    badge: "STAGE 07 / 12",
     title: "Interactive Timeline: The Evolution of DNase Therapy (1950–1993)",
     speakerNotes: `
       <h4>Slide 7: Historical Timeline Hub</h4>
@@ -100,7 +100,7 @@ const SLIDES = [
   },
   {
     stage: 8,
-    badge: "STAGE 08 / 10",
+    badge: "STAGE 08 / 12",
     title: "The 1950s Precursor: The Bovine Dead-End (Cow DNase Hazard)",
     speakerNotes: `
       <h4>Slide 8: 1950s Bovine Pancreatic DNase Hazard</h4>
@@ -114,7 +114,7 @@ const SLIDES = [
   },
   {
     stage: 9,
-    badge: "STAGE 09 / 10",
+    badge: "STAGE 09 / 12",
     title: "1988–1989: The Genentech Breakthrough (Dr. Shak & Dr. Levinson)",
     speakerNotes: `
       <h4>Slide 9: The Recombinant Revolution at Genentech</h4>
@@ -128,7 +128,7 @@ const SLIDES = [
   },
   {
     stage: 10,
-    badge: "STAGE 10 / 10",
+    badge: "STAGE 10 / 12",
     title: "1990–1993: Clinical Trials to FDA Approval (Pulmozyme®)",
     speakerNotes: `
       <h4>Slide 10: Clinical Trials & FDA Commercial Approval</h4>
@@ -137,6 +137,34 @@ const SLIDES = [
         <li><strong>Summer 1990 (Phase I Trials):</strong> Proved that inhaled human recombinant DNase 1 was completely non-immunogenic, safe, and highly effective at thinning secretions in CF patients.</li>
         <li><strong>1992–1993 (Phase III Trials):</strong> Multi-center trials with 968 CF patients showed a 28% reduction in respiratory tract infections and sustained improvement in lung function (FEV1).</li>
         <li><strong>December 30, 1993 (FDA Approval):</strong> The FDA officially approved Pulmozyme® (dornase alfa), making it the first recombinant therapeutic specifically approved for Cystic Fibrosis in history!</li>
+      </ul>
+    `
+  },
+  {
+    stage: 11,
+    badge: "STAGE 11 / 12",
+    title: "Molecular Action: rhDNase 1 Cleaving & Lysing the DNA Mesh",
+    speakerNotes: `
+      <h4>Slide 11: Molecular Enzymatic Cleavage of Extracellular DNA</h4>
+      <p><strong>Mechanism of Action:</strong> In purulent CF sputum, high-molecular-weight extracellular DNA (eDNA) released from dying neutrophils forms a rigid, viscoelastic gel matrix that traps mucus and bacteria.</p>
+      <ul>
+        <li><strong>Endonuclease Precision:</strong> Recombinant human DNase 1 (dornase alfa, 37 kDa) diffuses into the thick sputum. Its catalytic active site coordinates essential <strong>Ca²⁺</strong> (structural stability) and <strong>Mg²⁺</strong> ions (activating water molecules for nucleophilic hydrolytic attack).</li>
+        <li><strong>Phosphodiester Hydrolysis:</strong> rhDNase 1 cleaves phosphodiester backbones internally within double-stranded DNA, producing 3'-hydroxyl and 5'-phosphoryl oligonucleotides.</li>
+        <li><strong>Mesh Dissolution:</strong> Enormous genomic strands exceeding <strong>100,000 base pairs</strong> are rapidly snipped into tiny soluble fragments under <strong>100 base pairs</strong>. The cross-linked lattice disintegrates, relieving gel tension and freeing entrapped <em>Pseudomonas aeruginosa</em>!</li>
+      </ul>
+    `
+  },
+  {
+    stage: 12,
+    badge: "STAGE 12 / 12",
+    title: "Physiological Rescue: Sputum Liquefaction & Mucociliary Clearance",
+    speakerNotes: `
+      <h4>Slide 12: Airway Healing & Mucociliary Transport Recovery</h4>
+      <p><strong>Clinical & Physiological Reversal:</strong> Once the rigid DNA skeleton is dissolved, the mechanical properties of the airway surface liquid are dramatically restored.</p>
+      <ul>
+        <li><strong>800-Fold Viscosity Plunge:</strong> Sputum viscoelasticity drops precipitously from over <strong>12,000 cP</strong> (thick gelatinous sludge) down to <strong>15 cP</strong> (flowing watery sol layer).</li>
+        <li><strong>Cilia Reactivation:</strong> Released from the crushing weight of the stagnant gel blanket, bronchial cilia stand upright and resume high-frequency metachronal beating (12–15 Hz), driving the mucociliary escalator.</li>
+        <li><strong>Airway Clearance & FEV₁ Gains:</strong> Mucus plugs are easily cleared upward toward the pharynx by gentle coughing or normal airflow. Bronchial lumens reopen, restoring dynamic airflow and elevating FEV₁ by ~15.8% while cutting pulmonary exacerbations by 37%!</li>
       </ul>
     `
   }

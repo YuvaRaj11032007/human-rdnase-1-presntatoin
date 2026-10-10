@@ -180,6 +180,10 @@ class PresentationEngine {
         vy: -0.15 - Math.random() * 0.25
       });
     }
+
+    // 6. Stage 11 Molecular Lysis & Stage 12 Airway Clearance
+    this.initStage11LysisData();
+    this.initStage12ClearanceData();
   }
 
   initBattleData() {
@@ -391,7 +395,16 @@ class PresentationEngine {
         }
       }
 
-      // 4. Regular slide advancement: Clicking anywhere on the slide goes to next slide
+      // 4. Stage 11 Inhale Aerosolized rhDNase 1 Button
+      if (this.currentStage === 11) {
+        const inNebBtn = (mx >= 190 && mx <= 460 && my >= -242 && my <= -204);
+        if (inNebBtn) {
+          this.triggerNebulizerPulse();
+          return;
+        }
+      }
+
+      // 5. Regular slide advancement: Clicking anywhere on the slide goes to next slide
       if (window.soundEngine) window.soundEngine.playClick();
       if (window.slideManager) {
         window.slideManager.nextSlide();
@@ -452,6 +465,14 @@ class PresentationEngine {
     if (stageNum === 9) {
       this.labDropProgress = 0;
       this.liquefactionProgress = 0;
+    }
+
+    if (stageNum === 11) {
+      this.initStage11LysisData();
+    }
+
+    if (stageNum === 12) {
+      this.initStage12ClearanceData();
     }
 
     if (window.soundEngine) {
@@ -543,6 +564,16 @@ class PresentationEngine {
     // Stage 9 Lab Sputum Liquefaction & CHO Secreting Animation
     if (this.currentStage === 9 || this.targetStage === 9) {
       this.updateLabStage(dt);
+    }
+
+    // Stage 11 Molecular rhDNase 1 DNA Lysis Simulation
+    if (this.currentStage === 11 || this.targetStage === 11) {
+      this.updateStage11Lysis(dt);
+    }
+
+    // Stage 12 Airway Physiological Recovery & Mucociliary Clearance
+    if (this.currentStage === 12 || this.targetStage === 12) {
+      this.updateStage12Clearance(dt);
     }
   }
 
@@ -869,6 +900,8 @@ class PresentationEngine {
       case 8: this.drawStage8BovineCow1950s(ctx); break;
       case 9: this.drawStage9GenentechLabAnimated(ctx); break;
       case 10: this.drawStage10TrialsAndFdaApproval(ctx); break;
+      case 11: this.drawStage11DnaLysis(ctx); break;
+      case 12: this.drawStage12AirwayClearance(ctx); break;
       default: this.drawStage1HiNannaGenetics(ctx);
     }
   }
@@ -4845,4 +4878,1034 @@ class PresentationEngine {
 
     ctx.restore();
   }
+
+  /* ========================================================
+     STAGE 11: Molecular Action: rhDNase 1 Cleaving & Lysing the DNA Mesh
+     High-magnification visualization of aerosolized rhDNase 1 endonucleases
+     hydrolyzing phosphodiester bonds, cleaving high-MW DNA, dissolving the mesh,
+     and liberating entrapped Pseudomonas bacteria!
+     ======================================================== */
+  initStage11LysisData() {
+    this.lysisTimer = 0;
+    this.lysisLevel = 0; // 0.0 (dense mesh) to 1.0 (completely lysed)
+    this.nebulizerPulse = 0;
+    this.lysisCutsCount = 0;
+    this.cleavageSparks = [];
+    this.dissolvedOligomers = [];
+
+    // DNA polymer mesh filaments spanning the field
+    this.lysisFilaments = [];
+    const numFilaments = 16;
+    for (let f = 0; f < numFilaments; f++) {
+      const angle = (f / numFilaments) * Math.PI * 2 + (Math.random() - 0.5) * 0.25;
+      const nodes = [];
+      const numNodes = 14;
+      let curX = (Math.random() - 0.5) * 40;
+      let curY = (Math.random() - 0.5) * 30;
+      for (let n = 0; n < numNodes; n++) {
+        const step = 24 + Math.random() * 12;
+        const segAngle = angle + Math.sin(n * 0.8) * 0.35 + (Math.random() - 0.5) * 0.2;
+        curX += Math.cos(segAngle) * step;
+        curY += Math.sin(segAngle) * step;
+        nodes.push({
+          x: curX,
+          y: curY,
+          baseX: curX,
+          baseY: curY,
+          cleaved: false,
+          cleaveProgress: 0,
+          driftVx: (Math.random() - 0.5) * 0.6,
+          driftVy: (Math.random() - 0.5) * 0.6,
+          hasHistone: (n % 3 === 1)
+        });
+      }
+      this.lysisFilaments.push({
+        angle: angle,
+        nodes: nodes
+      });
+    }
+
+    // Crosslinking tension bridges
+    this.lysisCrosslinks = [];
+    for (let i = 0; i < 22; i++) {
+      const f1 = Math.floor(Math.random() * numFilaments);
+      const f2 = (f1 + 1 + Math.floor(Math.random() * (numFilaments - 2))) % numFilaments;
+      const n1 = Math.floor(Math.random() * 12);
+      const n2 = Math.floor(Math.random() * 12);
+      this.lysisCrosslinks.push({ f1, n1, f2, n2, severed: false });
+    }
+
+    // Entrapped Pseudomonas bacteria
+    this.lysisBacteria = [
+      { x: -140, y: -60, angle: 0.3, trapped: true, speed: 0.2, flagellaPhase: 0 },
+      { x: 120, y: 50, angle: -0.5, trapped: true, speed: 0.25, flagellaPhase: 1 },
+      { x: -80, y: 70, angle: 1.1, trapped: true, speed: 0.18, flagellaPhase: 2 },
+      { x: 90, y: -70, angle: -1.2, trapped: true, speed: 0.22, flagellaPhase: 3 },
+      { x: 0, y: -20, angle: 0.6, trapped: true, speed: 0.3, flagellaPhase: 4 }
+    ];
+
+    // rhDNase 1 Endonuclease Enzyme molecules
+    this.lysisEnzymes = [];
+    for (let e = 0; e < 7; e++) {
+      this.lysisEnzymes.push({
+        x: (Math.random() - 0.5) * 440,
+        y: (Math.random() - 0.5) * 260,
+        vx: (Math.random() - 0.5) * 40,
+        vy: (Math.random() - 0.5) * 40,
+        angle: Math.random() * Math.PI * 2,
+        angularSpeed: (Math.random() - 0.5) * 1.5,
+        dockedNode: null,
+        cutCooldown: 0.5 + Math.random() * 1.2,
+        auraPulse: Math.random() * Math.PI * 2
+      });
+    }
+  }
+
+  triggerNebulizerPulse() {
+    this.nebulizerPulse = 1.0;
+    if (window.soundEngine && window.soundEngine.playEnzymeCut) {
+      window.soundEngine.playEnzymeCut();
+    }
+    // Spawn nebulizer aerosol mist droplets
+    for (let i = 0; i < 40; i++) {
+      this.cleavageSparks.push({
+        x: (Math.random() - 0.5) * 700,
+        y: -180 + Math.random() * 40,
+        vx: (Math.random() - 0.5) * 20,
+        vy: 40 + Math.random() * 60,
+        alpha: 0.9,
+        color: '#38BDF8',
+        size: 3 + Math.random() * 3,
+        life: 0.8 + Math.random() * 0.6
+      });
+    }
+  }
+
+  updateStage11Lysis(dt) {
+    this.lysisTimer += dt;
+    if (this.nebulizerPulse > 0) {
+      this.nebulizerPulse = Math.max(0, this.nebulizerPulse - dt * 0.8);
+    }
+
+    // Auto progress lysis smoothly (or accelerated when nebulizer active)
+    const speedMult = 1.0 + (this.nebulizerPulse * 3.5);
+    this.lysisLevel = Math.min(1.0, this.lysisLevel + (dt * 0.08) * speedMult);
+
+    // Update enzymes
+    this.lysisEnzymes.forEach((enz, eIdx) => {
+      enz.auraPulse += dt * 5;
+      enz.angle += enz.angularSpeed * dt;
+
+      if (!enz.dockedNode) {
+        // Move freely seeking substrate
+        enz.x += enz.vx * dt;
+        enz.y += enz.vy * dt;
+        if (enz.x > 380) { enz.vx = -Math.abs(enz.vx); }
+        if (enz.x < -380) { enz.vx = Math.abs(enz.vx); }
+        if (enz.y > 180) { enz.vy = -Math.abs(enz.vy); }
+        if (enz.y < -150) { enz.vy = Math.abs(enz.vy); }
+
+        enz.cutCooldown -= dt;
+        if (enz.cutCooldown <= 0) {
+          // Find closest uncleaved node
+          let bestDist = 140;
+          let candidate = null;
+          this.lysisFilaments.forEach((fil, fIdx) => {
+            fil.nodes.forEach((node, nIdx) => {
+              if (!node.cleaved) {
+                const d = Math.hypot(node.x - enz.x, node.y - enz.y);
+                if (d < bestDist) {
+                  bestDist = d;
+                  candidate = { fil: fIdx, node: nIdx };
+                }
+              }
+            });
+          });
+
+          if (candidate) {
+            enz.dockedNode = candidate;
+            enz.dockTimer = 0.45;
+          } else {
+            enz.cutCooldown = 0.8;
+          }
+        }
+      } else {
+        // Docked: homing into node and cutting!
+        const fil = this.lysisFilaments[enz.dockedNode.fil];
+        const targetNode = fil ? fil.nodes[enz.dockedNode.node] : null;
+        if (targetNode) {
+          enz.x += (targetNode.x - enz.x) * dt * 8;
+          enz.y += (targetNode.y - enz.y) * dt * 8;
+          enz.dockTimer -= dt;
+
+          if (enz.dockTimer <= 0) {
+            // EXECUTE CLEAVAGE!
+            targetNode.cleaved = true;
+            this.lysisCutsCount += 1420;
+            if (eIdx === 0 && window.soundEngine && window.soundEngine.playEnzymeCut && Math.random() < 0.35) {
+              window.soundEngine.playEnzymeCut();
+            }
+
+            // Sever connected crosslinks
+            this.lysisCrosslinks.forEach(cl => {
+              if ((cl.f1 === enz.dockedNode.fil && cl.n1 === enz.dockedNode.node) ||
+                  (cl.f2 === enz.dockedNode.fil && cl.n2 === enz.dockedNode.node)) {
+                cl.severed = true;
+              }
+            });
+
+            // Burst enzymatic sparks
+            for (let s = 0; s < 6; s++) {
+              this.cleavageSparks.push({
+                x: targetNode.x,
+                y: targetNode.y,
+                vx: (Math.random() - 0.5) * 80,
+                vy: (Math.random() - 0.5) * 80,
+                alpha: 1.0,
+                color: Math.random() > 0.5 ? '#F59E0B' : '#38BDF8',
+                size: 2.5 + Math.random() * 2,
+                life: 0.4 + Math.random() * 0.3
+              });
+            }
+
+            // Create free floating oligonucleotide fragment
+            this.dissolvedOligomers.push({
+              x: targetNode.x,
+              y: targetNode.y,
+              len: 8 + Math.random() * 10,
+              angle: Math.random() * Math.PI * 2,
+              vx: (Math.random() - 0.5) * 15,
+              vy: (Math.random() - 0.5) * 15,
+              alpha: 0.95
+            });
+
+            enz.dockedNode = null;
+            enz.cutCooldown = 0.4 + Math.random() * 0.8;
+            enz.vx = (Math.random() - 0.5) * 50;
+            enz.vy = (Math.random() - 0.5) * 50;
+          }
+        } else {
+          enz.dockedNode = null;
+        }
+      }
+    });
+
+    // Update nodes drift when cleaved
+    this.lysisFilaments.forEach(fil => {
+      fil.nodes.forEach(node => {
+        if (node.cleaved) {
+          node.x += node.driftVx * dt * 12;
+          node.y += node.driftVy * dt * 12;
+        }
+      });
+    });
+
+    // Update sparks
+    for (let i = this.cleavageSparks.length - 1; i >= 0; i--) {
+      const sp = this.cleavageSparks[i];
+      sp.x += sp.vx * dt;
+      sp.y += sp.vy * dt;
+      sp.life -= dt;
+      sp.alpha = Math.max(0, sp.life / 0.7);
+      if (sp.life <= 0) {
+        this.cleavageSparks.splice(i, 1);
+      }
+    }
+
+    // Update free oligomers
+    this.dissolvedOligomers.forEach(ol => {
+      ol.x += ol.vx * dt;
+      ol.y += ol.vy * dt;
+      ol.angle += 0.2 * dt;
+    });
+    if (this.dissolvedOligomers.length > 60) {
+      this.dissolvedOligomers.splice(0, 10);
+    }
+
+    // Bacteria escape from dissolving web
+    this.lysisBacteria.forEach(bact => {
+      bact.flagellaPhase += dt * 12;
+      if (this.lysisLevel > 0.35) {
+        bact.trapped = false;
+        bact.x += Math.cos(bact.angle) * bact.speed * 40 * dt;
+        bact.y += Math.sin(bact.angle) * bact.speed * 40 * dt;
+        if (bact.x > 380) bact.angle = Math.PI - bact.angle;
+        if (bact.x < -380) bact.angle = Math.PI - bact.angle;
+        if (bact.y > 170) bact.angle = -bact.angle;
+        if (bact.y < -140) bact.angle = -bact.angle;
+      } else {
+        bact.x += Math.sin(this.time * 8 + bact.flagellaPhase) * 0.4;
+      }
+    });
+  }
+
+  drawStage11DnaLysis(ctx) {
+    ctx.save();
+
+    // 1. Pristine Medical Stage Background
+    ctx.fillStyle = '#FFFFFF';
+    ctx.fillRect(-500, -260, 1000, 520);
+
+    // Subtle background grid dots
+    ctx.fillStyle = '#E2E8F0';
+    for (let gx = -460; gx <= 460; gx += 40) {
+      for (let gy = -220; gy <= 220; gy += 40) {
+        ctx.beginPath();
+        ctx.arc(gx, gy, 1.2, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+
+    // 2. Top Header Section
+    ctx.fillStyle = '#F8FAFC';
+    ctx.strokeStyle = '#CBD5E1';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.roundRect(-240, -252, 480, 26, 13);
+    ctx.fill();
+    ctx.stroke();
+
+    ctx.font = '700 9.5px "JetBrains Mono", monospace';
+    ctx.fillStyle = '#0284C7';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('● MOLECULAR ACTION • RECOMBINANT HUMAN DNASE 1 (DORNASE ALFA)', 0, -239);
+
+    ctx.font = '800 22px "Plus Jakarta Sans", sans-serif';
+    ctx.fillStyle = '#0F172A';
+    ctx.fillText('Enzymatic Cleavage & Lysis of Extracellular DNA (eDNA) Mesh', 0, -210);
+
+    ctx.font = '500 11.5px "Plus Jakarta Sans", sans-serif';
+    ctx.fillStyle = '#64748B';
+    ctx.fillText('rhDNase 1 selectively hydrolyzes phosphodiester backbones, dissolving the rigid viscoelastic polymer mesh.', 0, -188);
+
+    // 3. Interactive Nebulizer Spray Button (Top Right)
+    const btnX = 200;
+    const btnY = -252;
+    const btnW = 260;
+    const btnH = 28;
+    const nebActive = (this.nebulizerPulse > 0.05);
+
+    ctx.save();
+    if (nebActive) {
+      ctx.shadowColor = 'rgba(14, 165, 233, 0.6)';
+      ctx.shadowBlur = 12;
+    }
+    const btnGrad = ctx.createLinearGradient(btnX, 0, btnX + btnW, 0);
+    btnGrad.addColorStop(0, nebActive ? '#0284C7' : '#0369A1');
+    btnGrad.addColorStop(1, nebActive ? '#38BDF8' : '#0284C7');
+    ctx.fillStyle = btnGrad;
+    ctx.beginPath();
+    ctx.roundRect(btnX, btnY, btnW, btnH, 14);
+    ctx.fill();
+
+    ctx.strokeStyle = '#BAE6FD';
+    ctx.lineWidth = 1.2;
+    ctx.stroke();
+
+    ctx.font = '700 10.5px "Plus Jakarta Sans", sans-serif';
+    ctx.fillStyle = '#FFFFFF';
+    ctx.textAlign = 'center';
+    ctx.fillText('⚡ Click to Inhale rhDNase 1 Mist', btnX + btnW / 2, btnY + btnH / 2);
+    ctx.restore();
+
+    // 4. Microscopic Inspection Viewport Card
+    const vpX = -460;
+    const vpY = -170;
+    const vpW = 920;
+    const vpH = 415;
+
+    ctx.save();
+    ctx.fillStyle = '#090D16';
+    ctx.beginPath();
+    ctx.roundRect(vpX, vpY, vpW, vpH, 12);
+    ctx.fill();
+
+    ctx.strokeStyle = '#1E293B';
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+
+    // Soft cellular fluid vignette inside viewport
+    const vGrad = ctx.createRadialGradient(0, vpY + vpH / 2, 80, 0, vpY + vpH / 2, 450);
+    vGrad.addColorStop(0, 'rgba(15, 23, 42, 0.1)');
+    vGrad.addColorStop(1, 'rgba(3, 7, 18, 0.85)');
+    ctx.fillStyle = vGrad;
+    ctx.roundRect(vpX, vpY, vpW, vpH, 12);
+    ctx.fill();
+
+    // Clip rendering to viewport
+    ctx.beginPath();
+    ctx.roundRect(vpX, vpY, vpW, vpH, 12);
+    ctx.clip();
+
+    // Draw Crosslink tension lines between filaments
+    ctx.strokeStyle = 'rgba(147, 51, 234, 0.35)';
+    ctx.lineWidth = 1.2;
+    ctx.setLineDash([3, 4]);
+    this.lysisCrosslinks.forEach(cl => {
+      if (cl.severed) return;
+      const f1 = this.lysisFilaments[cl.f1];
+      const f2 = this.lysisFilaments[cl.f2];
+      if (f1 && f2 && f1.nodes[cl.n1] && f2.nodes[cl.n2]) {
+        const pt1 = f1.nodes[cl.n1];
+        const pt2 = f2.nodes[cl.n2];
+        ctx.beginPath();
+        ctx.moveTo(pt1.x, pt1.y);
+        ctx.lineTo(pt2.x, pt2.y);
+        ctx.stroke();
+      }
+    });
+    ctx.setLineDash([]);
+
+    // Draw DNA Filaments (Double stranded helical effect)
+    this.lysisFilaments.forEach((fil, fIdx) => {
+      for (let n = 0; n < fil.nodes.length - 1; n++) {
+        const p1 = fil.nodes[n];
+        const p2 = fil.nodes[n + 1];
+
+        if (p1.cleaved && p2.cleaved) {
+          // Both cleaved: segment has disintegrated into solution
+          continue;
+        }
+
+        const isCleaved = p1.cleaved || p2.cleaved;
+        const strandAlpha = isCleaved ? 0.35 : 0.85;
+
+        // Double strand 1 (Indigo backbone)
+        ctx.strokeStyle = `rgba(99, 102, 241, ${strandAlpha})`;
+        ctx.lineWidth = isCleaved ? 1.4 : 2.4;
+        ctx.beginPath();
+        ctx.moveTo(p1.x, p1.y);
+        const wave = Math.sin(this.time * 2 + n + fIdx) * 2;
+        ctx.quadraticCurveTo((p1.x + p2.x) / 2 + wave, (p1.y + p2.y) / 2 - wave, p2.x, p2.y);
+        ctx.stroke();
+
+        // Double strand 2 (Cyan complementary backbone)
+        ctx.strokeStyle = `rgba(56, 189, 248, ${strandAlpha * 0.75})`;
+        ctx.lineWidth = 1.2;
+        ctx.beginPath();
+        ctx.moveTo(p1.x + 2, p1.y + 2);
+        ctx.quadraticCurveTo((p1.x + p2.x) / 2 - wave, (p1.y + p2.y) / 2 + wave, p2.x + 2, p2.y + 2);
+        ctx.stroke();
+
+        // Base-pair rungs
+        if (!isCleaved) {
+          ctx.strokeStyle = 'rgba(168, 85, 247, 0.4)';
+          ctx.lineWidth = 1.0;
+          ctx.beginPath();
+          ctx.moveTo((p1.x + p2.x) / 2, (p1.y + p2.y) / 2);
+          ctx.lineTo((p1.x + p2.x) / 2 + 3, (p1.y + p2.y) / 2 + 3);
+          ctx.stroke();
+        }
+
+        // Histone octamer core particles bound to DNA
+        if (p1.hasHistone && !p1.cleaved) {
+          ctx.fillStyle = '#F59E0B';
+          ctx.beginPath();
+          ctx.arc(p1.x, p1.y, 3.2, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      }
+    });
+
+    // Draw free-floating cleaved oligonucleotides (<100 bp)
+    ctx.strokeStyle = '#38BDF8';
+    ctx.lineWidth = 1.5;
+    this.dissolvedOligomers.forEach(ol => {
+      ctx.save();
+      ctx.translate(ol.x, ol.y);
+      ctx.rotate(ol.angle);
+      ctx.globalAlpha = ol.alpha;
+      ctx.beginPath();
+      ctx.moveTo(-ol.len / 2, 0);
+      ctx.lineTo(ol.len / 2, 0);
+      ctx.stroke();
+
+      // Terminal 3'-OH and 5'-P marker dots
+      ctx.fillStyle = '#EC4899';
+      ctx.beginPath();
+      ctx.arc(-ol.len / 2, 0, 1.4, 0, Math.PI * 2);
+      ctx.arc(ol.len / 2, 0, 1.4, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+    });
+
+    // Draw Pseudomonas bacteria (trapped or liberated)
+    this.lysisBacteria.forEach(bact => {
+      ctx.save();
+      ctx.translate(bact.x, bact.y);
+      ctx.rotate(bact.angle);
+
+      // Capsule body
+      ctx.fillStyle = '#22C55E';
+      ctx.strokeStyle = '#15803D';
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.roundRect(-14, -6, 28, 12, 6);
+      ctx.fill();
+      ctx.stroke();
+
+      // Flagella tail
+      ctx.strokeStyle = '#16A34A';
+      ctx.lineWidth = 1.2;
+      ctx.beginPath();
+      ctx.moveTo(-14, 0);
+      for (let s = 1; s <= 4; s++) {
+        ctx.lineTo(-14 - s * 4, Math.sin(bact.flagellaPhase + s * 1.2) * 4);
+      }
+      ctx.stroke();
+
+      // Entrapment indicator rings if trapped
+      if (bact.trapped) {
+        ctx.strokeStyle = 'rgba(239, 68, 68, 0.7)';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.ellipse(0, 0, 18, 10, 0, 0, Math.PI * 2);
+        ctx.stroke();
+      }
+
+      ctx.restore();
+    });
+
+    // Draw Catalytic Sparks
+    this.cleavageSparks.forEach(sp => {
+      ctx.fillStyle = sp.color;
+      ctx.globalAlpha = sp.alpha;
+      ctx.beginPath();
+      ctx.arc(sp.x, sp.y, sp.size, 0, Math.PI * 2);
+      ctx.fill();
+    });
+
+    // Draw rhDNase 1 Endonuclease Enzyme Molecules
+    this.lysisEnzymes.forEach((enz, eIdx) => {
+      ctx.save();
+      ctx.translate(enz.x, enz.y);
+      ctx.rotate(enz.angle);
+
+      // Outer catalytic enzyme aura
+      const auraPulse = Math.sin(enz.auraPulse) * 2;
+      ctx.fillStyle = 'rgba(14, 165, 233, 0.15)';
+      ctx.beginPath();
+      ctx.arc(0, 0, 22 + auraPulse, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Enzyme bi-lobed globular fold (Kidney shaped endonuclease 37 kDa)
+      const enzGrad = ctx.createLinearGradient(-15, -12, 15, 12);
+      enzGrad.addColorStop(0, '#0284C7');
+      enzGrad.addColorStop(0.5, '#0369A1');
+      enzGrad.addColorStop(1, '#075985');
+
+      ctx.fillStyle = enzGrad;
+      ctx.strokeStyle = '#38BDF8';
+      ctx.lineWidth = 1.6;
+
+      ctx.beginPath();
+      ctx.arc(-6, 0, 11, Math.PI * 0.4, Math.PI * 1.6);
+      ctx.arc(6, 0, 11, Math.PI * 1.4, Math.PI * 0.6);
+      ctx.closePath();
+      ctx.fill();
+      ctx.stroke();
+
+      // Catalytic Cleft (Active Site Pocket)
+      ctx.fillStyle = '#0C4A6E';
+      ctx.beginPath();
+      ctx.arc(0, -2, 5.5, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Coordinated Ca²⁺ ion (Cyan sphere: structural stabilization)
+      ctx.fillStyle = '#38BDF8';
+      ctx.beginPath();
+      ctx.arc(-4, -2, 2.8, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Coordinated Mg²⁺ ion (Amber gold sphere: catalytic nucleophile activation)
+      ctx.fillStyle = '#F59E0B';
+      ctx.beginPath();
+      ctx.arc(4, -2, 2.8, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Cleaving Scissors indicator if docked
+      if (enz.dockedNode) {
+        ctx.strokeStyle = '#FEF08A';
+        ctx.lineWidth = 1.4;
+        ctx.beginPath();
+        ctx.moveTo(-5, 8);
+        ctx.lineTo(5, 14);
+        ctx.moveTo(5, 8);
+        ctx.lineTo(-5, 14);
+        ctx.stroke();
+      }
+
+      ctx.restore();
+    });
+
+    // 5. Live Biophysical Telemetry Glassmorphic Dashboard (Bottom Left)
+    const cardX = vpX + 16;
+    const cardY = vpY + vpH - 142;
+    const cardW = 345;
+    const cardH = 126;
+
+    ctx.fillStyle = 'rgba(15, 23, 42, 0.92)';
+    ctx.strokeStyle = '#0284C7';
+    ctx.lineWidth = 1.2;
+    ctx.beginPath();
+    ctx.roundRect(cardX, cardY, cardW, cardH, 8);
+    ctx.fill();
+    ctx.stroke();
+
+    ctx.font = '700 9px "JetBrains Mono", monospace';
+    ctx.fillStyle = '#38BDF8';
+    ctx.textAlign = 'left';
+    ctx.fillText('● REAL-TIME BIOPHYSICAL TELEMETRY', cardX + 12, cardY + 18);
+
+    // Metric 1: DNA Polymer Length (100,000 bp -> <85 bp)
+    const curBp = Math.max(78, Math.round(100000 * (1.0 - this.lysisLevel * 0.999)));
+    ctx.font = '500 9.5px "Plus Jakarta Sans", sans-serif';
+    ctx.fillStyle = '#94A3B8';
+    ctx.fillText('DNA Chain Length:', cardX + 12, cardY + 38);
+    ctx.font = '700 10.5px "JetBrains Mono", monospace';
+    ctx.fillStyle = this.lysisLevel > 0.6 ? '#10B981' : '#F59E0B';
+    ctx.fillText(`${curBp.toLocaleString()} bp`, cardX + 120, cardY + 38);
+
+    // Bar 1
+    ctx.fillStyle = '#1E293B';
+    ctx.beginPath();
+    ctx.roundRect(cardX + 215, cardY + 28, 115, 10, 3);
+    ctx.fill();
+    ctx.fillStyle = this.lysisLevel > 0.6 ? '#10B981' : '#F59E0B';
+    ctx.beginPath();
+    ctx.roundRect(cardX + 215, cardY + 28, Math.max(6, 115 * (1.0 - this.lysisLevel)), 10, 3);
+    ctx.fill();
+
+    // Metric 2: Sputum Viscoelasticity (98% -> 4%)
+    const viscPct = Math.max(4, Math.round(98 * (1.0 - this.lysisLevel * 0.96)));
+    ctx.font = '500 9.5px "Plus Jakarta Sans", sans-serif';
+    ctx.fillStyle = '#94A3B8';
+    ctx.fillText('Mesh Viscoelasticity:', cardX + 12, cardY + 58);
+    ctx.font = '700 10.5px "JetBrains Mono", monospace';
+    ctx.fillStyle = viscPct < 20 ? '#10B981' : '#EF4444';
+    ctx.fillText(`${viscPct}% (Gel → Sol)`, cardX + 120, cardY + 58);
+
+    // Bar 2
+    ctx.fillStyle = '#1E293B';
+    ctx.beginPath();
+    ctx.roundRect(cardX + 215, cardY + 48, 115, 10, 3);
+    ctx.fill();
+    ctx.fillStyle = viscPct < 20 ? '#10B981' : '#EF4444';
+    ctx.beginPath();
+    ctx.roundRect(cardX + 215, cardY + 48, Math.max(6, 115 * (viscPct / 100)), 10, 3);
+    ctx.fill();
+
+    // Metric 3: Phosphodiester Bonds Cleaved
+    const totalCuts = Math.round(this.lysisCutsCount + this.lysisLevel * 45000);
+    ctx.font = '500 9.5px "Plus Jakarta Sans", sans-serif';
+    ctx.fillStyle = '#94A3B8';
+    ctx.fillText('Hydrolytic Cleavages:', cardX + 12, cardY + 78);
+    ctx.font = '700 10.5px "JetBrains Mono", monospace';
+    ctx.fillStyle = '#38BDF8';
+    ctx.fillText(`${totalCuts.toLocaleString()} bonds`, cardX + 120, cardY + 78);
+
+    // Reaction Formula at bottom of card
+    ctx.strokeStyle = '#334155';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(cardX + 10, cardY + 92);
+    ctx.lineTo(cardX + cardW - 10, cardY + 92);
+    ctx.stroke();
+
+    ctx.font = '600 8.5px "JetBrains Mono", monospace';
+    ctx.fillStyle = '#CBD5E1';
+    ctx.fillText('DNA-(P-O-C)ₙ + H₂O ──[rhDNase 1 (Ca²⁺/Mg²⁺)]──> 5\'-P Oligonucleotides', cardX + 12, cardY + 108);
+
+    // Restore clip
+    ctx.restore();
+
+    // 6. Scientific Callout Badges
+    this.drawCallout(ctx, 40, -40, 160, -110, 'rhDNase 1 Endonuclease (Ca²⁺/Mg²⁺ Pocket)', '#0284C7');
+    this.drawCallout(ctx, -140, -20, -320, -90, 'Phosphodiester Cleavage Sites (Lysis)', '#6366F1');
+    if (this.lysisLevel > 0.4) {
+      this.drawCallout(ctx, -120, 30, -320, 20, 'Soluble Short Oligomers (<100 bp)', '#38BDF8');
+      this.drawCallout(ctx, 120, 50, 240, 30, 'Pseudomonas Escaping Dissolved Web', '#16A34A');
+    }
+
+    ctx.restore();
+  }
+
+  /* ========================================================
+     STAGE 12: Physiological Rescue: Sputum Liquefaction & Mucociliary Clearance
+     Anatomical dual comparative presentation of the bronchial airway before & after rhDNase:
+     Reversing hyper-viscosity, reactivating metachronal cilia wave (14 Hz),
+     opening the airway lumen, and restoring lung ventilation!
+     ======================================================== */
+  initStage12ClearanceData() {
+    this.clearanceTimer = 0;
+    this.ciliaPhase = 0;
+    this.airflowParticles = [];
+    for (let i = 0; i < 35; i++) {
+      this.airflowParticles.push({
+        x: (Math.random() - 0.5) * 360 + 240, // right side airway lumen
+        y: -140 + Math.random() * 240,
+        speed: 80 + Math.random() * 60,
+        radius: 2 + Math.random() * 2,
+        alpha: 0.3 + Math.random() * 0.5
+      });
+    }
+  }
+
+  updateStage12Clearance(dt) {
+    this.clearanceTimer += dt;
+    this.ciliaPhase += dt * 14; // 14 Hz physiological ciliary beat frequency
+
+    this.airflowParticles.forEach(p => {
+      p.y -= p.speed * dt;
+      if (p.y < -160) {
+        p.y = 100;
+        p.x = 240 + (Math.random() - 0.5) * 360;
+      }
+    });
+  }
+
+  drawStage12AirwayClearance(ctx) {
+    ctx.save();
+
+    // 1. Pristine Medical Stage Background
+    ctx.fillStyle = '#FFFFFF';
+    ctx.fillRect(-500, -260, 1000, 520);
+
+    // Subtle background grid dots
+    ctx.fillStyle = '#E2E8F0';
+    for (let gx = -460; gx <= 460; gx += 40) {
+      for (let gy = -220; gy <= 220; gy += 40) {
+        ctx.beginPath();
+        ctx.arc(gx, gy, 1.2, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+
+    // 2. Header Section
+    ctx.fillStyle = '#F8FAFC';
+    ctx.strokeStyle = '#CBD5E1';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.roundRect(-240, -252, 480, 26, 13);
+    ctx.fill();
+    ctx.stroke();
+
+    ctx.font = '700 9.5px "JetBrains Mono", monospace';
+    ctx.fillStyle = '#059669';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('● PHYSIOLOGICAL RESCUE • MUCOUS MEMBRANE CLEARANCE', 0, -239);
+
+    ctx.font = '800 22px "Plus Jakarta Sans", sans-serif';
+    ctx.fillStyle = '#0F172A';
+    ctx.fillText('Sputum Liquefaction, Ciliary Wave Reactivation & Lumen Patency', 0, -210);
+
+    ctx.font = '500 11.5px "Plus Jakarta Sans", sans-serif';
+    ctx.fillStyle = '#64748B';
+    ctx.fillText('Dissolving the DNA mesh converts suffocating gel into flowing sol, restoring natural mucociliary escalator defense.', 0, -188);
+
+    // 3. Side-by-Side Comparative Cards
+    const cardW = 445;
+    const cardH = 295;
+    const cardY = -172;
+
+    // --- LEFT CARD: UNTREATED CF AIRWAY ---
+    const leftX = -460;
+    ctx.save();
+    ctx.fillStyle = '#FFF7ED';
+    ctx.strokeStyle = '#FDBA74';
+    ctx.lineWidth = 1.2;
+    ctx.beginPath();
+    ctx.roundRect(leftX, cardY, cardW, cardH, 10);
+    ctx.fill();
+    ctx.stroke();
+
+    // Header badge
+    ctx.fillStyle = '#FFEDD5';
+    ctx.strokeStyle = '#EA580C';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.roundRect(leftX + 14, cardY + 12, cardW - 28, 24, 6);
+    ctx.fill();
+    ctx.stroke();
+
+    ctx.font = '800 10px "Plus Jakarta Sans", sans-serif';
+    ctx.fillStyle = '#C2410C';
+    ctx.textAlign = 'center';
+    ctx.fillText('❌ PRE-TREATMENT: DESICCATED DNA MESH & CILIARY PARALYSIS', leftX + cardW / 2, cardY + 24);
+
+    // Airway Illustration Left
+    const artLeftY = cardY + 50;
+    const artH = 145;
+
+    // Epithelial basement membrane & columnar cells
+    ctx.fillStyle = '#FED7AA';
+    ctx.fillRect(leftX + 16, artLeftY + 95, cardW - 32, 45);
+
+    // Columnar epithelial cell dividers
+    ctx.strokeStyle = '#FB923C';
+    ctx.lineWidth = 1;
+    for (let cx = leftX + 16; cx < leftX + cardW - 16; cx += 32) {
+      ctx.beginPath();
+      ctx.moveTo(cx, artLeftY + 95);
+      ctx.lineTo(cx, artLeftY + 140);
+      ctx.stroke();
+
+      // Nuclei
+      ctx.fillStyle = '#EA580C';
+      ctx.beginPath();
+      ctx.arc(cx + 16, artLeftY + 118, 5, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    // CRUSHED / MATTED CILIA (0 Hz: flattened against cell surface)
+    ctx.strokeStyle = '#9A3412';
+    ctx.lineWidth = 1.8;
+    for (let cx = leftX + 20; cx < leftX + cardW - 24; cx += 8) {
+      ctx.beginPath();
+      ctx.moveTo(cx, artLeftY + 95);
+      // Bent flat horizontally
+      ctx.lineTo(cx + 10, artLeftY + 98);
+      ctx.stroke();
+    }
+
+    // Thick suffocating gel mucus layer (Ochre / dark amber sludge)
+    const gelGrad = ctx.createLinearGradient(0, artLeftY + 25, 0, artLeftY + 95);
+    gelGrad.addColorStop(0, 'rgba(217, 119, 6, 0.85)');
+    gelGrad.addColorStop(1, 'rgba(180, 83, 9, 0.95)');
+    ctx.fillStyle = gelGrad;
+    ctx.fillRect(leftX + 16, artLeftY + 25, cardW - 32, 70);
+
+    // Entrapped bacteria dots in sludge
+    ctx.fillStyle = '#16A34A';
+    for (let b = 0; b < 14; b++) {
+      const bx = leftX + 35 + (b * 28) % (cardW - 60);
+      const by = artLeftY + 38 + (b * 12) % 45;
+      ctx.beginPath();
+      ctx.roundRect(bx, by, 10, 5, 2.5);
+      ctx.fill();
+    }
+
+    // Airway lumen (occluded, narrow with turbulent red resistance arrows)
+    ctx.fillStyle = '#FEF2F2';
+    ctx.fillRect(leftX + 16, artLeftY, cardW - 32, 25);
+
+    ctx.strokeStyle = '#DC2626';
+    ctx.lineWidth = 1.5;
+    ctx.setLineDash([4, 4]);
+    ctx.beginPath();
+    ctx.moveTo(leftX + 35, artLeftY + 12);
+    ctx.lineTo(leftX + cardW - 35, artLeftY + 12);
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    ctx.font = '700 8.5px "Plus Jakarta Sans", sans-serif';
+    ctx.fillStyle = '#DC2626';
+    ctx.textAlign = 'center';
+    ctx.fillText('⚠ SEVERE AIRWAY RESISTANCE (Raw +320%) • CHOKED VENTILATION', leftX + cardW / 2, artLeftY + 13);
+
+    // Left Metric Summary Box
+    const metY = artLeftY + artH + 10;
+    ctx.fillStyle = '#FFFFFF';
+    ctx.strokeStyle = '#FED7AA';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.roundRect(leftX + 16, metY, cardW - 32, 72, 6);
+    ctx.fill();
+    ctx.stroke();
+
+    ctx.font = '700 9.5px "JetBrains Mono", monospace';
+    ctx.fillStyle = '#9A3412';
+    ctx.textAlign = 'left';
+    ctx.fillText('• Sputum Viscosity: >12,000 cP (Rigid DNA Gel)', leftX + 26, metY + 18);
+    ctx.fillText('• Ciliary Beat Freq: 0 Hz (Crushed / Paralyzed)', leftX + 26, metY + 36);
+    ctx.fillText('• Mucus Transport:  0.0 mm/min (Stagnant Plugs)', leftX + 26, metY + 54);
+    ctx.restore();
+
+
+    // --- RIGHT CARD: POST-rhDNASE 1 RESCUED AIRWAY ---
+    const rightX = 15;
+    ctx.save();
+    ctx.fillStyle = '#F0FDF4';
+    ctx.strokeStyle = '#86EFAC';
+    ctx.lineWidth = 1.2;
+    ctx.beginPath();
+    ctx.roundRect(rightX, cardY, cardW, cardH, 10);
+    ctx.fill();
+    ctx.stroke();
+
+    // Header badge
+    ctx.fillStyle = '#DCFCE7';
+    ctx.strokeStyle = '#16A34A';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.roundRect(rightX + 14, cardY + 12, cardW - 28, 24, 6);
+    ctx.fill();
+    ctx.stroke();
+
+    ctx.font = '800 10px "Plus Jakarta Sans", sans-serif';
+    ctx.fillStyle = '#15803D';
+    ctx.textAlign = 'center';
+    ctx.fillText('✓ POST-rhDNASE 1: FLUID SOL LAYER & ACTIVE CILIARY ESCALATOR', rightX + cardW / 2, cardY + 24);
+
+    // Airway Illustration Right
+    const artRightY = cardY + 50;
+
+    // Epithelial basement membrane & columnar cells
+    ctx.fillStyle = '#E0F2FE';
+    ctx.fillRect(rightX + 16, artRightY + 95, cardW - 32, 45);
+
+    // Columnar epithelial cell dividers
+    ctx.strokeStyle = '#38BDF8';
+    ctx.lineWidth = 1;
+    for (let cx = rightX + 16; cx < rightX + cardW - 16; cx += 32) {
+      ctx.beginPath();
+      ctx.moveTo(cx, artRightY + 95);
+      ctx.lineTo(cx, artRightY + 140);
+      ctx.stroke();
+
+      // Nuclei
+      ctx.fillStyle = '#0284C7';
+      ctx.beginPath();
+      ctx.arc(cx + 16, artRightY + 118, 5, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    // ACTIVE METACHRONAL WAVE CILIA (14 Hz synchronized beating)
+    ctx.strokeStyle = '#0284C7';
+    ctx.lineWidth = 1.8;
+    for (let cx = rightX + 20, idx = 0; cx < rightX + cardW - 24; cx += 8, idx++) {
+      ctx.beginPath();
+      ctx.moveTo(cx, artRightY + 95);
+      // Synchronous metachronal wave stroke
+      const cilWave = Math.sin(this.ciliaPhase + idx * 0.38) * 8;
+      ctx.quadraticCurveTo(cx + cilWave * 0.5, artRightY + 80, cx + cilWave, artRightY + 68);
+      ctx.stroke();
+    }
+
+    // Thin, watery lubricated sol-mucus layer (Pale fluid cyan/sky blue)
+    const solGrad = ctx.createLinearGradient(0, artRightY + 58, 0, artRightY + 74);
+    solGrad.addColorStop(0, 'rgba(56, 189, 248, 0.25)');
+    solGrad.addColorStop(1, 'rgba(14, 165, 233, 0.45)');
+    ctx.fillStyle = solGrad;
+    ctx.fillRect(rightX + 16, artRightY + 58, cardW - 32, 16);
+
+    // Open Patent Airway Lumen with smooth laminar blue airflow streams
+    ctx.fillStyle = '#F0F9FF';
+    ctx.fillRect(rightX + 16, artRightY, cardW - 32, 58);
+
+    // Animated Laminar Airflow Streams
+    ctx.strokeStyle = '#38BDF8';
+    ctx.lineWidth = 1.6;
+    for (let line = 0; line < 3; line++) {
+      const ly = artRightY + 14 + line * 16;
+      ctx.beginPath();
+      ctx.moveTo(rightX + 35, ly);
+      ctx.lineTo(rightX + cardW - 35, ly);
+      ctx.stroke();
+
+      // Arrowheads
+      ctx.fillStyle = '#0284C7';
+      ctx.beginPath();
+      ctx.moveTo(rightX + cardW - 35, ly);
+      ctx.lineTo(rightX + cardW - 43, ly - 4);
+      ctx.lineTo(rightX + cardW - 43, ly + 4);
+      ctx.fill();
+    }
+
+    ctx.font = '700 8.5px "Plus Jakarta Sans", sans-serif';
+    ctx.fillStyle = '#0369A1';
+    ctx.textAlign = 'center';
+    ctx.fillText('RESTORED BRONCHIAL PATENCY • SMOOTH LAMINAR AIRFLOW (FEV₁ +15.8%)', rightX + cardW / 2, artRightY + 10);
+
+    // Right Metric Summary Box
+    ctx.fillStyle = '#FFFFFF';
+    ctx.strokeStyle = '#86EFAC';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.roundRect(rightX + 16, metY, cardW - 32, 72, 6);
+    ctx.fill();
+    ctx.stroke();
+
+    ctx.font = '700 9.5px "JetBrains Mono", monospace';
+    ctx.fillStyle = '#15803D';
+    ctx.textAlign = 'left';
+    ctx.fillText('• Sputum Viscosity: 15 cP (800× Liquefaction Drop!)', rightX + 26, metY + 18);
+    ctx.fillText('• Ciliary Beat Freq: 14 Hz (Synchronous Metachronal Wave)', rightX + 26, metY + 36);
+    ctx.fillText('• Mucus Transport:  8.5 mm/min (Normal Escalator Speed)', rightX + 26, metY + 54);
+    ctx.restore();
+
+
+    // 4. Bottom Clinical Resolution Banner (Hi Nanna Case Study & CF Patients)
+    const bnrX = -460;
+    const bnrY = 132;
+    const bnrW = 920;
+    const bnrH = 108;
+
+    ctx.save();
+    ctx.fillStyle = '#F8FAFC';
+    ctx.strokeStyle = '#CBD5E1';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.roundRect(bnrX, bnrY, bnrW, bnrH, 8);
+    ctx.fill();
+    ctx.stroke();
+
+    // Banner Top Header
+    ctx.font = '800 10.5px "Plus Jakarta Sans", sans-serif';
+    ctx.fillStyle = '#1E293B';
+    ctx.textAlign = 'left';
+    ctx.fillText('★ CLINICAL OUTCOMES & THERAPEUTIC RESOLUTION (HI NANNA CASE STUDY):', bnrX + 16, bnrY + 20);
+
+    // 3 Column Pillars
+    const colW = (bnrW - 48) / 3;
+    const pillars = [
+      {
+        title: '1. Sputum Clearance',
+        desc: 'Sputum viscosity plunges from 12,000 cP to 15 cP. Secretions are cleared easily with gentle coughing without airway trauma.'
+      },
+      {
+        title: '2. Infection Defense',
+        desc: 'Pseudomonas bio-colonization is halted. Patients experience a 28% to 37% reduction in life-threatening lung exacerbations.'
+      },
+      {
+        title: '3. Long-Term Survival',
+        desc: 'Mahi and CF patients maintain sustained +15.8% FEV₁ lung function, enabling normal play, exercise, and extended life expectancy.'
+      }
+    ];
+
+    pillars.forEach((pil, pIdx) => {
+      const px = bnrX + 16 + pIdx * (colW + 8);
+      ctx.fillStyle = '#FFFFFF';
+      ctx.strokeStyle = '#E2E8F0';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.roundRect(px, bnrY + 32, colW, 66, 6);
+      ctx.fill();
+      ctx.stroke();
+
+      ctx.font = '700 10px "Plus Jakarta Sans", sans-serif';
+      ctx.fillStyle = '#0284C7';
+      ctx.fillText(pil.title, px + 10, bnrY + 48);
+
+      ctx.font = '400 9px/1.35 "Plus Jakarta Sans", sans-serif';
+      ctx.fillStyle = '#475569';
+      // Word wrap text into 2 lines
+      const words = pil.desc.split(' ');
+      let line1 = '';
+      let line2 = '';
+      words.forEach(w => {
+        if ((line1 + w).length < 38) line1 += w + ' ';
+        else line2 += w + ' ';
+      });
+      ctx.fillText(line1, px + 10, bnrY + 66);
+      ctx.fillText(line2, px + 10, bnrY + 80);
+    });
+
+    ctx.restore();
+
+    ctx.restore();
+  }
 }
+
