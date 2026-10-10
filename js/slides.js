@@ -6,7 +6,7 @@
 const SLIDES = [
   {
     stage: 1,
-    badge: "STAGE 01 / 12",
+    badge: "STAGE 01 / 16",
     title: "Hi Nanna Case Study: Autosomal Recessive Inheritance & Chromosome 7",
     speakerNotes: `
       <h4>Slide 1: Clinical Genetics & Hi Nanna Pedigree</h4>
@@ -20,7 +20,7 @@ const SLIDES = [
   },
   {
     stage: 2,
-    badge: "STAGE 02 / 12",
+    badge: "STAGE 02 / 16",
     title: "Macro Pulmonary Anatomy & CFTR Defect",
     speakerNotes: `
       <h4>Slide 2: Whole Lung Overview</h4>
@@ -33,7 +33,7 @@ const SLIDES = [
   },
   {
     stage: 3,
-    badge: "STAGE 03 / 12",
+    badge: "STAGE 03 / 16",
     title: "Airway Lining: Ciliary Collapse & Thick Mucus",
     speakerNotes: `
       <h4>Slide 3: Airway Tissue & Mucociliary Dysfunction</h4>
@@ -46,7 +46,7 @@ const SLIDES = [
   },
   {
     stage: 4,
-    badge: "STAGE 04 / 12",
+    badge: "STAGE 04 / 16",
     title: "Microbial Colonization: Pseudomonas Breeding Ground",
     speakerNotes: `
       <h4>Slide 4: Microbial Pathogens & Biofilms</h4>
@@ -59,7 +59,7 @@ const SLIDES = [
   },
   {
     stage: 5,
-    badge: "STAGE 05 / 12",
+    badge: "STAGE 05 / 16",
     title: "Immune Response: Blood Vessel to Mucus Diapedesis",
     speakerNotes: `
       <h4>Slide 5: Neutrophil Recruitment (Diapedesis)</h4>
@@ -72,7 +72,7 @@ const SLIDES = [
   },
   {
     stage: 6,
-    badge: "STAGE 06 / 12",
+    badge: "STAGE 06 / 16",
     title: "Phagocytosis, Multiple WBC Death & DNA Mesh Formation",
     speakerNotes: `
       <h4>Slide 6: The Microscopic Battle, Phagocytosis & NETosis</h4>
@@ -86,7 +86,7 @@ const SLIDES = [
   },
   {
     stage: 7,
-    badge: "STAGE 07 / 12",
+    badge: "STAGE 07 / 16",
     title: "Interactive Timeline: The Evolution of DNase Therapy (1950–1993)",
     speakerNotes: `
       <h4>Slide 7: Historical Timeline Hub</h4>
@@ -100,7 +100,7 @@ const SLIDES = [
   },
   {
     stage: 8,
-    badge: "STAGE 08 / 12",
+    badge: "STAGE 08 / 16",
     title: "The 1950s Precursor: The Bovine Dead-End (Cow DNase Hazard)",
     speakerNotes: `
       <h4>Slide 8: 1950s Bovine Pancreatic DNase Hazard</h4>
@@ -114,7 +114,7 @@ const SLIDES = [
   },
   {
     stage: 9,
-    badge: "STAGE 09 / 12",
+    badge: "STAGE 09 / 16",
     title: "1988–1989: The Genentech Breakthrough (Dr. Shak & Dr. Levinson)",
     speakerNotes: `
       <h4>Slide 9: The Recombinant Revolution at Genentech</h4>
@@ -128,7 +128,7 @@ const SLIDES = [
   },
   {
     stage: 10,
-    badge: "STAGE 10 / 12",
+    badge: "STAGE 10 / 16",
     title: "1990–1993: Clinical Trials to FDA Approval (Pulmozyme®)",
     speakerNotes: `
       <h4>Slide 10: Clinical Trials & FDA Commercial Approval</h4>
@@ -142,7 +142,7 @@ const SLIDES = [
   },
   {
     stage: 11,
-    badge: "STAGE 11 / 12",
+    badge: "STAGE 11 / 16",
     title: "Molecular Action: rhDNase 1 Cleaving & Lysing the DNA Mesh",
     speakerNotes: `
       <h4>Slide 11: Molecular Enzymatic Cleavage of Extracellular DNA</h4>
@@ -156,7 +156,7 @@ const SLIDES = [
   },
   {
     stage: 12,
-    badge: "STAGE 12 / 12",
+    badge: "STAGE 12 / 16",
     title: "Physiological Rescue: Sputum Liquefaction & Mucociliary Clearance",
     speakerNotes: `
       <h4>Slide 12: Airway Healing & Mucociliary Transport Recovery</h4>
@@ -165,6 +165,69 @@ const SLIDES = [
         <li><strong>800-Fold Viscosity Plunge:</strong> Sputum viscoelasticity drops precipitously from over <strong>12,000 cP</strong> (thick gelatinous sludge) down to <strong>15 cP</strong> (flowing watery sol layer).</li>
         <li><strong>Cilia Reactivation:</strong> Released from the crushing weight of the stagnant gel blanket, bronchial cilia stand upright and resume high-frequency metachronal beating (12–15 Hz), driving the mucociliary escalator.</li>
         <li><strong>Airway Clearance & FEV₁ Gains:</strong> Mucus plugs are easily cleared upward toward the pharynx by gentle coughing or normal airflow. Bronchial lumens reopen, restoring dynamic airflow and elevating FEV₁ by ~15.8% while cutting pulmonary exacerbations by 37%!</li>
+      </ul>
+    `
+  },
+  {
+    stage: 13,
+    badge: "STAGE 13 / 16",
+    title: "Industrial Evolution: Past Slaughterhouse Extraction vs. Modern Biosynthesis",
+    speakerNotes: `
+      <h4>Slide 13: Past vs. Present Synthesis of DNase</h4>
+      <p><strong>The Paradigm Shift in Manufacturing:</strong> How DNase 1 transitioned from slaughterhouse extraction to modern genetic biotechnology.</p>
+      <ul>
+        <li><strong>The Past (1950s Bovine Extraction):</strong> Harvested directly from slaughtered cattle pancreases. Acid extraction and crude fractionation yielded an impure cocktail riddled with bovine trypsin and chymotrypsin. Inhalation caused airway mucosal ulceration, severe anti-bovine antibody cascades, bronchospasm, and life-threatening anaphylaxis. Yields were tiny, with high batch-to-batch variability and pathogen/prion contamination risks.</li>
+        <li><strong>The Present (Recombinant Biotechnology):</strong> Synthesized using the exact human DNase 1 cDNA sequence in dedicated ISO-classified biopharmaceutical cleanrooms. Completely animal-origin-free, cell-banked, highly scalable to 10,000-liter bioreactors, and yielding >99.9% crystalline purity with zero immunogenicity.</li>
+      </ul>
+    `
+  },
+  {
+    stage: 14,
+    badge: "STAGE 14 / 16",
+    title: "The Host Organism: Why CHO Cells (and Why Bacteria Fail)",
+    speakerNotes: `
+      <h4>Slide 14: Cellular Host Selection — Why Only CHO Cells Succeed</h4>
+      <p><strong>Biochemical Prerequisite:</strong> Why Chinese Hamster Ovary (CHO-K1) cells are the exclusive choice, and why microbial systems (E. coli, yeast) fail completely.</p>
+      <ul>
+        <li><strong>Complex N-Glycosylation (The Primary Barrier):</strong> Human DNase 1 is a glycoprotein with two mandatory N-linked glycosylation sites (Asn18 and Asn106). Without mammalian-type branched oligosaccharides, the enzyme rapidly aggregates, misfolds, loses catalytic activity, and is instantly digested by airway proteases. Bacteria (<em>E. coli</em>) completely lack the ER/Golgi machinery for N-glycosylation!</li>
+        <li><strong>Disulfide Bond Folding:</strong> DNase 1 requires two intramolecular disulfide bridges (Cys101–Cys104 and Cys173–Cys209) to stabilize its active catalytic pocket. The reducing bacterial cytoplasm triggers massive insoluble, misfolded inclusion bodies that cannot be refolded economically.</li>
+        <li><strong>Endotoxin & Secretion:</strong> Bacteria harbor toxic lipopolysaccharide (LPS endotoxin) in their outer membranes—fatal if inhaled into CF lungs. CHO cells actively secrete folded rhDNase 1 into the extracellular culture fluid with its 22-amino acid signal peptide cleanly cleaved, enabling gentle, non-destructive downstream harvesting.</li>
+      </ul>
+    `
+  },
+  {
+    stage: 15,
+    badge: "STAGE 15 / 16",
+    title: "Upstream Bioprocess: Fed-Batch Bioreactor Engineering",
+    speakerNotes: `
+      <h4>Slide 15: Industrial Bioreactor Architecture & Process Control</h4>
+      <p><strong>Engineering the Cell Factory:</strong> Cultivating shear-sensitive mammalian cells at industrial scale (2,000 L to 10,000 L stirred tanks).</p>
+      <ul>
+        <li><strong>Low-Shear Hydrodynamic Mixing:</strong> Mammalian CHO cells lack a rigid cell wall and easily rupture under turbulence. Industrial bioreactors utilize specialized large-diameter, low-shear marine or pitched-blade impellers running at low RPM (40–70 RPM) to ensure uniform nutrient and oxygen distribution without cellular lysis.</li>
+        <li><strong>Oxygen Sparging & Gas Exchange:</strong> Dissolved oxygen is held precisely at 40–50% air saturation using micro-bubble spargers. pH is strictly maintained at 7.00 ± 0.05 via automated CO₂ sparging (acidification) and base addition.</li>
+        <li><strong>Biphasic Temperature Shift Strategy:</strong> Cultures start at 37.0°C for rapid cell growth. Once peak viable cell density is reached (>15 × 10⁶ cells/mL), temperature is shifted down to 32.5°C–33.0°C. This arrests cell proliferation in the G1 phase, suppresses apoptosis, extends culture longevity, and channels all cellular energy into hyper-secreting rhDNase 1.</li>
+        <li><strong>Calcium-Enriched Feeding:</strong> Continuous fed-batch feeding supplies glucose, amino acids, and vital Ca²⁺ ions—which bind directly to nascent DNase 1 molecules, conferring structural rigidity and shielding them from proteolytic cleavage in the bioreactor.</li>
+      </ul>
+    `
+  },
+  {
+    stage: 16,
+    badge: "STAGE 16 / 16",
+    title: "Downstream Bioprocessing: Multi-Stage Purification & Sterile Formulation",
+    speakerNotes: `
+      <h4>Slide 16: Downstream Chromatography, Viral Safety & Medicine Delivery</h4>
+      <p><strong>From Broth to Medicine:</strong> Transforming raw bioreactor harvest into pharmaceutical-grade Pulmozyme® ampules.</p>
+      <ul>
+        <li><strong>Clarification & Separation:</strong> Continuous disk-stack centrifugation and depth filtration separate intact CHO cells from the rhDNase 1-rich broth with >95% recovery.</li>
+        <li><strong>Three-Stage Chromatography Cascade:</strong>
+          <ul>
+            <li><em>Capture (Anion Exchange):</em> DEAE/Q-Sepharose binds anionic DNase 1 at neutral pH, stripping away 90% of culture medium impurities.</li>
+            <li><em>Intermediate (HIC):</em> Hydrophobic Interaction Chromatography separates host cell proteins (HCP) and trace host cell DNA.</li>
+            <li><em>Polishing (SEC/Cation):</em> Resolves trace multimeric aggregates to achieve >99.9% monomeric purity.</li>
+          </ul>
+        </li>
+        <li><strong>Robust Viral Clearance:</strong> Orthogonal 20-nm nanofiltration and solvent/detergent chemical inactivation guarantee zero viral contamination.</li>
+        <li><strong>Final Formulation (Pulmozyme® Ampules):</strong> Formulated as a preservative-free, sterile, isotonic aqueous inhalation solution: 1.0 mg/mL dornase alfa, 8.77 mg/mL NaCl, 0.15 mg/mL CaCl₂·2H₂O, pH 6.3. Packaged into single-use blow-fill-seal (BFS) LDPE plastic ampules designed for jet nebulizers.</li>
       </ul>
     `
   }

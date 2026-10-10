@@ -13,7 +13,7 @@ View the live presentation here:
 
 ---
 
-## 📋 Presentation Stages (12 Stages)
+## 📋 Presentation Stages (16 Stages)
 
 1. **Stage 1**: *Hi Nanna* Case Study — Autosomal Recessive Inheritance & Chromosome 7
 2. **Stage 2**: Macro Pulmonary Anatomy & CFTR Defect
@@ -35,6 +35,22 @@ View the live presentation here:
     - 800-fold plunge in sputum viscoelasticity (from 12,000 cP down to 15 cP)
     - Bronchial cilia reactivation with synchronized 14 Hz metachronal wave beating
     - Restored airway patency, smooth laminar airflow (+15.8% FEV₁), and long-term clinical remission for patients like Mahi
+13. **Stage 13**: **Industrial Evolution: Past Slaughterhouse vs. Modern Biosynthesis**
+    - The historic 1950s bovine pancreas slaughterhouse extraction method, contaminated with bovine trypsin/chymotrypsin proteases causing mucosal ulceration and life-threatening anaphylaxis
+    - Transition to modern 100% human recombinant biotechnology in ISO cleanroom facilities (>99.9% purity, zero immunogenicity)
+14. **Stage 14**: **The Host Organism: Why CHO Cells (and Why Bacteria Fail)**
+    - Why prokaryotes (*E. coli*) fail completely: lack of endoplasmic reticulum/Golgi prevents mandatory N-glycosylation at Asn18 & Asn106, reducing cytosol causes misfolded insoluble inclusion bodies, and toxic LPS endotoxins cause lethal lung shock
+    - Why Chinese Hamster Ovary (CHO-K1) cells are the gold standard: authentic human-like branched N-glycan trees, chaperone-assisted disulfide bonding (Cys101-Cys104, Cys173-Cys209), and active extracellular secretion
+15. **Stage 15**: **Upstream Bioprocess: Fed-Batch Bioreactor Engineering**
+    - Industrial 10,000 L stirred-tank stainless steel bioreactor cutaway visualization
+    - Low-shear marine pitched-blade impellers (40–70 RPM) protecting shear-sensitive mammalian cell membranes without rigid cell walls
+    - Biphasic temperature-shift kinetics: 37.0°C growth phase to build biomass, shifted down to 32.5°C production phase to arrest cell division and hyper-secrete rhDNase 1
+    - Automated closed-loop pH (7.00 ± 0.05 via CO₂/base), dissolved oxygen (DO 40–50%), and continuous Ca²⁺ feeding to stabilize the tertiary protein fold
+16. **Stage 16**: **Downstream Bioprocessing: Multi-Stage Purification & Sterile Formulation**
+    - Continuous cell clarification via disk-stack centrifugation and 0.2 µm depth filtration (>95% recovery)
+    - Triple-column chromatography cascade: Anion Exchange (DEAE/Q) capture, Hydrophobic Interaction Chromatography (HIC), and Size Exclusion / Cation polishing
+    - Viral clearance: 20 nm nanofiltration and solvent/detergent chemical inactivation (>12 LRV)
+    - Sterile blow-fill-seal (BFS) single-use LDPE ampules (1.0 mg/mL in calcium-stabilized isotonic saline) formulated exclusively for jet nebulizers
 
 ---
 
