@@ -6,7 +6,7 @@
 const SLIDES = [
   {
     stage: 1,
-    badge: "STAGE 01 / 16",
+    badge: "STAGE 01 / 17",
     title: "Hi Nanna Case Study: Autosomal Recessive Inheritance & Chromosome 7",
     speakerNotes: `
       <h4>Slide 1: Clinical Genetics & Hi Nanna Pedigree</h4>
@@ -20,7 +20,7 @@ const SLIDES = [
   },
   {
     stage: 2,
-    badge: "STAGE 02 / 16",
+    badge: "STAGE 02 / 17",
     title: "Macro Pulmonary Anatomy & CFTR Defect",
     speakerNotes: `
       <h4>Slide 2: Whole Lung Overview</h4>
@@ -33,7 +33,7 @@ const SLIDES = [
   },
   {
     stage: 3,
-    badge: "STAGE 03 / 16",
+    badge: "STAGE 03 / 17",
     title: "Airway Lining: Ciliary Collapse & Thick Mucus",
     speakerNotes: `
       <h4>Slide 3: Airway Tissue & Mucociliary Dysfunction</h4>
@@ -46,7 +46,7 @@ const SLIDES = [
   },
   {
     stage: 4,
-    badge: "STAGE 04 / 16",
+    badge: "STAGE 04 / 17",
     title: "Microbial Colonization: Pseudomonas Breeding Ground",
     speakerNotes: `
       <h4>Slide 4: Microbial Pathogens & Biofilms</h4>
@@ -59,7 +59,7 @@ const SLIDES = [
   },
   {
     stage: 5,
-    badge: "STAGE 05 / 16",
+    badge: "STAGE 05 / 17",
     title: "Immune Response: Blood Vessel to Mucus Diapedesis",
     speakerNotes: `
       <h4>Slide 5: Neutrophil Recruitment (Diapedesis)</h4>
@@ -72,7 +72,7 @@ const SLIDES = [
   },
   {
     stage: 6,
-    badge: "STAGE 06 / 16",
+    badge: "STAGE 06 / 17",
     title: "Phagocytosis, Multiple WBC Death & DNA Mesh Formation",
     speakerNotes: `
       <h4>Slide 6: The Microscopic Battle, Phagocytosis & NETosis</h4>
@@ -86,7 +86,7 @@ const SLIDES = [
   },
   {
     stage: 7,
-    badge: "STAGE 07 / 16",
+    badge: "STAGE 07 / 17",
     title: "Interactive Timeline: The Evolution of DNase Therapy (1950–1993)",
     speakerNotes: `
       <h4>Slide 7: Historical Timeline Hub</h4>
@@ -100,7 +100,7 @@ const SLIDES = [
   },
   {
     stage: 8,
-    badge: "STAGE 08 / 16",
+    badge: "STAGE 08 / 17",
     title: "The 1950s Precursor: The Bovine Dead-End (Cow DNase Hazard)",
     speakerNotes: `
       <h4>Slide 8: 1950s Bovine Pancreatic DNase Hazard</h4>
@@ -114,7 +114,7 @@ const SLIDES = [
   },
   {
     stage: 9,
-    badge: "STAGE 09 / 16",
+    badge: "STAGE 09 / 17",
     title: "1988–1989: The Genentech Breakthrough (Dr. Shak & Dr. Levinson)",
     speakerNotes: `
       <h4>Slide 9: The Recombinant Revolution at Genentech</h4>
@@ -128,7 +128,7 @@ const SLIDES = [
   },
   {
     stage: 10,
-    badge: "STAGE 10 / 16",
+    badge: "STAGE 10 / 17",
     title: "1990–1993: Clinical Trials to FDA Approval (Pulmozyme®)",
     speakerNotes: `
       <h4>Slide 10: Clinical Trials & FDA Commercial Approval</h4>
@@ -142,10 +142,25 @@ const SLIDES = [
   },
   {
     stage: 11,
-    badge: "STAGE 11 / 16",
+    badge: "STAGE 11 / 17",
+    title: "Clinical Delivery: Nebulizer Inhalation & Pulmonary Aerosol Deposition",
+    speakerNotes: `
+      <h4>Slide 11: Clinical Inhalation & Deep Airway Deposition via Jet Nebulizer</h4>
+      <p><strong>Administration & Aerosol Mechanics:</strong> How Pulmozyme® (dornase alfa) reaches the target obstruction sites deep in the pulmonary tree.</p>
+      <ul>
+        <li><strong>Single-Use Sterile Ampule:</strong> Delivered as 2.5 mg / 2.5 mL (1.0 mg/mL) clear, colorless aqueous solution in a blow-fill-seal plastic ampule. Administered once daily via a dedicated jet nebulizer (e.g., Pari LC Plus with DeVilbiss or Proneb compressor).</li>
+        <li><strong>Respirable Aerodynamic Droplets:</strong> High-velocity compressed air (6–8 L/min at 1.6 bar) shears the aqueous solution across a micro-baffle, generating a dense aerosol mist with a <strong>Mass Median Aerodynamic Diameter (MMAD) of 2.1–2.8 µm</strong>. Over 80% of droplets are within the 1–5 µm respirable fraction.</li>
+        <li><strong>Deep Pulmonary Penetration:</strong> Droplets larger than 10 µm impact the oral pharynx, while ultrafine droplets under 1 µm are exhaled. The 2.4 µm optimal droplets bypass upper airway filters, traveling through the larynx and trachea to deposit directly onto mucus plugs in the 10th to 16th generations of branching bronchial airways.</li>
+        <li><strong>Topical High-Concentration Lysis:</strong> Inhalation delivers rhDNase 1 directly to the apical surface of the obstructed epithelium, achieving local microgram concentrations that instantly begin enzymatic lysis of purulent eDNA while avoiding systemic exposure and side effects.</li>
+      </ul>
+    `
+  },
+  {
+    stage: 12,
+    badge: "STAGE 12 / 17",
     title: "Molecular Action: rhDNase 1 Cleaving & Lysing the DNA Mesh",
     speakerNotes: `
-      <h4>Slide 11: Molecular Enzymatic Cleavage of Extracellular DNA</h4>
+      <h4>Slide 12: Molecular Enzymatic Cleavage of Extracellular DNA</h4>
       <p><strong>Mechanism of Action:</strong> In purulent CF sputum, high-molecular-weight extracellular DNA (eDNA) released from dying neutrophils forms a rigid, viscoelastic gel matrix that traps mucus and bacteria.</p>
       <ul>
         <li><strong>Endonuclease Precision:</strong> Recombinant human DNase 1 (dornase alfa, 37 kDa) diffuses into the thick sputum. Its catalytic active site coordinates essential <strong>Ca²⁺</strong> (structural stability) and <strong>Mg²⁺</strong> ions (activating water molecules for nucleophilic hydrolytic attack).</li>
@@ -155,11 +170,11 @@ const SLIDES = [
     `
   },
   {
-    stage: 12,
-    badge: "STAGE 12 / 16",
+    stage: 13,
+    badge: "STAGE 13 / 17",
     title: "Physiological Rescue: Sputum Liquefaction & Mucociliary Clearance",
     speakerNotes: `
-      <h4>Slide 12: Airway Healing & Mucociliary Transport Recovery</h4>
+      <h4>Slide 13: Airway Healing & Mucociliary Transport Recovery</h4>
       <p><strong>Clinical & Physiological Reversal:</strong> Once the rigid DNA skeleton is dissolved, the mechanical properties of the airway surface liquid are dramatically restored.</p>
       <ul>
         <li><strong>800-Fold Viscosity Plunge:</strong> Sputum viscoelasticity drops precipitously from over <strong>12,000 cP</strong> (thick gelatinous sludge) down to <strong>15 cP</strong> (flowing watery sol layer).</li>
@@ -169,11 +184,11 @@ const SLIDES = [
     `
   },
   {
-    stage: 13,
-    badge: "STAGE 13 / 16",
+    stage: 14,
+    badge: "STAGE 14 / 17",
     title: "Industrial Evolution: Past Slaughterhouse Extraction vs. Modern Biosynthesis",
     speakerNotes: `
-      <h4>Slide 13: Past vs. Present Synthesis of DNase</h4>
+      <h4>Slide 14: Past vs. Present Synthesis of DNase</h4>
       <p><strong>The Paradigm Shift in Manufacturing:</strong> How DNase 1 transitioned from slaughterhouse extraction to modern genetic biotechnology.</p>
       <ul>
         <li><strong>The Past (1950s Bovine Extraction):</strong> Harvested directly from slaughtered cattle pancreases. Acid extraction and crude fractionation yielded an impure cocktail riddled with bovine trypsin and chymotrypsin. Inhalation caused airway mucosal ulceration, severe anti-bovine antibody cascades, bronchospasm, and life-threatening anaphylaxis. Yields were tiny, with high batch-to-batch variability and pathogen/prion contamination risks.</li>
@@ -182,11 +197,11 @@ const SLIDES = [
     `
   },
   {
-    stage: 14,
-    badge: "STAGE 14 / 16",
+    stage: 15,
+    badge: "STAGE 15 / 17",
     title: "The Host Organism: Why CHO Cells (and Why Bacteria Fail)",
     speakerNotes: `
-      <h4>Slide 14: Cellular Host Selection — Why Only CHO Cells Succeed</h4>
+      <h4>Slide 15: Cellular Host Selection — Why Only CHO Cells Succeed</h4>
       <p><strong>Biochemical Prerequisite:</strong> Why Chinese Hamster Ovary (CHO-K1) cells are the exclusive choice, and why microbial systems (E. coli, yeast) fail completely.</p>
       <ul>
         <li><strong>Complex N-Glycosylation (The Primary Barrier):</strong> Human DNase 1 is a glycoprotein with two mandatory N-linked glycosylation sites (Asn18 and Asn106). Without mammalian-type branched oligosaccharides, the enzyme rapidly aggregates, misfolds, loses catalytic activity, and is instantly digested by airway proteases. Bacteria (<em>E. coli</em>) completely lack the ER/Golgi machinery for N-glycosylation!</li>
@@ -196,11 +211,11 @@ const SLIDES = [
     `
   },
   {
-    stage: 15,
-    badge: "STAGE 15 / 16",
+    stage: 16,
+    badge: "STAGE 16 / 17",
     title: "Upstream Bioprocess: Fed-Batch Bioreactor Engineering",
     speakerNotes: `
-      <h4>Slide 15: Industrial Bioreactor Architecture & Process Control</h4>
+      <h4>Slide 16: Industrial Bioreactor Architecture & Process Control</h4>
       <p><strong>Engineering the Cell Factory:</strong> Cultivating shear-sensitive mammalian cells at industrial scale (2,000 L to 10,000 L stirred tanks).</p>
       <ul>
         <li><strong>Low-Shear Hydrodynamic Mixing:</strong> Mammalian CHO cells lack a rigid cell wall and easily rupture under turbulence. Industrial bioreactors utilize specialized large-diameter, low-shear marine or pitched-blade impellers running at low RPM (40–70 RPM) to ensure uniform nutrient and oxygen distribution without cellular lysis.</li>
@@ -211,11 +226,11 @@ const SLIDES = [
     `
   },
   {
-    stage: 16,
-    badge: "STAGE 16 / 16",
+    stage: 17,
+    badge: "STAGE 17 / 17",
     title: "Downstream Bioprocessing: Multi-Stage Purification & Sterile Formulation",
     speakerNotes: `
-      <h4>Slide 16: Downstream Chromatography, Viral Safety & Medicine Delivery</h4>
+      <h4>Slide 17: Downstream Chromatography, Viral Safety & Medicine Delivery</h4>
       <p><strong>From Broth to Medicine:</strong> Transforming raw bioreactor harvest into pharmaceutical-grade Pulmozyme® ampules.</p>
       <ul>
         <li><strong>Clarification & Separation:</strong> Continuous disk-stack centrifugation and depth filtration separate intact CHO cells from the rhDNase 1-rich broth with >95% recovery.</li>
