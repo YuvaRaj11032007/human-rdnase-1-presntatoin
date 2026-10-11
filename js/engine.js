@@ -5102,19 +5102,19 @@ class PresentationEngine {
     const lGrad = ctx.createLinearGradient(0, vpY, 0, vpY + vpH);
     lGrad.addColorStop(0, '#0F172A');
     lGrad.addColorStop(0.6, '#1E293B');
-    lGrad.addColorStop(1, '#0B132B');
+    lGrad.addColorStop(1, '#0F172A');
     ctx.fillStyle = lGrad;
     ctx.beginPath();
     ctx.roundRect(leftX, vpY, vpW, vpH, 12);
     ctx.fill();
 
-    ctx.strokeStyle = '#0284C7';
+    ctx.strokeStyle = '#10B981';
     ctx.lineWidth = 1.8;
     ctx.stroke();
 
     // Banner Top
-    ctx.fillStyle = 'rgba(2, 132, 199, 0.25)';
-    ctx.strokeStyle = '#38BDF8';
+    ctx.fillStyle = 'rgba(16, 185, 129, 0.15)';
+    ctx.strokeStyle = '#10B981';
     ctx.lineWidth = 1.2;
     ctx.beginPath();
     ctx.roundRect(leftX + 14, vpY + 12, vpW - 28, 26, 6);
@@ -5122,124 +5122,144 @@ class PresentationEngine {
     ctx.stroke();
 
     ctx.font = '800 10px "Plus Jakarta Sans", sans-serif';
-    ctx.fillStyle = '#38BDF8';
+    ctx.fillStyle = '#6EE7B7';
     ctx.textAlign = 'center';
     ctx.fillText('PATIENT INHALATION & NEBULIZER CHAMBER CUTAWAY', leftX + vpW / 2, vpY + 25);
 
     // Patient Profile & Breathing Action
     const breath = Math.sin(this.nebTimer * this.nebBreathRate);
-    const chestExpand = breath * 6;
+    const chestExpand = Math.max(0, breath) * 5;
 
-    // Torso & Chest (Profile)
-    ctx.fillStyle = '#334155';
+    // --- NATURAL HUMAN ANATOMICAL HEAD & PROFILE SILHOUETTE ---
+    ctx.save();
+    const skinGrad = ctx.createLinearGradient(leftX + 220, vpY + 20, leftX + 400, vpY + 300);
+    skinGrad.addColorStop(0, '#E2E8F0');
+    skinGrad.addColorStop(0.5, '#CBD5E1');
+    skinGrad.addColorStop(1, '#94A3B8');
+    ctx.fillStyle = skinGrad;
     ctx.strokeStyle = '#475569';
-    ctx.lineWidth = 2;
+    ctx.lineWidth = 1.5;
+
+    // Torso / Neck / Chin / Face / Cranium Path
     ctx.beginPath();
-    ctx.moveTo(leftX + 280, vpY + 310);
-    ctx.quadraticCurveTo(leftX + 260 + chestExpand, vpY + 230, leftX + 270, vpY + 160); // Chest
-    ctx.quadraticCurveTo(leftX + 280, vpY + 130, leftX + 265, vpY + 110); // Neck
-    ctx.lineTo(leftX + 390, vpY + 110); // Back of neck
-    ctx.lineTo(leftX + 410, vpY + 310); // Back
+    ctx.moveTo(leftX + 265 - chestExpand, vpY + 325);
+    ctx.quadraticCurveTo(leftX + 258 - chestExpand, vpY + 250, leftX + 265, vpY + 195);
+    ctx.quadraticCurveTo(leftX + 268, vpY + 160, leftX + 255, vpY + 138);
+    ctx.lineTo(leftX + 242, vpY + 125);
+    ctx.quadraticCurveTo(leftX + 234, vpY + 118, leftX + 236, vpY + 110);
+    ctx.quadraticCurveTo(leftX + 238, vpY + 104, leftX + 232, vpY + 98);
+    ctx.lineTo(leftX + 215, vpY + 95);
+    ctx.lineTo(leftX + 232, vpY + 92);
+    ctx.quadraticCurveTo(leftX + 237, vpY + 86, leftX + 235, vpY + 80);
+    ctx.lineTo(leftX + 230, vpY + 74);
+    ctx.quadraticCurveTo(leftX + 216, vpY + 70, leftX + 218, vpY + 64);
+    ctx.quadraticCurveTo(leftX + 230, vpY + 54, leftX + 235, vpY + 44);
+    ctx.quadraticCurveTo(leftX + 240, vpY + 24, leftX + 275, vpY + 15);
+    ctx.quadraticCurveTo(leftX + 335, vpY + 8, leftX + 370, vpY + 48);
+    ctx.quadraticCurveTo(leftX + 385, vpY + 110, leftX + 355, vpY + 160);
+    ctx.quadraticCurveTo(leftX + 360, vpY + 210, leftX + 410, vpY + 325);
     ctx.closePath();
     ctx.fill();
     ctx.stroke();
 
-    // Patient Head (Profile Silhouette)
-    ctx.fillStyle = '#475569';
+    // Natural styled hair contour
+    ctx.fillStyle = '#334155';
     ctx.beginPath();
-    // Neck to jaw
-    ctx.moveTo(leftX + 265, vpY + 110);
-    ctx.lineTo(leftX + 245, vpY + 95); // Chin
-    ctx.lineTo(leftX + 225, vpY + 90); // Lower lip
-    ctx.lineTo(leftX + 225, vpY + 75); // Upper lip (mouthpiece sealed here)
-    ctx.lineTo(leftX + 235, vpY + 68); // Philtrum
-    ctx.lineTo(leftX + 215, vpY + 55); // Nose tip
-    ctx.lineTo(leftX + 240, vpY + 45); // Bridge of nose
-    ctx.quadraticCurveTo(leftX + 245, vpY + 20, leftX + 290, vpY + 15); // Forehead
-    ctx.quadraticCurveTo(leftX + 360, vpY + 20, leftX + 370, vpY + 75); // Cranium
-    ctx.quadraticCurveTo(leftX + 370, vpY + 120, leftX + 340, vpY + 120); // Back of head
+    ctx.moveTo(leftX + 252, vpY + 30);
+    ctx.quadraticCurveTo(leftX + 285, vpY + 10, leftX + 340, vpY + 6);
+    ctx.quadraticCurveTo(leftX + 388, vpY + 25, leftX + 382, vpY + 85);
+    ctx.quadraticCurveTo(leftX + 365, vpY + 120, leftX + 340, vpY + 105);
+    ctx.quadraticCurveTo(leftX + 348, vpY + 65, leftX + 310, vpY + 38);
+    ctx.quadraticCurveTo(leftX + 275, vpY + 32, leftX + 252, vpY + 30);
     ctx.closePath();
     ctx.fill();
 
-    // Eye (calm, closed or relaxed)
-    ctx.strokeStyle = '#94A3B8';
-    ctx.lineWidth = 2;
+    // Eyebrow & relaxed eye
+    ctx.strokeStyle = '#475569';
+    ctx.lineWidth = 1.6;
     ctx.beginPath();
-    ctx.arc(leftX + 260, vpY + 50, 5, 0.2, Math.PI - 0.2);
+    ctx.moveTo(leftX + 242, vpY + 38);
+    ctx.quadraticCurveTo(leftX + 255, vpY + 34, leftX + 268, vpY + 38);
     ctx.stroke();
 
-    // Hair styling
-    ctx.fillStyle = '#1E293B';
     ctx.beginPath();
-    ctx.arc(leftX + 320, vpY + 45, 38, -Math.PI * 0.9, Math.PI * 0.3);
-    ctx.fill();
+    ctx.arc(leftX + 252, vpY + 48, 5, 0.25, Math.PI - 0.25);
+    ctx.stroke();
 
-    // Breathing Lung Expansion Wave overlay
+    // Ear contour
+    ctx.strokeStyle = '#64748B';
+    ctx.lineWidth = 1.4;
+    ctx.beginPath();
+    ctx.arc(leftX + 318, vpY + 88, 11, -Math.PI * 0.7, Math.PI * 0.6);
+    ctx.stroke();
+
+    // Breathing lung expansion wave in chest
     if (breath > 0) {
-      ctx.strokeStyle = 'rgba(56, 189, 248, 0.4)';
+      ctx.strokeStyle = 'rgba(52, 211, 153, 0.45)';
       ctx.lineWidth = 2.5;
       ctx.beginPath();
-      ctx.arc(leftX + 300, vpY + 220, 32 + chestExpand * 2, -Math.PI * 0.7, Math.PI * 0.4);
+      ctx.arc(leftX + 295, vpY + 235, 30 + chestExpand * 2, -Math.PI * 0.7, Math.PI * 0.4);
       ctx.stroke();
     }
+    ctx.restore();
 
     // --- JET NEBULIZER DEVICE (CUTAWAY) ---
-    const nebX = leftX + 130;
-    const nebY = vpY + 175;
+    const nebX = leftX + 115;
+    const nebY = vpY + 160;
 
-    // Compressor Air Hose at bottom (Blue flexible tube)
-    ctx.strokeStyle = '#0284C7';
-    ctx.lineWidth = 7;
+    // Compressor Air Hose at bottom (Medical green flexible tube)
+    ctx.strokeStyle = '#059669';
+    ctx.lineWidth = 6;
     ctx.beginPath();
-    ctx.moveTo(nebX, nebY + 115);
-    ctx.bezierCurveTo(nebX - 25, nebY + 135, nebX - 45, nebY + 150, nebX - 70, vpY + 310);
+    ctx.moveTo(nebX, nebY + 125);
+    ctx.bezierCurveTo(nebX - 25, nebY + 145, nebX - 55, nebY + 165, nebX - 85, vpY + 315);
     ctx.stroke();
 
-    // Tubing Air Flow Pulsing Arrows
-    ctx.fillStyle = '#38BDF8';
+    // Tubing Air Flow Pulsing Dots
+    ctx.fillStyle = '#6EE7B7';
     const hoseFlowOffset = (this.nebTimer * 50) % 30;
     ctx.beginPath();
-    ctx.arc(nebX - 35 - hoseFlowOffset * 0.8, nebY + 145 + hoseFlowOffset * 1.5, 3, 0, Math.PI * 2);
+    ctx.arc(nebX - 45 - hoseFlowOffset * 0.8, nebY + 155 + hoseFlowOffset * 1.5, 2.5, 0, Math.PI * 2);
     ctx.fill();
 
-    // Outer Translucent Plastic Body (Pari LC style)
-    ctx.fillStyle = 'rgba(30, 58, 138, 0.35)';
-    ctx.strokeStyle = '#38BDF8';
+    // Outer Translucent Medical Nebulizer Cup
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.85)';
+    ctx.strokeStyle = '#10B981';
     ctx.lineWidth = 2;
     ctx.beginPath();
-    ctx.roundRect(nebX - 35, nebY - 15, 70, 125, [8, 8, 14, 14]);
+    ctx.roundRect(nebX - 35, nebY, 70, 125, [8, 8, 14, 14]);
     ctx.fill();
     ctx.stroke();
 
     // Volume Graduation Ticks on chamber
-    ctx.strokeStyle = 'rgba(255, 255, 255, 0.6)';
+    ctx.strokeStyle = '#94A3B8';
     ctx.lineWidth = 1;
     for (let mark = 0; mark < 4; mark++) {
-      const my = nebY + 80 - mark * 22;
+      const my = nebY + 95 - mark * 22;
       ctx.beginPath();
       ctx.moveTo(nebX - 33, my);
       ctx.lineTo(nebX - 22, my);
       ctx.stroke();
 
       ctx.font = '600 7.5px "JetBrains Mono", monospace';
-      ctx.fillStyle = '#CBD5E1';
+      ctx.fillStyle = '#64748B';
       ctx.textAlign = 'left';
       ctx.fillText(`${(mark + 1) * 0.5 + 0.5} mL`, nebX - 18, my + 3);
     }
 
-    // Liquid Solution (2.5 mL Pulmozyme - clear crystal blue)
+    // Liquid Solution (2.5 mL Pulmozyme - clear emerald tint)
     const liqH = 55;
-    const liqY = nebY + 95 - liqH;
-    const liqGrad = ctx.createLinearGradient(0, liqY, 0, nebY + 95);
-    liqGrad.addColorStop(0, 'rgba(56, 189, 248, 0.65)');
-    liqGrad.addColorStop(1, 'rgba(2, 132, 199, 0.85)');
+    const liqY = nebY + 110 - liqH;
+    const liqGrad = ctx.createLinearGradient(0, liqY, 0, nebY + 110);
+    liqGrad.addColorStop(0, 'rgba(52, 211, 153, 0.45)');
+    liqGrad.addColorStop(1, 'rgba(5, 150, 105, 0.75)');
     ctx.fillStyle = liqGrad;
     ctx.beginPath();
     ctx.roundRect(nebX - 33, liqY, 66, liqH, [0, 0, 12, 12]);
     ctx.fill();
 
     // Liquid Bubbling Surface Meniscus
-    ctx.fillStyle = '#FFFFFF';
+    ctx.fillStyle = '#ECFDF5';
     for (let bx = -25; bx <= 25; bx += 10) {
       const bubbleY = liqY + Math.sin(this.nebTimer * 10 + bx) * 2;
       ctx.beginPath();
@@ -5248,54 +5268,61 @@ class PresentationEngine {
     }
 
     // Venturi High-Speed Nozzle & Conical Shear Baffle
-    ctx.fillStyle = '#0284C7';
-    ctx.fillRect(nebX - 6, nebY + 60, 12, 45); // Central air tube
-    ctx.fillStyle = '#38BDF8';
+    ctx.fillStyle = '#047857';
+    ctx.fillRect(nebX - 5, nebY + 75, 10, 45); // Central air tube
+    ctx.fillStyle = '#10B981';
     ctx.beginPath();
-    ctx.moveTo(nebX - 14, nebY + 45); // Conical baffle
-    ctx.lineTo(nebX + 14, nebY + 45);
-    ctx.lineTo(nebX, nebY + 28);
+    ctx.moveTo(nebX - 14, nebY + 60); // Conical baffle
+    ctx.lineTo(nebX + 14, nebY + 60);
+    ctx.lineTo(nebX, nebY + 42);
     ctx.closePath();
     ctx.fill();
 
+    // Angled connection collar
+    ctx.fillStyle = '#E2E8F0';
+    ctx.fillRect(nebX - 12, nebY - 30, 24, 30);
+    ctx.strokeRect(nebX - 12, nebY - 30, 24, 30);
+
     // Horizontal Mouthpiece Tube (Extending from chamber to patient lips)
-    ctx.fillStyle = 'rgba(56, 189, 248, 0.4)';
-    ctx.strokeStyle = '#38BDF8';
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+    ctx.strokeStyle = '#10B981';
     ctx.lineWidth = 1.8;
     ctx.beginPath();
-    ctx.roundRect(nebX + 15, nebY - 35, 95, 26, 4);
+    ctx.roundRect(nebX + 12, nebY - 75, 90, 22, 4);
     ctx.fill();
     ctx.stroke();
 
-    // Mouthpiece Lip Flange
-    ctx.fillStyle = '#0284C7';
-    ctx.fillRect(nebX + 100, nebY - 40, 10, 36);
+    // Mouthpiece Lip Flange comfortably between patient lips
+    ctx.fillStyle = '#059669';
+    ctx.beginPath();
+    ctx.roundRect(nebX + 96, nebY - 80, 8, 32, 3);
+    ctx.fill();
 
     // Swirling Aerosol Droplets inside Cup & Mouthpiece
     this.nebParticles.forEach(p => {
-      ctx.fillStyle = `rgba(56, 189, 248, ${p.alpha})`;
+      ctx.fillStyle = `rgba(16, 185, 129, ${p.alpha})`;
       ctx.beginPath();
-      ctx.arc(p.x + nebX + 220, p.y + nebY - 30, p.radius, 0, Math.PI * 2);
+      ctx.arc(p.x + nebX + 220, p.y + nebY - 60, p.radius, 0, Math.PI * 2);
       ctx.fill();
     });
 
-    // Aerosol Vapor Stream entering oral cavity
+    // Aerosol Vapor Stream entering oral cavity smoothly
     if (breath > 0) {
-      const vaporGrad = ctx.createLinearGradient(nebX + 110, nebY - 22, leftX + 245, nebY - 22);
-      vaporGrad.addColorStop(0, 'rgba(56, 189, 248, 0.85)');
-      vaporGrad.addColorStop(1, 'rgba(56, 189, 248, 0.2)');
+      const vaporGrad = ctx.createLinearGradient(nebX + 105, nebY - 65, leftX + 235, nebY - 65);
+      vaporGrad.addColorStop(0, 'rgba(52, 211, 153, 0.85)');
+      vaporGrad.addColorStop(1, 'rgba(52, 211, 153, 0.15)');
       ctx.fillStyle = vaporGrad;
       ctx.beginPath();
-      ctx.moveTo(nebX + 110, nebY - 30);
-      ctx.lineTo(leftX + 250, nebY - 32);
-      ctx.lineTo(leftX + 250, nebY - 14);
-      ctx.lineTo(nebX + 110, nebY - 14);
+      ctx.moveTo(nebX + 105, nebY - 74);
+      ctx.lineTo(leftX + 235, nebY - 76);
+      ctx.lineTo(leftX + 235, nebY - 56);
+      ctx.lineTo(nebX + 105, nebY - 56);
       ctx.closePath();
       ctx.fill();
     }
 
     // Status Indicator Pill at bottom of left panel
-    ctx.fillStyle = '#022C22';
+    ctx.fillStyle = '#064E3B';
     ctx.strokeStyle = '#10B981';
     ctx.lineWidth = 1;
     ctx.beginPath();
@@ -5304,7 +5331,7 @@ class PresentationEngine {
     ctx.stroke();
 
     ctx.font = '800 9px "JetBrains Mono", monospace';
-    ctx.fillStyle = '#34D399';
+    ctx.fillStyle = '#6EE7B7';
     ctx.textAlign = 'center';
     const phaseLabel = breath > 0 ? '▶ ACTIVE INHALATION CYCLE' : '❚ TIDAL PAUSE';
     ctx.fillText(`⚡ AIR COMPRESSOR: 1.6 BAR • 7.2 L/MIN • ${phaseLabel}`, leftX + vpW / 2, vpY + vpH - 22);
@@ -5317,20 +5344,20 @@ class PresentationEngine {
     const rightX = 15;
     ctx.save();
     const rGrad = ctx.createLinearGradient(0, vpY, 0, vpY + vpH);
-    rGrad.addColorStop(0, '#021B2B');
-    rGrad.addColorStop(0.5, '#0B253A');
-    rGrad.addColorStop(1, '#071824');
+    rGrad.addColorStop(0, '#064E3B');
+    rGrad.addColorStop(0.5, '#0F172A');
+    rGrad.addColorStop(1, '#064E3B');
     ctx.fillStyle = rGrad;
     ctx.beginPath();
     ctx.roundRect(rightX, vpY, vpW, vpH, 12);
     ctx.fill();
 
-    ctx.strokeStyle = '#059669';
+    ctx.strokeStyle = '#10B981';
     ctx.lineWidth = 1.8;
     ctx.stroke();
 
     // Banner Top
-    ctx.fillStyle = 'rgba(5, 150, 105, 0.25)';
+    ctx.fillStyle = 'rgba(16, 185, 129, 0.25)';
     ctx.strokeStyle = '#10B981';
     ctx.lineWidth = 1.2;
     ctx.beginPath();
@@ -5339,7 +5366,7 @@ class PresentationEngine {
     ctx.stroke();
 
     ctx.font = '800 10px "Plus Jakarta Sans", sans-serif';
-    ctx.fillStyle = '#34D399';
+    ctx.fillStyle = '#A7F3D0';
     ctx.textAlign = 'center';
     ctx.fillText('DEEP BRONCHIAL TREE PENETRATION & SIZE SORTING', rightX + vpW / 2, vpY + 25);
 
@@ -5348,8 +5375,8 @@ class PresentationEngine {
     const treeY = vpY + 50;
 
     // Pharynx / Larynx upper funnel
-    ctx.fillStyle = '#1E3A5F';
-    ctx.strokeStyle = '#38BDF8';
+    ctx.fillStyle = '#065F46';
+    ctx.strokeStyle = '#34D399';
     ctx.lineWidth = 1.5;
     ctx.beginPath();
     ctx.moveTo(treeX - 25, treeY);
@@ -5361,18 +5388,18 @@ class PresentationEngine {
     ctx.stroke();
 
     ctx.font = '700 8px "JetBrains Mono", monospace';
-    ctx.fillStyle = '#94A3B8';
+    ctx.fillStyle = '#A7F3D0';
     ctx.textAlign = 'left';
     ctx.fillText('PHARYNX / LARYNX', treeX + 32, treeY + 18);
 
     // Trachea Main Stem (with C-shaped cartilage rings)
-    ctx.fillStyle = '#0F2B48';
+    ctx.fillStyle = '#044E39';
     ctx.fillRect(treeX - 16, treeY + 35, 32, 65);
     ctx.strokeRect(treeX - 16, treeY + 35, 32, 65);
 
     for (let c = 0; c < 5; c++) {
       const cy = treeY + 45 + c * 11;
-      ctx.strokeStyle = 'rgba(56, 189, 248, 0.4)';
+      ctx.strokeStyle = 'rgba(52, 211, 153, 0.4)';
       ctx.lineWidth = 2;
       ctx.beginPath();
       ctx.arc(treeX, cy, 14, -Math.PI * 0.7, Math.PI * 0.7);
@@ -5384,7 +5411,7 @@ class PresentationEngine {
     const carinaY = treeY + 100;
 
     // Left Main Bronchus (anatomical right)
-    ctx.strokeStyle = '#38BDF8';
+    ctx.strokeStyle = '#10B981';
     ctx.lineWidth = 18;
     ctx.lineCap = 'round';
     ctx.beginPath();
@@ -5417,7 +5444,7 @@ class PresentationEngine {
     ctx.stroke();
 
     // Inner Airway Lumen Fill (Darker Hollow Center)
-    ctx.strokeStyle = '#021B2B';
+    ctx.strokeStyle = '#022C22';
     ctx.lineWidth = 10;
     ctx.beginPath();
     ctx.moveTo(treeX, carinaY);
@@ -5473,14 +5500,14 @@ class PresentationEngine {
         curX = treeX + sign * (branchProgress * 85 + (branchProgress > 0.6 ? subOffset : 0));
       }
 
-      ctx.fillStyle = p.color;
+      ctx.fillStyle = p.category === 'respirable' ? '#34D399' : p.color;
       ctx.beginPath();
       ctx.arc(curX, curY, p.radius, 0, Math.PI * 2);
       ctx.fill();
 
       // Glow on respirable particles
       if (p.category === 'respirable') {
-        ctx.fillStyle = 'rgba(56, 189, 248, 0.4)';
+        ctx.fillStyle = 'rgba(52, 211, 153, 0.4)';
         ctx.beginPath();
         ctx.arc(curX, curY, p.radius * 2, 0, Math.PI * 2);
         ctx.fill();
@@ -5489,12 +5516,11 @@ class PresentationEngine {
 
     // Glowing impact ripples on mucus plugs
     this.mucusImpactRipples.forEach(rip => {
-      const sign = rip.branch === 'left' ? -1 : 1;
       const target = rip.branch === 'left'
         ? (rip.subBranch === 0 ? plugTargets[0] : plugTargets[1])
         : (rip.subBranch === 0 ? plugTargets[2] : plugTargets[3]);
 
-      ctx.strokeStyle = `rgba(56, 189, 248, ${rip.alpha})`;
+      ctx.strokeStyle = `rgba(52, 211, 153, ${rip.alpha})`;
       ctx.lineWidth = 2;
       ctx.beginPath();
       ctx.arc(target.x, target.y, rip.radius, 0, Math.PI * 2);
@@ -5515,8 +5541,8 @@ class PresentationEngine {
     ctx.textAlign = 'left';
     ctx.font = '700 8.5px "Plus Jakarta Sans", sans-serif';
 
-    // Item 1: Respirable (Cyan)
-    ctx.fillStyle = '#38BDF8';
+    // Item 1: Respirable (Emerald green)
+    ctx.fillStyle = '#34D399';
     ctx.beginPath();
     ctx.arc(rightX + 30, legY + 16, 4, 0, Math.PI * 2);
     ctx.fill();
@@ -5531,7 +5557,7 @@ class PresentationEngine {
     ctx.fillStyle = '#CBD5E1';
     ctx.fillText('>10 µm: Upper Airway Loss (Inertial Impaction in Pharynx ~12%)', rightX + 42, legY + 37);
 
-    // Item 3: Ultrafine (Grey)
+    // Item 3: Ultrafine (Slate)
     ctx.fillStyle = '#94A3B8';
     ctx.beginPath();
     ctx.arc(rightX + 30, legY + 52, 2.5, 0, Math.PI * 2);
@@ -7613,7 +7639,7 @@ class PresentationEngine {
     ctx.fillText('Stacks N-Glycans on Asn18 & Asn106', golX + 25, golY - 20);
 
     // 4. Secretory Vesicles Traveling to Membrane (Exocytosis Animation)
-    this.s14ChoVesicles.forEach((v, idx) => {
+    this.s15ChoVesicles.forEach((v, idx) => {
       const vx = golX + 45 + v.progress * 65;
       const vy = golY + Math.sin(v.progress * Math.PI) * 18 - 8;
 
