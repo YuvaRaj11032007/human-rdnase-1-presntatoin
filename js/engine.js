@@ -6638,621 +6638,663 @@ class PresentationEngine {
      ======================================================== */
   initStage14PastVsPresent() {
     this.stage14Timer = 0;
-    // Fumes and toxic smoke rising from crude 1950s acid vat
-    this.s14Smoke = [];
-    for (let i = 0; i < 22; i++) {
-      this.s14Smoke.push({
-        x: -250 + (Math.random() - 0.5) * 80,
-        y: 40 + Math.random() * 40,
-        vx: (Math.random() - 0.5) * 16,
-        vy: -25 - Math.random() * 20,
-        r: 6 + Math.random() * 12,
-        alpha: 0.6 + Math.random() * 0.4
-      });
-    }
 
-    // Murky acid drops dripping from the crude extraction funnel
-    this.s14Drips = [];
-    for (let i = 0; i < 6; i++) {
-      this.s14Drips.push({
-        x: -335,
-        y: -10 + i * 22,
-        speed: 45 + Math.random() * 25
-      });
-    }
-
-    // Destructive bovine proteases (Trypsin & Chymotrypsin) chewing patient mucosa
-    this.s14Proteases = [
-      { x: -160, y: -45, vx: 18, vy: 10, jawPhase: 0, label: 'Bovine Trypsin' },
-      { x: -110, y: 15, vx: -14, vy: -12, jawPhase: 1.5, label: 'Chymotrypsin' },
-      { x: -190, y: 35, vx: 15, vy: -15, jawPhase: 3.0, label: 'Peptidase' }
+    // 1. Left (Past 1950s): Contaminant bovine digestive proteases (Trypsin, Chymotrypsin)
+    this.s14ProteaseMolecules = [
+      { x: -380, y: 35, vx: 18, vy: 8, label: 'Bovine Trypsin', sub: '23.3 kDa', cleftAngle: 0 },
+      { x: -280, y: 15, vx: -16, vy: -12, label: 'Chymotrypsin A', sub: '25.0 kDa', cleftAngle: 1.2 },
+      { x: -180, y: 40, vx: 20, vy: -10, label: 'Carboxypeptidase', sub: '34.6 kDa', cleftAngle: 2.4 }
     ];
 
-    // Cleanroom sparkles on modern side
-    this.s14CleanSparks = [];
-    for (let i = 0; i < 24; i++) {
-      this.s14CleanSparks.push({
-        x: 235 + (Math.random() - 0.5) * 360,
-        y: (Math.random() - 0.5) * 260,
-        phase: Math.random() * Math.PI * 2,
-        size: 2 + Math.random() * 3
+    // Airway mucosal tight junction segments being proteolytically disrupted on the left
+    this.s14MucosaSegments = [];
+    for (let i = 0; i < 14; i++) {
+      this.s14MucosaSegments.push({
+        x: -430 + i * 30,
+        height: 38 + Math.sin(i * 1.5) * 8,
+        damageProgress: (i % 3 === 0) ? 0.8 : (i % 2 === 0 ? 0.4 : 0.1),
+        ciliaOffset: Math.random() * Math.PI * 2
       });
     }
 
-    // Pure recombinant human rhDNase 1 monomers
-    this.s14PureEnzymes = [
-      { x: 120, y: -60, vx: 12, vy: 8, angle: 0 },
-      { x: 250, y: -20, vx: -10, vy: 14, angle: 1.2 },
-      { x: 170, y: 40, vx: 15, vy: -11, angle: 2.4 },
-      { x: 330, y: 30, vx: -14, vy: -8, angle: 0.8 }
-    ];
+    // Immune antibody complex clusters (anti-bovine IgG/IgE)
+    this.s14ImmuneComplexes = [];
+    for (let i = 0; i < 5; i++) {
+      this.s14ImmuneComplexes.push({
+        x: -360 + i * 65,
+        y: -15 + (i % 2) * 25,
+        rot: i * 1.1,
+        pulsePhase: i * 0.8
+      });
+    }
+
+    // 2. Right (Modern Present): 3D Monomeric rhDNase 1 recombinant enzymes with native N-glycans
+    this.s14RecombinantMolecules = [];
+    for (let i = 0; i < 7; i++) {
+      this.s14RecombinantMolecules.push({
+        x: 60 + (i % 3) * 110,
+        y: -30 + Math.floor(i / 3) * 65,
+        vx: (Math.random() - 0.5) * 14,
+        vy: (Math.random() - 0.5) * 14,
+        rot: Math.random() * Math.PI * 2,
+        rotSpeed: 0.6 + Math.random() * 0.8,
+        scale: 0.95 + Math.random() * 0.2
+      });
+    }
+
+    // DNA substrate fragments being cleaved cleanly by rhDNase 1 on the right
+    this.s14DnaSubstrates = [];
+    for (let i = 0; i < 12; i++) {
+      this.s14DnaSubstrates.push({
+        x: 80 + Math.random() * 320,
+        y: 45 + Math.random() * 40,
+        len: 18 + Math.random() * 16,
+        cleaved: Math.random() > 0.4
+      });
+    }
+
+    // Healthy intact ciliated bronchial epithelium on the right
+    this.s14HealthyEpithelium = [];
+    for (let i = 0; i < 14; i++) {
+      this.s14HealthyEpithelium.push({
+        x: 60 + i * 30,
+        ciliaPhase: i * 0.45
+      });
+    }
   }
 
   updateStage14(dt) {
     this.stage14Timer += dt;
 
-    // Update smoke
-    this.s14Smoke.forEach(s => {
-      s.x += s.vx * dt;
-      s.y += s.vy * dt;
-      s.r += dt * 4;
-      s.alpha -= dt * 0.35;
-      if (s.alpha <= 0 || s.y < -130) {
-        s.x = -250 + (Math.random() - 0.5) * 80;
-        s.y = 40 + Math.random() * 30;
-        s.r = 6 + Math.random() * 8;
-        s.alpha = 0.7;
-      }
-    });
-
-    // Update acid drips
-    this.s14Drips.forEach(d => {
-      d.y += d.speed * dt;
-      if (d.y > 65) d.y = -10;
-    });
-
-    // Update bovine proteases wandering & chewing
-    this.s14Proteases.forEach(p => {
+    // Update bovine proteases moving and attacking
+    this.s14ProteaseMolecules.forEach(p => {
       p.x += p.vx * dt;
       p.y += p.vy * dt;
-      p.jawPhase += dt * 8;
-      if (p.x < -210) p.vx = Math.abs(p.vx);
-      if (p.x > -65) p.vx = -Math.abs(p.vx);
-      if (p.y < -75) p.vy = Math.abs(p.vy);
-      if (p.y > 65) p.vy = -Math.abs(p.vy);
+      p.cleftAngle += dt * 3.0;
+      if (p.x < -440) p.vx = Math.abs(p.vx);
+      if (p.x > -60) p.vx = -Math.abs(p.vx);
+      if (p.y < -30) p.vy = Math.abs(p.vy);
+      if (p.y > 60) p.vy = -Math.abs(p.vy);
     });
 
-    // Update pure rhDNase 1 floating in sterile cleanroom
-    this.s14PureEnzymes.forEach(e => {
-      e.x += e.vx * dt;
-      e.y += e.vy * dt;
-      e.angle += dt * 0.8;
-      if (e.x < 70) e.vx = Math.abs(e.vx);
-      if (e.x > 400) e.vx = -Math.abs(e.vx);
-      if (e.y < -110) e.vy = Math.abs(e.vy);
-      if (e.y > 110) e.vy = -Math.abs(e.vy);
+    // Mucosa damage progression on past side
+    this.s14MucosaSegments.forEach(m => {
+      m.damageProgress = 0.5 + Math.sin(this.stage14Timer * 2 + m.x * 0.05) * 0.4;
+    });
+
+    // Update modern recombinant molecules floating smoothly in sterile environment
+    this.s14RecombinantMolecules.forEach(rm => {
+      rm.x += rm.vx * dt;
+      rm.y += rm.vy * dt;
+      rm.rot += rm.rotSpeed * dt;
+      if (rm.x < 50) rm.vx = Math.abs(rm.vx);
+      if (rm.x > 420) rm.vx = -Math.abs(rm.vx);
+      if (rm.y < -55) rm.vy = Math.abs(rm.vy);
+      if (rm.y > 75) rm.vy = -Math.abs(rm.vy);
     });
   }
 
   drawStage14PastVsPresent(ctx) {
     ctx.save();
-    ctx.fillStyle = '#FFFFFF';
+    // Neutral deep slate background (clean scientific canvas)
+    ctx.fillStyle = '#090D16';
     ctx.fillRect(-500, -260, 1000, 520);
 
     // Subtle technical grid
-    ctx.fillStyle = '#E2E8F0';
+    ctx.fillStyle = '#1E293B';
     for (let gx = -460; gx <= 460; gx += 40) {
       for (let gy = -220; gy <= 220; gy += 40) {
         ctx.beginPath();
-        ctx.arc(gx, gy, 1.2, 0, Math.PI * 2);
+        ctx.arc(gx, gy, 1.0, 0, Math.PI * 2);
         ctx.fill();
       }
     }
 
     // Top Header Section
-    ctx.fillStyle = '#F8FAFC';
-    ctx.strokeStyle = '#CBD5E1';
+    ctx.fillStyle = '#0F172A';
+    ctx.strokeStyle = '#334155';
     ctx.lineWidth = 1;
     ctx.beginPath();
-    ctx.roundRect(-250, -252, 500, 26, 13);
+    ctx.roundRect(-275, -252, 550, 26, 13);
     ctx.fill();
     ctx.stroke();
 
-    ctx.font = '700 9.5px "JetBrains Mono", monospace';
-    ctx.fillStyle = '#D97706';
+    ctx.font = '700 9px "JetBrains Mono", monospace';
+    ctx.fillStyle = '#F59E0B';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    ctx.fillText('● COMMERCIAL MANUFACTURING • HISTORICAL PARADIGM SHIFT', 0, -239);
+    ctx.fillText('● INDUSTRIAL BIOPROCESS EVOLUTION • HISTORICAL PARADIGM SHIFT', 0, -239);
 
-    ctx.font = '800 22px "Plus Jakarta Sans", sans-serif';
-    ctx.fillStyle = '#0F172A';
+    ctx.font = '800 21px "Plus Jakarta Sans", sans-serif';
+    ctx.fillStyle = '#F8FAFC';
     ctx.fillText('Industrial Synthesis: Past Slaughterhouse vs. Modern Biosynthesis', 0, -210);
 
     ctx.font = '500 11.5px "Plus Jakarta Sans", sans-serif';
-    ctx.fillStyle = '#64748B';
-    ctx.fillText('From 1950s hazardous bovine pancreas acid extraction to modern cGMP recombinant mammalian cell cultivation.', 0, -188);
+    ctx.fillStyle = '#94A3B8';
+    ctx.fillText('From 1950s hazardous bovine pancreas acid extraction to modern cGMP recombinant mammalian cell cultivation', 0, -188);
 
-    const vpW = 450;
-    const vpH = 390;
-    const vpY = -170;
+    const vpW = 458;
+    const vpH = 398;
+    const vpY = -172;
 
     // ==========================================
-    // LEFT PANEL: 1950s SLAUGHTERHOUSE EXTRACTION (ANIMATED HAZARD)
+    // LEFT PANEL: 1950s SLAUGHTERHOUSE EXTRACTION (ANIMAL HAZARD)
     // ==========================================
-    const leftX = -465;
+    const leftX = -470;
     ctx.save();
-    const lGrad = ctx.createLinearGradient(0, vpY, 0, vpY + vpH);
-    lGrad.addColorStop(0, '#451A03');
-    lGrad.addColorStop(0.5, '#78350F');
-    lGrad.addColorStop(1, '#1C1917');
-    ctx.fillStyle = lGrad;
-    ctx.beginPath();
-    ctx.roundRect(leftX, vpY, vpW, vpH, 12);
-    ctx.fill();
 
-    ctx.strokeStyle = '#EA580C';
-    ctx.lineWidth = 1.8;
-    ctx.stroke();
-
-    // Panel Banner Top
-    ctx.fillStyle = 'rgba(239, 68, 68, 0.25)';
-    ctx.strokeStyle = '#EF4444';
-    ctx.lineWidth = 1.2;
+    // Deep slate chassis with neutral slate border (NO generic red box)
+    ctx.fillStyle = '#0F172A';
+    ctx.strokeStyle = '#334155';
+    ctx.lineWidth = 1.4;
     ctx.beginPath();
-    ctx.roundRect(leftX + 14, vpY + 12, vpW - 28, 26, 6);
+    ctx.roundRect(leftX, vpY, vpW, vpH, 10);
     ctx.fill();
     ctx.stroke();
 
-    ctx.font = '800 10px "Plus Jakarta Sans", sans-serif';
-    ctx.fillStyle = '#FCA5A5';
-    ctx.textAlign = 'center';
-    ctx.fillText('❌ 1950s: CRUDE SLAUGHTERHOUSE BOVINE EXTRACTION (HAZARD)', leftX + vpW / 2, vpY + 25);
-
-    // Smoke fumes rising from crude extraction vat
-    this.s14Smoke.forEach(s => {
-      ctx.fillStyle = `rgba(180, 83, 9, ${s.alpha * 0.4})`;
-      ctx.beginPath();
-      ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
-      ctx.fill();
-    });
-
-    // 4 Sequential Extraction Stations (Left)
-    // Station 1: Slaughterhouse Pancreas
-    ctx.fillStyle = '#78350F';
-    ctx.strokeStyle = '#92400E';
-    ctx.lineWidth = 1.5;
+    // Header Pill
+    ctx.fillStyle = '#1E293B';
+    ctx.strokeStyle = '#475569';
+    ctx.lineWidth = 1;
     ctx.beginPath();
-    ctx.roundRect(leftX + 16, vpY + 50, 96, 52, 6);
+    ctx.roundRect(leftX + 14, vpY + 12, vpW - 28, 28, 6);
     ctx.fill();
     ctx.stroke();
 
-    ctx.fillStyle = '#DC2626';
-    ctx.beginPath();
-    ctx.ellipse(leftX + 64, vpY + 70, 26, 12, 0.2, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.font = '800 7.5px "JetBrains Mono", monospace';
-    ctx.fillStyle = '#FEF2F2';
-    ctx.textAlign = 'center';
-    ctx.fillText('1. CATTLE PANCREAS', leftX + 64, vpY + 90);
-    ctx.font = '500 7px "Plus Jakarta Sans", sans-serif';
-    ctx.fillText('Raw slaughterhouse tissue', leftX + 64, vpY + 98);
-
-    // Connector Arrow 1 -> 2
-    ctx.fillStyle = '#EA580C';
-    ctx.font = '700 12px sans-serif';
-    ctx.fillText('➔', leftX + 124, vpY + 76);
-
-    // Station 2: Acid Vat & Salting Out
-    ctx.fillStyle = '#451A03';
-    ctx.strokeStyle = '#B45309';
-    ctx.lineWidth = 1.5;
-    ctx.beginPath();
-    ctx.roundRect(leftX + 136, vpY + 50, 96, 52, 6);
-    ctx.fill();
-    ctx.stroke();
-
-    // Vat fluid
-    ctx.fillStyle = '#B45309';
-    ctx.fillRect(leftX + 146, vpY + 68, 76, 16);
-    // Drips
-    this.s14Drips.forEach(d => {
-      ctx.fillStyle = '#F59E0B';
-      ctx.beginPath();
-      ctx.ellipse(leftX + 184, vpY + 70 + (d.y % 14), 2, 3, 0, 0, Math.PI * 2);
-      ctx.fill();
-    });
-
-    ctx.font = '800 7.5px "JetBrains Mono", monospace';
-    ctx.fillStyle = '#FCD34D';
-    ctx.fillText('2. 0.25N H₂SO₄ VAT', leftX + 184, vpY + 62);
-    ctx.font = '500 7px "Plus Jakarta Sans", sans-serif';
-    ctx.fillText('Acid leach + (NH₄)₂SO₄', leftX + 184, vpY + 94);
-
-    // Connector Arrow 2 -> 3
-    ctx.fillStyle = '#EA580C';
-    ctx.font = '700 12px sans-serif';
-    ctx.fillText('➔', leftX + 244, vpY + 76);
-
-    // Station 3: Protease Contaminant Cocktails
-    ctx.fillStyle = '#5F0F0F';
-    ctx.strokeStyle = '#DC2626';
-    ctx.lineWidth = 1.5;
-    ctx.beginPath();
-    ctx.roundRect(leftX + 256, vpY + 50, 96, 52, 6);
-    ctx.fill();
-    ctx.stroke();
-
-    // Pac-man icon in station 3
-    ctx.fillStyle = '#EF4444';
-    ctx.beginPath();
-    ctx.arc(leftX + 304, vpY + 72, 10, 0.4, Math.PI * 1.8);
-    ctx.lineTo(leftX + 304, vpY + 72);
-    ctx.fill();
-
-    ctx.font = '800 7.5px "JetBrains Mono", monospace';
-    ctx.fillStyle = '#FCA5A5';
-    ctx.fillText('3. TRYPSIN/CHYMO', leftX + 304, vpY + 62);
-    ctx.font = '500 7px "Plus Jakarta Sans", sans-serif';
-    ctx.fillText('Co-purified active proteases', leftX + 304, vpY + 94);
-
-    // Connector Arrow 3 -> 4
-    ctx.fillStyle = '#EA580C';
-    ctx.font = '700 12px sans-serif';
-    ctx.fillText('➔', leftX + 364, vpY + 76);
-
-    // Station 4: Airway Damage
-    ctx.fillStyle = '#7F1D1D';
-    ctx.strokeStyle = '#B91C1C';
-    ctx.lineWidth = 1.5;
-    ctx.beginPath();
-    ctx.roundRect(leftX + 376, vpY + 50, 60, 52, 6);
-    ctx.fill();
-    ctx.stroke();
-
-    ctx.font = '900 14px sans-serif';
-    ctx.fillStyle = '#F87171';
-    ctx.fillText('☠', leftX + 406, vpY + 74);
-    ctx.font = '800 6.5px "JetBrains Mono", monospace';
-    ctx.fillText('EPITHELIAL LYSIS', leftX + 406, vpY + 94);
-
-    // Lower Canvas: Human Mucosa Under Attack by Bovine Proteases
-    const tissueX = leftX + 30;
-    const tissueY = vpY + 165;
-
-    ctx.strokeStyle = '#F472B6';
-    ctx.lineWidth = 3;
-    ctx.beginPath();
-    ctx.moveTo(tissueX, tissueY - 30);
-    ctx.lineTo(tissueX + 390, tissueY - 30);
-    ctx.moveTo(tissueX, tissueY + 45);
-    ctx.lineTo(tissueX + 390, tissueY + 45);
-    ctx.stroke();
-
-    ctx.font = '700 8.5px "Plus Jakarta Sans", sans-serif';
-    ctx.fillStyle = '#F472B6';
+    ctx.font = '800 10px "JetBrains Mono", monospace';
+    ctx.fillStyle = '#E2E8F0';
     ctx.textAlign = 'left';
-    ctx.fillText('Human Airway Mucosal Barrier (Collagen & Elastin Scaffolding)', tissueX + 5, tissueY - 37);
+    ctx.fillText('1950s BOVINE EXTRACTION (DORNAVAC)', leftX + 24, vpY + 26);
+    ctx.font = '700 8.5px "JetBrains Mono", monospace';
+    ctx.fillStyle = '#D97706';
+    ctx.textAlign = 'right';
+    ctx.fillText('[ABATTOIR TISSUE ISOLATION]', leftX + vpW - 24, vpY + 26);
 
-    // Animated Bovine Proteases with snapping jaws chewing the tissue
-    this.s14Proteases.forEach(p => {
-      ctx.save();
-      ctx.translate(tissueX + 180 + p.x, tissueY + p.y);
-      const jawAngle = Math.abs(Math.sin(p.jawPhase)) * 0.45 + 0.15;
+    // 4 Sequential Extraction Stations Flowchart
+    const stW = 96;
+    const stH = 46;
+    const stY = vpY + 48;
+    const stGap = 12;
 
-      // Pac-Man body (Crimson / Toxic Red)
-      ctx.fillStyle = '#DC2626';
-      ctx.strokeStyle = '#991B1B';
-      ctx.lineWidth = 1.5;
+    const pastStages = [
+      { num: '1', title: 'CATTLE PANCREAS', sub: 'Abattoir tissue harvest', tag: 'Bos taurus' },
+      { num: '2', title: '0.25N H₂SO₄ ACID', sub: '(NH₄)₂SO₄ salting out', tag: 'Acid leach' },
+      { num: '3', title: 'PROTEASE CO-PRECIP', sub: 'Active digestive enzymes', tag: 'Trypsin/Chymo' },
+      { num: '4', title: 'AIRWAY CRISIS', sub: 'Mucosal ulceration & shock', tag: 'Epithelial lysis' }
+    ];
+
+    pastStages.forEach((st, idx) => {
+      const sx = leftX + 16 + idx * (stW + stGap);
+      ctx.fillStyle = '#111827';
+      ctx.strokeStyle = '#334155';
+      ctx.lineWidth = 1;
       ctx.beginPath();
-      ctx.arc(0, 0, 16, jawAngle, Math.PI * 2 - jawAngle);
-      ctx.lineTo(0, 0);
-      ctx.closePath();
+      ctx.roundRect(sx, stY, stW, stH, 5);
       ctx.fill();
       ctx.stroke();
 
-      // Sharp Teeth in jaws
-      ctx.fillStyle = '#FEF2F2';
+      ctx.font = '800 7.5px "JetBrains Mono", monospace';
+      ctx.fillStyle = '#CBD5E1';
+      ctx.textAlign = 'left';
+      ctx.fillText(`${st.num}. ${st.title}`, sx + 6, stY + 14);
+
+      ctx.font = '400 6.8px "Plus Jakarta Sans", sans-serif';
+      ctx.fillStyle = '#94A3B8';
+      ctx.fillText(st.sub, sx + 6, stY + 26);
+
+      ctx.font = '600 6.5px "JetBrains Mono", monospace';
+      ctx.fillStyle = '#D97706';
+      ctx.fillText(st.tag, sx + 6, stY + 38);
+
+      // Arrow to next station
+      if (idx < 3) {
+        ctx.fillStyle = '#64748B';
+        ctx.font = '700 10px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('➔', sx + stW + stGap / 2, stY + 26);
+      }
+    });
+
+    // Molecular Pathology Simulation Center
+    const simY = vpY + 104;
+    const simH = 155;
+    ctx.fillStyle = '#0B0F19';
+    ctx.strokeStyle = '#1E293B';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.roundRect(leftX + 14, simY, vpW - 28, simH, 6);
+    ctx.fill();
+    ctx.stroke();
+
+    ctx.font = '700 8px "JetBrains Mono", monospace';
+    ctx.fillStyle = '#94A3B8';
+    ctx.textAlign = 'left';
+    ctx.fillText('PATHOLOGY: BOVINE PROTEASE DEGRADATION OF AIRWAY MUCOSA', leftX + 22, simY + 15);
+
+    // Bronchial Columnar Epithelium (Disrupted by bovine proteases)
+    const epY = simY + 115;
+    this.s14MucosaSegments.forEach(m => {
+      const cellW = 28;
+      const cellH = m.height * (1.0 - m.damageProgress * 0.45);
+      const cx = leftX + 28 + (m.x + 430);
+
+      // Epithelial cell body
+      ctx.fillStyle = m.damageProgress > 0.6 ? '#1F1D2B' : '#1A2333';
+      ctx.strokeStyle = m.damageProgress > 0.6 ? '#D97706' : '#475569';
+      ctx.lineWidth = 1;
       ctx.beginPath();
-      ctx.moveTo(11, -8); ctx.lineTo(16, -3); ctx.lineTo(10, 0);
-      ctx.moveTo(11, 8); ctx.lineTo(16, 3); ctx.lineTo(10, 0);
+      ctx.roundRect(cx, epY - cellH, cellW, cellH, 3);
+      ctx.fill();
+      ctx.stroke();
+
+      // Nucleus
+      ctx.fillStyle = '#334155';
+      ctx.beginPath();
+      ctx.arc(cx + cellW / 2, epY - cellH * 0.4, 4, 0, Math.PI * 2);
       ctx.fill();
 
-      // Protease Label Tag
-      ctx.font = '700 7.5px "JetBrains Mono", monospace';
-      ctx.fillStyle = '#FEE2E2';
-      ctx.textAlign = 'center';
-      ctx.fillText(p.label, 0, -20);
+      // Bronchial Cilia on apical surface (slumped/broken if damaged)
+      ctx.strokeStyle = m.damageProgress > 0.5 ? 'rgba(217, 119, 6, 0.4)' : '#64748B';
+      ctx.lineWidth = 1.2;
+      for (let ci = 3; ci < cellW; ci += 4) {
+        const cLen = m.damageProgress > 0.5 ? 4 : 9;
+        const wave = Math.sin(this.stage14Timer * 4 + m.ciliaOffset + ci) * 2;
+        ctx.beginPath();
+        ctx.moveTo(cx + ci, epY - cellH);
+        ctx.lineTo(cx + ci + wave, epY - cellH - cLen);
+        ctx.stroke();
+      }
+    });
 
-      // Damage Sparks
-      ctx.fillStyle = '#FBBF24';
+    // Basement Membrane Line
+    ctx.strokeStyle = '#475569';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(leftX + 20, epY + 2);
+    ctx.lineTo(leftX + vpW - 20, epY + 2);
+    ctx.stroke();
+
+    ctx.font = '500 7px "JetBrains Mono", monospace';
+    ctx.fillStyle = '#64748B';
+    ctx.textAlign = 'left';
+    ctx.fillText('Basement Membrane Barrier', leftX + 24, epY + 12);
+
+    // Contaminant Bovine Proteases (Trypsin & Chymotrypsin) Docking & Digesting Tight Junctions
+    this.s14ProteaseMolecules.forEach(p => {
+      ctx.save();
+      const px = leftX + vpW / 2 + p.x + 230;
+      const py = simY + 50 + p.y;
+      ctx.translate(px, py);
+
+      // Realistic globular serine protease structure
+      ctx.fillStyle = '#1E293B';
+      ctx.strokeStyle = '#D97706';
+      ctx.lineWidth = 1.4;
       ctx.beginPath();
-      ctx.arc(18, 0, 2.5 + Math.sin(this.time * 8) * 1.5, 0, Math.PI * 2);
+      ctx.arc(0, 0, 13, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.stroke();
+
+      // Catalytic triad cleft (Asp102-His57-Ser195)
+      ctx.fillStyle = '#D97706';
+      ctx.beginPath();
+      ctx.arc(4 * Math.cos(p.cleftAngle), 4 * Math.sin(p.cleftAngle), 3, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Hydrolysis attack spark
+      ctx.strokeStyle = '#F59E0B';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(0, 0);
+      ctx.lineTo(8 * Math.cos(p.cleftAngle), 8 * Math.sin(p.cleftAngle));
+      ctx.stroke();
+
+      ctx.font = '700 7px "JetBrains Mono", monospace';
+      ctx.fillStyle = '#E2E8F0';
+      ctx.textAlign = 'center';
+      ctx.fillText(p.label, 0, -16);
+      ctx.font = '500 6.2px "JetBrains Mono", monospace';
+      ctx.fillStyle = '#94A3B8';
+      ctx.fillText(p.sub, 0, -8);
+
+      ctx.restore();
+    });
+
+    // Foreign Bovine Epitope Antibody Cascades (Y-Shaped IgG/IgE Complexes)
+    this.s14ImmuneComplexes.forEach(ic => {
+      ctx.save();
+      const ix = leftX + vpW / 2 + ic.x + 230;
+      const iy = simY + 45 + ic.y;
+      ctx.translate(ix, iy);
+      ctx.rotate(ic.rot + Math.sin(this.stage14Timer + ic.pulsePhase) * 0.2);
+
+      // Y-shaped antibody
+      ctx.strokeStyle = '#94A3B8';
+      ctx.lineWidth = 1.4;
+      ctx.beginPath();
+      ctx.moveTo(0, 8); ctx.lineTo(0, 0); // stem (Fc)
+      ctx.lineTo(-6, -7); // Fab arm 1
+      ctx.moveTo(0, 0); ctx.lineTo(6, -7); // Fab arm 2
+      ctx.stroke();
+
+      // Antigenic bovine peptide epitope trapped in Fab
+      ctx.fillStyle = '#D97706';
+      ctx.beginPath();
+      ctx.arc(-6, -7, 1.8, 0, Math.PI * 2);
+      ctx.arc(6, -7, 1.8, 0, Math.PI * 2);
       ctx.fill();
 
       ctx.restore();
     });
 
-    // Biohazard Red Warning Aura & Alert Stamp
-    ctx.fillStyle = 'rgba(239, 68, 68, 0.9)';
-    ctx.strokeStyle = '#B91C1C';
-    ctx.lineWidth = 1.5;
+    ctx.font = '600 7.2px "JetBrains Mono", monospace';
+    ctx.fillStyle = '#D97706';
+    ctx.textAlign = 'right';
+    ctx.fillText('▲ Anti-Bovine IgG/IgE Antibodies (Anaphylaxis Risk)', leftX + vpW - 24, simY + 28);
+
+    // Historical Technical Summary Evaluation Card
+    ctx.fillStyle = '#111827';
+    ctx.strokeStyle = '#334155';
+    ctx.lineWidth = 1;
     ctx.beginPath();
-    ctx.roundRect(leftX + 22, vpY + 270, vpW - 44, 52, 8);
+    ctx.roundRect(leftX + 14, vpY + 268, vpW - 28, 92, 6);
     ctx.fill();
     ctx.stroke();
 
-    ctx.font = '800 10px "Plus Jakarta Sans", sans-serif';
-    ctx.fillStyle = '#FFFFFF';
-    ctx.textAlign = 'center';
-    ctx.fillText('⚠ FATAL CLINICAL REACTION: ALLERGIC BRONCHOSPASM & HEMORRHAGE', leftX + vpW / 2, vpY + 288);
-    ctx.font = '500 8px "Plus Jakarta Sans", sans-serif';
-    ctx.fillText('Bovine proteases chewed human respiratory mucosa, causing pulmonary micro-hemorrhages.', leftX + vpW / 2, vpY + 301);
-    ctx.fillText('Foreign cow peptides triggered severe anaphylaxis. Discontinued worldwide in 1960s!', leftX + vpW / 2, vpY + 313);
+    const pastFacts = [
+      {
+        k: '1. Primary Source Material:',
+        v: 'Slaughterhouse cattle pancreas glands (Bos taurus); massive pathogen/prion risk & batch variability.'
+      },
+      {
+        k: '2. Severe Protease Impurities:',
+        v: 'Co-purified active trypsin and chymotrypsin digest bronchial mucosal barrier, causing ulceration & bleeding.'
+      },
+      {
+        k: '3. Intense Immunogenicity:',
+        v: 'Foreign non-human epitopes trigger violent anti-bovine antibody cascades, acute bronchospasm & anaphylaxis.'
+      }
+    ];
 
-    // Red Discontinued Stamp
-    ctx.save();
-    ctx.translate(leftX + vpW / 2, vpY + 355);
-    ctx.strokeStyle = '#EF4444';
-    ctx.lineWidth = 2;
-    ctx.beginPath();
-    ctx.roundRect(-135, -12, 270, 24, 6);
-    ctx.stroke();
-    ctx.font = '900 10px "JetBrains Mono", monospace';
-    ctx.fillStyle = '#EF4444';
-    ctx.fillText('★ 1950s BOVINE ROUTE ABANDONED ★', 0, 4);
-    ctx.restore();
+    let pfY = vpY + 283;
+    pastFacts.forEach(pf => {
+      ctx.font = '700 8.5px "Plus Jakarta Sans", sans-serif';
+      ctx.fillStyle = '#E2E8F0';
+      ctx.textAlign = 'left';
+      ctx.fillText(pf.k, leftX + 22, pfY);
 
-    ctx.restore();
-
-
-    // ==========================================
-    // RIGHT PANEL: MODERN RECOMBINANT BIOSYNTHESIS (CLEANROOM EXCELLENCE)
-    // ==========================================
-    const rightX = 15;
-    ctx.save();
-    const rGrad = ctx.createLinearGradient(0, vpY, 0, vpY + vpH);
-    rGrad.addColorStop(0, '#042F2E');
-    rGrad.addColorStop(0.5, '#0F172A');
-    rGrad.addColorStop(1, '#064E3B');
-    ctx.fillStyle = rGrad;
-    ctx.beginPath();
-    ctx.roundRect(rightX, vpY, vpW, vpH, 12);
-    ctx.fill();
-
-    ctx.strokeStyle = '#10B981';
-    ctx.lineWidth = 1.8;
-    ctx.stroke();
-
-    // Cleanroom Banner Top
-    ctx.fillStyle = 'rgba(16, 185, 129, 0.25)';
-    ctx.strokeStyle = '#10B981';
-    ctx.lineWidth = 1.2;
-    ctx.beginPath();
-    ctx.roundRect(rightX + 14, vpY + 12, vpW - 28, 26, 6);
-    ctx.fill();
-    ctx.stroke();
-
-    ctx.font = '800 10px "Plus Jakarta Sans", sans-serif';
-    ctx.fillStyle = '#A7F3D0';
-    ctx.textAlign = 'center';
-    ctx.fillText('✓ THE PRESENT: STERILE RECOMBINANT BIOSYNTHESIS (CHO-K1)', rightX + vpW / 2, vpY + 25);
-
-    // Floating Cleanroom Sparkles
-    this.s14CleanSparks.forEach(sp => {
-      const alpha = Math.abs(Math.sin(this.time * 3 + sp.phase));
-      ctx.fillStyle = `rgba(56, 189, 248, ${alpha * 0.7})`;
-      ctx.beginPath();
-      ctx.arc(rightX + 225 + (sp.x % 210), vpY + 140 + (sp.y % 110), sp.size, 0, Math.PI * 2);
-      ctx.fill();
+      ctx.font = '400 7.8px "Plus Jakarta Sans", sans-serif';
+      ctx.fillStyle = '#94A3B8';
+      ctx.fillText(pf.v, leftX + 22, pfY + 11);
+      pfY += 27;
     });
 
-    // 4 Modern Biosynthesis Pipeline Stages
-    // Station 1: rhDNase cDNA Plasmid Vector
-    ctx.fillStyle = '#064E3B';
-    ctx.strokeStyle = '#10B981';
-    ctx.lineWidth = 1.5;
+    // Bottom Historical Status Pill
+    ctx.fillStyle = '#1E293B';
+    ctx.strokeStyle = '#475569';
+    ctx.lineWidth = 1;
     ctx.beginPath();
-    ctx.roundRect(rightX + 16, vpY + 50, 96, 52, 6);
+    ctx.roundRect(leftX + 14, vpY + 368, vpW - 28, 20, 4);
     ctx.fill();
     ctx.stroke();
 
-    // Circular plasmid DNA icon
-    ctx.strokeStyle = '#34D399';
-    ctx.lineWidth = 2;
-    ctx.beginPath();
-    ctx.arc(rightX + 64, vpY + 70, 11, 0, Math.PI * 2);
-    ctx.stroke();
-    ctx.font = '800 7px "JetBrains Mono", monospace';
-    ctx.fillStyle = '#A7F3D0';
+    ctx.font = '700 8px "JetBrains Mono", monospace';
+    ctx.fillStyle = '#CBD5E1';
     ctx.textAlign = 'center';
-    ctx.fillText('1. cDNA VECTOR', rightX + 64, vpY + 90);
-    ctx.font = '500 7px "Plus Jakarta Sans", sans-serif';
-    ctx.fillText('260-aa human sequence', rightX + 64, vpY + 98);
+    ctx.fillText('HISTORICAL VERDICT: DISCONTINUED IN 1960s DUE TO FATAL AIRWAY TOXICITY', leftX + vpW / 2, vpY + 381);
 
-    // Connector Arrow 1 -> 2
-    ctx.fillStyle = '#10B981';
-    ctx.font = '700 12px sans-serif';
-    ctx.fillText('➔', rightX + 124, vpY + 76);
+    ctx.restore();
 
-    // Station 2: Validated Master Cell Bank (CHO-K1)
-    ctx.fillStyle = '#065F46';
-    ctx.strokeStyle = '#059669';
-    ctx.lineWidth = 1.5;
+
+    // ==========================================
+    // RIGHT PANEL: MODERN RECOMBINANT BIOSYNTHESIS (PULMOZYME®)
+    // ==========================================
+    const rightX = 12;
+    ctx.save();
+
+    // Deep slate chassis with neutral slate border (NO generic green box)
+    ctx.fillStyle = '#0F172A';
+    ctx.strokeStyle = '#334155';
+    ctx.lineWidth = 1.4;
     ctx.beginPath();
-    ctx.roundRect(rightX + 136, vpY + 50, 96, 52, 6);
+    ctx.roundRect(rightX, vpY, vpW, vpH, 10);
     ctx.fill();
     ctx.stroke();
 
-    // Cell icon
-    ctx.fillStyle = '#10B981';
+    // Header Pill
+    ctx.fillStyle = '#1E293B';
+    ctx.strokeStyle = '#475569';
+    ctx.lineWidth = 1;
     ctx.beginPath();
-    ctx.ellipse(rightX + 184, vpY + 70, 14, 10, 0, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.fillStyle = '#047857';
-    ctx.beginPath();
-    ctx.arc(rightX + 184, vpY + 70, 5, 0, Math.PI * 2);
-    ctx.fill();
-
-    ctx.font = '800 7px "JetBrains Mono", monospace';
-    ctx.fillStyle = '#A7F3D0';
-    ctx.fillText('2. CHO-K1 MCB', rightX + 184, vpY + 90);
-    ctx.font = '500 7px "Plus Jakarta Sans", sans-serif';
-    ctx.fillText('Clonal cGMP bank', rightX + 184, vpY + 98);
-
-    // Connector Arrow 2 -> 3
-    ctx.fillStyle = '#10B981';
-    ctx.font = '700 12px sans-serif';
-    ctx.fillText('➔', rightX + 244, vpY + 76);
-
-    // Station 3: 10,000L Bioreactor
-    ctx.fillStyle = '#0F2F3B';
-    ctx.strokeStyle = '#0284C7';
-    ctx.lineWidth = 1.5;
-    ctx.beginPath();
-    ctx.roundRect(rightX + 256, vpY + 50, 96, 52, 6);
+    ctx.roundRect(rightX + 14, vpY + 12, vpW - 28, 28, 6);
     ctx.fill();
     ctx.stroke();
 
-    // Bioreactor tank icon
+    ctx.font = '800 10px "JetBrains Mono", monospace';
     ctx.fillStyle = '#38BDF8';
+    ctx.textAlign = 'left';
+    ctx.fillText('MODERN RECOMBINANT BIOSYNTHESIS (PULMOZYME®)', rightX + 24, vpY + 26);
+    ctx.font = '700 8.5px "JetBrains Mono", monospace';
+    ctx.fillStyle = '#94A3B8';
+    ctx.textAlign = 'right';
+    ctx.fillText('[CHO-K1 CELL BIO-FACTORY]', rightX + vpW - 24, vpY + 26);
+
+    // 4 Sequential cGMP Bioprocess Stages Flowchart
+    const modernStages = [
+      { num: '1', title: 'HUMAN cDNA VECTOR', sub: '260-aa native sequence', tag: 'Synthetic gene' },
+      { num: '2', title: 'CHO-K1 CELL BANK', sub: 'Validated cGMP master bank', tag: 'Animal-origin free' },
+      { num: '3', title: '10,000L FERMENTER', sub: 'Automated fed-batch cold shift', tag: 'Extracellular' },
+      { num: '4', title: 'STERILE BFS DOSING', sub: 'Triple chromatography + 20nm', tag: '2.5 mg/2.5 mL' }
+    ];
+
+    modernStages.forEach((st, idx) => {
+      const sx = rightX + 16 + idx * (stW + stGap);
+      ctx.fillStyle = '#111827';
+      ctx.strokeStyle = '#334155';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.roundRect(sx, stY, stW, stH, 5);
+      ctx.fill();
+      ctx.stroke();
+
+      ctx.font = '800 7.5px "JetBrains Mono", monospace';
+      ctx.fillStyle = '#38BDF8';
+      ctx.textAlign = 'left';
+      ctx.fillText(`${st.num}. ${st.title}`, sx + 6, stY + 14);
+
+      ctx.font = '400 6.8px "Plus Jakarta Sans", sans-serif';
+      ctx.fillStyle = '#CBD5E1';
+      ctx.fillText(st.sub, sx + 6, stY + 26);
+
+      ctx.font = '600 6.5px "JetBrains Mono", monospace';
+      ctx.fillStyle = '#2DD4BF';
+      ctx.fillText(st.tag, sx + 6, stY + 38);
+
+      // Arrow to next station
+      if (idx < 3) {
+        ctx.fillStyle = '#38BDF8';
+        ctx.font = '700 10px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('➔', sx + stW + stGap / 2, stY + 26);
+      }
+    });
+
+    // Molecular Biology & Intact Tissue Simulation Center
+    ctx.fillStyle = '#0B0F19';
+    ctx.strokeStyle = '#1E293B';
+    ctx.lineWidth = 1;
     ctx.beginPath();
-    ctx.roundRect(rightX + 296, vpY + 62, 16, 18, 3);
-    ctx.fill();
-
-    ctx.font = '800 7px "JetBrains Mono", monospace';
-    ctx.fillStyle = '#7DD3FC';
-    ctx.fillText('3. 10,000L STR', rightX + 304, vpY + 90);
-    ctx.font = '500 7px "Plus Jakarta Sans", sans-serif';
-    ctx.fillText('Fed-batch cold shift', rightX + 304, vpY + 98);
-
-    // Connector Arrow 3 -> 4
-    ctx.fillStyle = '#10B981';
-    ctx.font = '700 12px sans-serif';
-    ctx.fillText('➔', rightX + 364, vpY + 76);
-
-    // Station 4: BFS Ampule Formulation
-    ctx.fillStyle = '#064E3B';
-    ctx.strokeStyle = '#10B981';
-    ctx.lineWidth = 1.5;
-    ctx.beginPath();
-    ctx.roundRect(rightX + 376, vpY + 50, 60, 52, 6);
+    ctx.roundRect(rightX + 14, simY, vpW - 28, simH, 6);
     ctx.fill();
     ctx.stroke();
 
-    // Ampule icon
-    ctx.fillStyle = '#6EE7B7';
-    ctx.beginPath();
-    ctx.roundRect(rightX + 400, vpY + 62, 12, 18, 3);
-    ctx.fill();
+    ctx.font = '700 8px "JetBrains Mono", monospace';
+    ctx.fillStyle = '#38BDF8';
+    ctx.textAlign = 'left';
+    ctx.fillText('PHYSIOLOGY: STERILE MONOMERIC RHDNASE 1 SAFELY DIGESTS DNA MESH', rightX + 22, simY + 15);
 
-    ctx.font = '800 6.5px "JetBrains Mono", monospace';
-    ctx.fillStyle = '#A7F3D0';
-    ctx.fillText('4. BFS AMPULE', rightX + 406, vpY + 90);
-    ctx.font = '500 6.5px "Plus Jakarta Sans", sans-serif';
-    ctx.fillText('2.5 mg/2.5 mL', rightX + 406, vpY + 98);
+    // Intact Bronchial Columnar Epithelium (Pristine, Healthy Tissue)
+    this.s14HealthyEpithelium.forEach(h => {
+      const cellW = 28;
+      const cellH = 38;
+      const hx = rightX + 28 + (h.x - 60);
 
-    // Lower Canvas: Pure 37 kDa Human rhDNase 1 Monomers (Animated with N-Glycans)
-    this.s14PureEnzymes.forEach(e => {
-      ctx.save();
-      ctx.translate(rightX + 180 + (e.x % 170), vpY + 165 + e.y);
-      ctx.rotate(e.angle);
-
-      // Outer pure enzyme aura
-      ctx.fillStyle = 'rgba(56, 189, 248, 0.25)';
+      // Healthy columnar cell
+      ctx.fillStyle = '#111E2E';
+      ctx.strokeStyle = '#0284C7';
+      ctx.lineWidth = 1;
       ctx.beginPath();
-      ctx.arc(0, 0, 18, 0, Math.PI * 2);
+      ctx.roundRect(hx, epY - cellH, cellW, cellH, 3);
+      ctx.fill();
+      ctx.stroke();
+
+      // Intact tight junction line at apical boundary
+      ctx.strokeStyle = '#38BDF8';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(hx, epY - cellH);
+      ctx.lineTo(hx + cellW, epY - cellH);
+      ctx.stroke();
+
+      // Nucleus
+      ctx.fillStyle = '#312E81';
+      ctx.beginPath();
+      ctx.arc(hx + cellW / 2, epY - cellH * 0.4, 4, 0, Math.PI * 2);
       ctx.fill();
 
-      // Globular 37 kDa monomer (Cerulean / Cyan)
-      const eGrad = ctx.createLinearGradient(-10, -10, 10, 10);
-      eGrad.addColorStop(0, '#0284C7');
-      eGrad.addColorStop(1, '#0369A1');
-      ctx.fillStyle = eGrad;
+      // Healthy upright beating cilia (metachronal wave)
+      ctx.strokeStyle = '#38BDF8';
+      ctx.lineWidth = 1.3;
+      for (let ci = 3; ci < cellW; ci += 4) {
+        const wave = Math.sin(this.stage14Timer * 5 + h.ciliaPhase + ci) * 3;
+        ctx.beginPath();
+        ctx.moveTo(hx + ci, epY - cellH);
+        ctx.lineTo(hx + ci + wave, epY - cellH - 10);
+        ctx.stroke();
+      }
+    });
+
+    // Healthy Basement Membrane
+    ctx.strokeStyle = '#0284C7';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(rightX + 20, epY + 2);
+    ctx.lineTo(rightX + vpW - 20, epY + 2);
+    ctx.stroke();
+
+    ctx.font = '500 7px "JetBrains Mono", monospace';
+    ctx.fillStyle = '#38BDF8';
+    ctx.textAlign = 'left';
+    ctx.fillText('Intact Tight Junctions (Zero Protease Cleavage)', rightX + 24, epY + 12);
+
+    // Authentic 37 kDa Dornase Alfa Molecules Rotating in Extracellular Broth
+    this.s14RecombinantMolecules.forEach(rm => {
+      ctx.save();
+      const rx = rightX + 20 + rm.x;
+      const ry = simY + 45 + rm.y;
+      ctx.translate(rx, ry);
+      ctx.rotate(rm.rot);
+      ctx.scale(rm.scale, rm.scale);
+
+      // Globular 37 kDa enzyme core
+      ctx.fillStyle = '#0F172A';
       ctx.strokeStyle = '#38BDF8';
       ctx.lineWidth = 1.5;
       ctx.beginPath();
-      ctx.arc(0, 0, 12, 0, Math.PI * 2);
+      ctx.arc(0, 0, 11, 0, Math.PI * 2);
       ctx.fill();
       ctx.stroke();
 
-      // Active site cleft (Golden Mg²⁺ / Ca²⁺)
+      // Active Catalytic Pocket with Calcium (Ca²⁺) / Magnesium (Mg²⁺) Ions
       ctx.fillStyle = '#F59E0B';
       ctx.beginPath();
-      ctx.arc(4, -3, 3, 0, Math.PI * 2);
+      ctx.arc(3, -2, 2.5, 0, Math.PI * 2);
       ctx.fill();
 
-      // Branched N-Glycan Antenna trees on Asn18 & Asn106 (Emerald green branches)
-      ctx.strokeStyle = '#10B981';
-      ctx.lineWidth = 1.5;
+      // Dual Complex N-Glycan Antennae (Asn18 & Asn106)
+      ctx.strokeStyle = '#2DD4BF';
+      ctx.lineWidth = 1.2;
       ctx.beginPath();
-      ctx.moveTo(-10, 4);
-      ctx.lineTo(-18, 9);
-      ctx.moveTo(-14, 6);
-      ctx.lineTo(-14, 13);
+      ctx.moveTo(-8, 3); ctx.lineTo(-14, 8);
+      ctx.moveTo(-11, 5); ctx.lineTo(-12, 12);
       ctx.stroke();
 
-      ctx.fillStyle = '#10B981';
+      ctx.fillStyle = '#2DD4BF';
       ctx.beginPath();
-      ctx.arc(-18, 9, 2, 0, Math.PI * 2);
-      ctx.arc(-14, 13, 2, 0, Math.PI * 2);
+      ctx.arc(-14, 8, 1.5, 0, Math.PI * 2);
+      ctx.arc(-12, 12, 1.5, 0, Math.PI * 2);
       ctx.fill();
 
       ctx.restore();
     });
 
-    // Monomer annotation
-    ctx.font = '700 9px "Plus Jakarta Sans", sans-serif';
+    // DNA Substrate Strands being hydrolyzed cleanly by rhDNase 1
+    this.s14DnaSubstrates.forEach(dna => {
+      ctx.strokeStyle = dna.cleaved ? '#10B981' : 'rgba(148, 163, 184, 0.4)';
+      ctx.lineWidth = 1.2;
+      ctx.setLineDash(dna.cleaved ? [3, 2] : []);
+      ctx.beginPath();
+      ctx.moveTo(rightX + dna.x - dna.len / 2, simY + dna.y);
+      ctx.lineTo(rightX + dna.x + dna.len / 2, simY + dna.y);
+      ctx.stroke();
+      ctx.setLineDash([]);
+    });
+
+    ctx.font = '600 7.2px "JetBrains Mono", monospace';
+    ctx.fillStyle = '#2DD4BF';
+    ctx.textAlign = 'right';
+    ctx.fillText('Pure Dornase Alfa (Hydrolyzes DNA Mesh with Zero Mucosal Damage)', rightX + vpW - 24, simY + 28);
+
+    // Modern Technical Summary Evaluation Card
+    ctx.fillStyle = '#111827';
+    ctx.strokeStyle = '#334155';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.roundRect(rightX + 14, vpY + 268, vpW - 28, 92, 6);
+    ctx.fill();
+    ctx.stroke();
+
+    const modernFacts = [
+      {
+        k: '1. 100% Native Human Sequence:',
+        v: 'Cloned human DNase 1 cDNA expressed in CHO-K1 cells; zero non-human epitopes & zero immunogenicity.'
+      },
+      {
+        k: '2. Undetectable Protease Contamination (<0.001 ppm):',
+        v: 'Triple-column chromatography eliminates all host enzymes; preserves intact bronchial tight junctions.'
+      },
+      {
+        k: '3. Proven Clinical Efficacy & Safety:',
+        v: 'Reduces sputum viscosity 800-fold, elevates FEV₁ by 15.8%, and cuts exacerbations by 37% with >30 years safe use.'
+      }
+    ];
+
+    let mfY = vpY + 283;
+    modernFacts.forEach(mf => {
+      ctx.font = '700 8.5px "Plus Jakarta Sans", sans-serif';
+      ctx.fillStyle = '#E2E8F0';
+      ctx.textAlign = 'left';
+      ctx.fillText(mf.k, rightX + 22, mfY);
+
+      ctx.font = '400 7.8px "Plus Jakarta Sans", sans-serif';
+      ctx.fillStyle = '#94A3B8';
+      ctx.fillText(mf.v, rightX + 22, mfY + 11);
+      mfY += 27;
+    });
+
+    // Bottom Modern Status Pill
+    ctx.fillStyle = '#1E293B';
+    ctx.strokeStyle = '#475569';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.roundRect(rightX + 14, vpY + 368, vpW - 28, 20, 4);
+    ctx.fill();
+    ctx.stroke();
+
+    ctx.font = '700 8px "JetBrains Mono", monospace';
     ctx.fillStyle = '#38BDF8';
     ctx.textAlign = 'center';
-    ctx.fillText('Pure 100% Recombinant Human DNase 1 Monomers (37 kDa)', rightX + 225, vpY + 120);
-    ctx.font = '500 8px "Plus Jakarta Sans", sans-serif';
-    ctx.fillStyle = '#A7F3D0';
-    ctx.fillText('Protected by Dual N-Glycans (Asn18 & Asn106) • Non-Immunogenic', rightX + 225, vpY + 134);
-
-    // Digital Laser Circular Purity HUD Gauge
-    const hudX = rightX + vpW / 2;
-    const hudY = vpY + 270;
-
-    ctx.strokeStyle = 'rgba(16, 185, 129, 0.2)';
-    ctx.lineWidth = 8;
-    ctx.beginPath();
-    ctx.arc(hudX - 110, hudY + 15, 26, 0, Math.PI * 2);
-    ctx.stroke();
-
-    ctx.strokeStyle = '#10B981';
-    ctx.lineWidth = 8;
-    ctx.beginPath();
-    ctx.arc(hudX - 110, hudY + 15, 26, -Math.PI / 2, Math.PI * 1.45);
-    ctx.stroke();
-
-    ctx.font = '900 13px "JetBrains Mono", monospace';
-    ctx.fillStyle = '#10B981';
-    ctx.textAlign = 'center';
-    ctx.fillText('99.98%', hudX - 110, hudY + 19);
-
-    ctx.font = '800 10px "Plus Jakarta Sans", sans-serif';
-    ctx.fillStyle = '#FFFFFF';
-    ctx.textAlign = 'left';
-    ctx.fillText('PHARMACEUTICAL MONOMER PURITY', hudX - 65, hudY + 5);
-
-    ctx.font = '500 8.5px "Plus Jakarta Sans", sans-serif';
-    ctx.fillStyle = '#94A3B8';
-    ctx.fillText('• 100% Identical to native human sequence (260 aa)', hudX - 65, hudY + 20);
-    ctx.fillText('• Zero foreign bovine epitopes • Zero bronchospasm', hudX - 65, hudY + 34);
-
-    // Bottom Approved Gold Seal Badge
-    ctx.save();
-    ctx.translate(rightX + vpW / 2, vpY + 355);
-    ctx.strokeStyle = '#10B981';
-    ctx.lineWidth = 2;
-    ctx.beginPath();
-    ctx.roundRect(-140, -12, 280, 24, 6);
-    ctx.stroke();
-    ctx.font = '900 10px "JetBrains Mono", monospace';
-    ctx.fillStyle = '#10B981';
-    ctx.textAlign = 'center';
-    ctx.fillText('★ GLOBAL CLINICAL STANDARD (PULMOZYME®) ★', 0, 4);
-    ctx.restore();
+    ctx.fillText('CURRENT GOLD STANDARD: PULMOZYME® (FDA/EMA APPROVED LIFE-SAVING BIOTHERAPEUTIC)', rightX + vpW / 2, vpY + 381);
 
     ctx.restore();
 
