@@ -70,6 +70,8 @@ class PresentationEngine {
     this.motherImg.src = 'images/mother_square.jpg';
     this.childImg = new Image();
     this.childImg.src = 'images/child_square.jpg';
+    this.nebulizerImg = new Image();
+    this.nebulizerImg.src = 'images/nebulizer_inhalation.png';
 
     // Stage 6 Battle & Multi-WBC Lysis Simulation
     this.battleTimer = 0;
@@ -5143,54 +5145,61 @@ class PresentationEngine {
      - Cascading animated blue directional chevron flow arrows + fine aerosol particles
      - Technical pointer callouts matching reference diagram
      ======================================================== */
+/* ========================================================
+     STAGE 11: Nebulizer Inhalation & Pulmonary Deposition
+     High-fidelity medical illustration matching media_1791811848956_bbd606ad.png:
+     - Full high-resolution textbook medical anatomy base artwork
+     - 60 FPS animated aerosol mist stream flowing from nebulizer cup to lungs
+     - Pulsing directional airflow energy along respiratory tract
+     - Active aerosol droplet deposition inside the "Alveolar Level" inset circle
+     ======================================================== */
   initStage11NebulizerData() {
     this.nebTimer = 0;
-    this.nebBreathRate = 1.8;
+    this.nebBreathRate = 1.6;
 
-    // Droplets inside nebulizer reservoir cup
+    // Bubbling aerosol mist inside nebulizer chamber
     this.s11CupMist = [];
-    for (let i = 0; i < 45; i++) {
+    for (let i = 0; i < 40; i++) {
       this.s11CupMist.push({
-        x: (Math.random() - 0.5) * 22,
-        y: (Math.random() - 0.5) * 36,
-        vx: (Math.random() - 0.5) * 12,
-        vy: -15 - Math.random() * 24,
-        r: 1.0 + Math.random() * 1.6,
-        alpha: 0.35 + Math.random() * 0.55
+        u: 0.540 + Math.random() * 0.035,
+        v: 0.360 + Math.random() * 0.085,
+        vy: -0.018 - Math.random() * 0.025,
+        vx: (Math.random() - 0.5) * 0.010,
+        r: 1.2 + Math.random() * 1.6,
+        alpha: 0.35 + Math.random() * 0.60
       });
     }
 
-    // Aerosol mist stream traversing from mouthpiece through airway down to alveoli
+    // Inhaled aerosol particles traversing the anatomical airway
     this.s11AerosolStream = [];
-    for (let i = 0; i < 95; i++) {
+    for (let i = 0; i < 110; i++) {
       this.s11AerosolStream.push({
-        prog: i / 95,
+        prog: i / 110,
         branch: i % 2, // 0 = right lung, 1 = left lung
         speed: 0.22 + (i % 4) * 0.04,
         wobble: Math.random() * Math.PI * 2,
-        r: 1.2 + (i % 3) * 0.6
+        r: 1.4 + (i % 3) * 0.7
       });
     }
 
-    // Directional chevron flow arrows moving along the airway
-    this.s11FlowChevrons = [];
-    for (let i = 0; i < 16; i++) {
-      this.s11FlowChevrons.push({
-        prog: i / 16,
+    // Glowing directional flow pulses along the airway
+    this.s11FlowPulses = [];
+    for (let i = 0; i < 12; i++) {
+      this.s11FlowPulses.push({
+        prog: i / 12,
         branch: i % 2,
-        speed: 0.26
+        speed: 0.25
       });
     }
 
-    // Inset Alveolar Level pulsating droplets
+    // Inset Alveolar Level droplets
     this.s11AlveolarDroplets = [];
     for (let i = 0; i < 28; i++) {
       this.s11AlveolarDroplets.push({
         angle: Math.random() * Math.PI * 2,
-        dist: 5 + Math.random() * 24,
-        sacIdx: i % 6,
-        r: 1.2 + Math.random() * 1.4,
-        alpha: 0.4 + Math.random() * 0.6
+        dist: 4 + Math.random() * 26,
+        r: 1.2 + Math.random() * 1.5,
+        alpha: 0.35 + Math.random() * 0.65
       });
     }
   }
@@ -5198,40 +5207,39 @@ class PresentationEngine {
   updateStage11Nebulizer(dt) {
     this.nebTimer += dt;
     const breath = Math.sin(this.nebTimer * this.nebBreathRate);
-    const isInhaling = breath > 0;
-    const flowSpeedMult = isInhaling ? 1.4 : 0.7;
+    const flowMult = breath > 0 ? 1.4 : 0.75;
 
     // Update cup mist
     this.s11CupMist.forEach(m => {
-      m.y += m.vy * dt;
-      m.x += m.vx * dt;
-      if (m.y < -22) {
-        m.y = 18;
-        m.x = (Math.random() - 0.5) * 22;
+      m.v += m.vy * dt;
+      m.u += m.vx * dt;
+      if (m.v < 0.360) {
+        m.v = 0.445;
+        m.u = 0.540 + Math.random() * 0.035;
       }
     });
 
     // Update aerosol particles
     this.s11AerosolStream.forEach(p => {
-      p.prog += p.speed * dt * flowSpeedMult;
+      p.prog += p.speed * dt * flowMult;
       if (p.prog >= 1.0) p.prog -= 1.0;
     });
 
-    // Update directional chevron arrows
-    this.s11FlowChevrons.forEach(c => {
-      c.prog += c.speed * dt * flowSpeedMult;
-      if (c.prog >= 1.0) c.prog -= 1.0;
+    // Update flow pulses
+    this.s11FlowPulses.forEach(fp => {
+      fp.prog += fp.speed * dt * flowMult;
+      if (fp.prog >= 1.0) fp.prog -= 1.0;
     });
 
     // Update alveolar droplets shimmer
     this.s11AlveolarDroplets.forEach(ad => {
-      ad.alpha = 0.35 + Math.sin(this.nebTimer * 3 + ad.angle) * 0.35;
+      ad.alpha = 0.35 + Math.sin(this.nebTimer * 3.5 + ad.angle) * 0.35;
     });
   }
 
   drawStage11NebulizerAdministration(ctx) {
     ctx.save();
-    // 1. Clean Pristine Medical Background
+    // 1. Pristine Medical Stage Background
     ctx.fillStyle = '#FFFFFF';
     ctx.fillRect(-800, -450, 1600, 900);
 
@@ -5245,7 +5253,7 @@ class PresentationEngine {
       }
     }
 
-    // Top Header Section
+    // Top Header Section (Aligned with overall presentation identity)
     ctx.fillStyle = '#F8FAFC';
     ctx.strokeStyle = '#CBD5E1';
     ctx.lineWidth = 1;
@@ -5260,551 +5268,134 @@ class PresentationEngine {
     ctx.textBaseline = 'middle';
     ctx.fillText('● CLINICAL ADMINISTRATION • AEROSOL INHALATION DELIVERY', 0, -239);
 
-    ctx.font = '800 22px "Plus Jakarta Sans", sans-serif';
-    ctx.fillStyle = '#0F172A';
-    ctx.fillText('NEBULIZER INHALATION & PULMONARY DEPOSITION', 0, -210);
+    // Size and position the high-resolution reference medical artwork
+    const imgW = 660;
+    const imgH = imgW * (765 / 1024); // 493.5px
+    const imgX = -imgW / 2; // -330
+    const imgY = -220; // leaves clean margin from -220 to 273.5
 
-    ctx.font = '500 11.5px "Plus Jakarta Sans", sans-serif';
-    ctx.fillStyle = '#64748B';
-    ctx.fillText('Aerosolized rhDNase 1 (2.4 µm MMAD mist) traversing the respiratory tract for deep bronchial & alveolar deposition', 0, -188);
+    // Helper to map normalized coordinates (u, v) in [0, 1] to stage coordinates
+    const toScreen = (u, v) => ({
+      x: imgX + u * imgW,
+      y: imgY + v * imgH
+    });
 
-    const vpX = -470;
-    const vpY = -172;
-    const vpW = 940;
-    const vpH = 405;
-
-    // Outer Main Viewport Frame matching reference diagram
-    ctx.fillStyle = '#F8FAFC';
-    ctx.strokeStyle = '#CBD5E1';
-    ctx.lineWidth = 1.8;
-    ctx.beginPath();
-    ctx.roundRect(vpX, vpY, vpW, vpH, 12);
-    ctx.fill();
-    ctx.stroke();
-
-    // Subtle breathing dynamics
-    const breath = Math.sin(this.nebTimer * this.nebBreathRate);
-    const chestExpand = Math.max(0, breath) * 4.5;
-
-    // Helper for technical callout labels with elbow leader line (zero text overlap!)
-    const drawRefCallout = (targetX, targetY, labelX, labelY, label, align = 'left') => {
+    // 2. Render High-Resolution Reference Artwork
+    if (this.nebulizerImg && this.nebulizerImg.complete && this.nebulizerImg.naturalWidth > 0) {
       ctx.save();
-      ctx.strokeStyle = '#0F172A';
-      ctx.lineWidth = 1.2;
-
-      // Anchor dot on anatomical feature
-      ctx.fillStyle = '#0F172A';
-      ctx.beginPath();
-      ctx.arc(targetX, targetY, 2.5, 0, Math.PI * 2);
-      ctx.fill();
-
-      // Dogleg line to label
-      ctx.beginPath();
-      ctx.moveTo(targetX, targetY);
-      const kneeX = align === 'left' ? labelX - 12 : labelX + 12;
-      ctx.lineTo(kneeX, labelY);
-      ctx.lineTo(labelX, labelY);
-      ctx.stroke();
-
-      // Text label with white halo backing (supports multi-line with \n)
-      ctx.font = '700 11px "Plus Jakarta Sans", sans-serif';
-      ctx.textAlign = align;
-      ctx.textBaseline = 'middle';
-      const offset = align === 'left' ? 5 : -5;
-      ctx.strokeStyle = '#FFFFFF';
-      ctx.lineWidth = 3.5;
-      ctx.fillStyle = '#0F172A';
-      const lines = label.split('\n');
-      const lineHeight = 13;
-      const startY = labelY - ((lines.length - 1) * lineHeight) / 2;
-      lines.forEach((ln, lIdx) => {
-        const ly = startY + lIdx * lineHeight;
-        ctx.strokeText(ln, labelX + offset, ly);
-        ctx.fillText(ln, labelX + offset, ly);
-      });
+      // Drop shadow for card depth
+      ctx.shadowColor = 'rgba(15, 23, 42, 0.10)';
+      ctx.shadowBlur = 18;
+      ctx.shadowOffsetY = 6;
+      ctx.drawImage(this.nebulizerImg, imgX, imgY, imgW, imgH);
       ctx.restore();
-    };
-
-    // ========================================================
-    // 1. PATIENT UPPER BODY & CHAIR (SEATED PROFILE FACING RIGHT)
-    // ========================================================
-    const headX = -215;
-    const headY = -78;
-    const mouthX = -125;
-    const mouthY = -48;
-    const tracheaX = -178;
-    const tracheaTopY = 4;
-    const carinaY = 66;
-
-    // Chair Back on Left
-    ctx.save();
-    ctx.fillStyle = '#94A3B8';
-    ctx.strokeStyle = '#64748B';
-    ctx.lineWidth = 2.0;
-    ctx.beginPath();
-    ctx.roundRect(-420, headY + 30, 48, 260, 18);
-    ctx.fill();
-    ctx.stroke();
-    // Inner cushion seam
-    ctx.fillStyle = '#CBD5E1';
-    ctx.beginPath();
-    ctx.roundRect(-412, headY + 45, 32, 230, 12);
-    ctx.fill();
-    ctx.restore();
-
-    // Patient Skin Gradient
-    ctx.save();
-    const skinGrad = ctx.createLinearGradient(-350, headY, -30, headY + 280);
-    skinGrad.addColorStop(0, '#FDE8E0');
-    skinGrad.addColorStop(0.5, '#F8D2C4');
-    skinGrad.addColorStop(1, '#F3BFAD');
-    ctx.fillStyle = skinGrad;
-    ctx.strokeStyle = '#0F172A';
-    ctx.lineWidth = 2.0;
-
-    // Patient Torso, Shoulder & Neck Outer Contour
-    ctx.beginPath();
-    ctx.moveTo(-372, headY + 280); // Lower back
-    ctx.lineTo(-372, headY + 115); // Upper back against chair
-    ctx.quadraticCurveTo(-360, headY + 70, -295, headY + 55); // Left shoulder slope
-    ctx.quadraticCurveTo(-260, headY + 50, -240, headY + 30); // Nape of neck
-    ctx.quadraticCurveTo(-265, headY - 5, -260, headY - 45); // Occiput
-    ctx.quadraticCurveTo(-245, headY - 88, -200, headY - 88); // Cranium top
-    ctx.quadraticCurveTo(-155, headY - 85, -145, headY - 60); // Forehead
-    ctx.lineTo(-140, headY - 45); // Nasal bridge
-    ctx.lineTo(-124, headY - 36); // Nose tip
-    ctx.lineTo(-136, headY - 26); // Subnasal point
-    ctx.lineTo(-132, mouthY - 6); // Upper lip
-    ctx.lineTo(mouthX, mouthY); // Mouth opening (gripping mouthpiece)
-    ctx.lineTo(-136, mouthY + 8); // Lower lip
-    ctx.quadraticCurveTo(-145, headY - 2, -138, headY + 8); // Chin
-    ctx.quadraticCurveTo(-155, headY + 32, -172, headY + 54); // Throat & anterior neck
-    // Chest / Thoracic anterior margin (expanding with breath)
-    ctx.quadraticCurveTo(-140 + chestExpand, headY + 115, -135 + chestExpand, headY + 185);
-    ctx.quadraticCurveTo(-135 + chestExpand, headY + 245, -140 + chestExpand, headY + 280);
-    ctx.lineTo(-372, headY + 280);
-    ctx.closePath();
-    ctx.fill();
-    ctx.stroke();
-
-    // Hair (Chestnut brown cap with realistic curve matching reference)
-    ctx.fillStyle = '#8B4513';
-    ctx.strokeStyle = '#0F172A';
-    ctx.lineWidth = 2.0;
-    ctx.beginPath();
-    ctx.moveTo(-150, headY - 55);
-    ctx.quadraticCurveTo(-155, headY - 88, -200, headY - 88);
-    ctx.quadraticCurveTo(-245, headY - 88, -260, headY - 45);
-    ctx.quadraticCurveTo(-265, headY - 5, -245, headY - 5);
-    ctx.quadraticCurveTo(-240, headY - 35, -215, headY - 45);
-    ctx.quadraticCurveTo(-180, headY - 45, -150, headY - 55);
-    ctx.closePath();
-    ctx.fill();
-    ctx.stroke();
-
-    // Eye, Eyebrow & Ear
-    // Ear
-    ctx.fillStyle = '#F8D2C4';
-    ctx.beginPath();
-    ctx.roundRect(-236, headY - 32, 16, 26, 8);
-    ctx.fill();
-    ctx.stroke();
-    // Inner ear fold
-    ctx.strokeStyle = '#0F172A';
-    ctx.lineWidth = 1.4;
-    ctx.beginPath();
-    ctx.arc(-228, headY - 20, 5, 0.5, Math.PI + 0.5);
-    ctx.stroke();
-
-    // Eyebrow
-    ctx.strokeStyle = '#5C2C10';
-    ctx.lineWidth = 2.2;
-    ctx.beginPath();
-    ctx.moveTo(-162, headY - 52);
-    ctx.quadraticCurveTo(-150, headY - 56, -140, headY - 50);
-    ctx.stroke();
-
-    // Closed / Relaxed Eye
-    ctx.strokeStyle = '#0F172A';
-    ctx.lineWidth = 1.8;
-    ctx.beginPath();
-    ctx.arc(-148, headY - 42, 4.5, 0.2, Math.PI - 0.2);
-    ctx.stroke();
-    ctx.restore();
-
-    // ========================================================
-    // 2. SAGITTAL CUTAWAY OF HEAD & UPPER RESPIRATORY TRACT
-    // ========================================================
-    ctx.save();
-    // Nasal cavity (sinus conchae with warm reddish-pink mucosa)
-    ctx.fillStyle = '#FCA5A5';
-    ctx.strokeStyle = '#DC2626';
-    ctx.lineWidth = 1.4;
-    ctx.beginPath();
-    ctx.moveTo(-142, headY - 38);
-    ctx.quadraticCurveTo(-175, headY - 45, -195, headY - 25);
-    ctx.quadraticCurveTo(-180, headY - 10, -155, headY - 16);
-    ctx.quadraticCurveTo(-142, headY - 22, -142, headY - 38);
-    ctx.closePath();
-    ctx.fill();
-    ctx.stroke();
-
-    // Nasal conchae horizontal ridges
-    ctx.strokeStyle = '#B91C1C';
-    ctx.lineWidth = 1.2;
-    ctx.beginPath();
-    ctx.moveTo(-182, headY - 28); ctx.lineTo(-155, headY - 28);
-    ctx.moveTo(-186, headY - 22); ctx.lineTo(-158, headY - 22);
-    ctx.stroke();
-
-    // Oral cavity & Pharynx lumen
-    ctx.fillStyle = '#FFE4E6';
-    ctx.strokeStyle = '#FDA4AF';
-    ctx.lineWidth = 1.5;
-    ctx.beginPath();
-    ctx.moveTo(mouthX, mouthY - 4);
-    ctx.quadraticCurveTo(-155, mouthY - 10, -180, mouthY - 4); // Hard & soft palate
-    ctx.quadraticCurveTo(-198, headY + 5, -188, tracheaTopY); // Pharynx rear wall
-    ctx.lineTo(tracheaX, tracheaTopY); // Anterior larynx entry
-    ctx.quadraticCurveTo(-184, headY + 5, -165, mouthY + 10);
-    ctx.lineTo(mouthX, mouthY + 4);
-    ctx.closePath();
-    ctx.fill();
-    ctx.stroke();
-
-    // Crimson muscular tongue
-    ctx.fillStyle = '#BE123C';
-    ctx.beginPath();
-    ctx.moveTo(-138, mouthY + 6);
-    ctx.quadraticCurveTo(-158, mouthY + 2, -174, mouthY + 12);
-    ctx.quadraticCurveTo(-155, mouthY + 18, -138, mouthY + 6);
-    ctx.fill();
-    ctx.restore();
-
-    // ========================================================
-    // 3. RIGHT ARM & HAND HOLDING THE NEBULIZER
-    // ========================================================
-    const cupX = -42;
-    const cupY = -18;
-
-    ctx.save();
-    // Arm sleeve / upper arm contour
-    ctx.fillStyle = skinGrad;
-    ctx.strokeStyle = '#0F172A';
-    ctx.lineWidth = 2.0;
-
-    // Forearm extending upward from chest to clasp nebulizer cup
-    ctx.beginPath();
-    ctx.moveTo(-18, headY + 265);
-    ctx.quadraticCurveTo(72, headY + 235, 82, headY + 140); // Elbow / forearm lateral curve
-    ctx.quadraticCurveTo(80, headY + 75, 45, cupY + 35); // Wrist approaching cup
-    ctx.lineTo(cupX + 22, cupY + 35);
-    ctx.lineTo(cupX + 22, cupY - 12); // Fingers clasping cup
-    ctx.quadraticCurveTo(cupX + 35, cupY - 22, cupX + 22, cupY - 32); // Thumb over T-piece
-    ctx.quadraticCurveTo(45, cupY - 15, 48, headY + 80);
-    ctx.quadraticCurveTo(55, headY + 160, -15, headY + 235);
-    ctx.closePath();
-    ctx.fill();
-    ctx.stroke();
-
-    // Individual fingers wrapped around nebulizer cup (matching reference diagram)
-    ctx.fillStyle = '#F8D2C4';
-    ctx.strokeStyle = '#0F172A';
-    ctx.lineWidth = 1.6;
-    for (let f = 0; f < 4; f++) {
-      const fy = cupY - 6 + f * 11;
+    } else {
+      // Fallback clean frame while image is decoding
+      ctx.fillStyle = '#F0F9FF';
+      ctx.strokeStyle = '#CBD5E1';
+      ctx.lineWidth = 2;
       ctx.beginPath();
-      ctx.roundRect(cupX + 8, fy, 22, 9, 4.5);
+      ctx.roundRect(imgX, imgY, imgW, imgH, 12);
       ctx.fill();
       ctx.stroke();
+
+      ctx.font = '700 14px "Plus Jakarta Sans", sans-serif';
+      ctx.fillStyle = '#0284C7';
+      ctx.textAlign = 'center';
+      ctx.fillText('Loading Medical Illustration...', 0, imgY + imgH / 2);
     }
-    // Thumb resting behind T-piece
-    ctx.beginPath();
-    ctx.roundRect(cupX - 10, cupY - 32, 14, 18, 5);
-    ctx.fill();
-    ctx.stroke();
-    ctx.restore();
 
     // ========================================================
-    // 4. NEBULIZER DEVICE (MOUTHPIECE, T-PIECE & RESERVOIR CUP)
+    // 3. ANIMATED 60 FPS DYNAMIC FLOW OVERLAYS
     // ========================================================
+    // A. Active Bubbling & Mist Vaporization inside Nebulizer Reservoir Cup
     ctx.save();
-    // Clear blue compressor tubing descending from bottom of cup
-    ctx.strokeStyle = '#0284C7';
-    ctx.lineWidth = 3.5;
-    ctx.beginPath();
-    ctx.moveTo(cupX, cupY + 45);
-    ctx.lineTo(cupX, cupY + 115);
-    ctx.stroke();
-
-    // Horizontal Mouthpiece Tube (held between lips)
-    ctx.fillStyle = '#E0F2FE';
-    ctx.strokeStyle = '#0F172A';
-    ctx.lineWidth = 2.0;
-    ctx.beginPath();
-    ctx.moveTo(mouthX + 6, mouthY - 6);
-    ctx.lineTo(cupX - 22, mouthY - 8);
-    ctx.lineTo(cupX - 10, mouthY - 12);
-    ctx.lineTo(cupX - 10, mouthY + 12);
-    ctx.lineTo(cupX - 22, mouthY + 8);
-    ctx.lineTo(mouthX + 6, mouthY + 6);
-    ctx.closePath();
-    ctx.fill();
-    ctx.stroke();
-
-    // T-piece connector atop the cup
-    ctx.fillStyle = '#F8FAFC';
-    ctx.strokeStyle = '#0F172A';
-    ctx.lineWidth = 2.0;
-    ctx.beginPath();
-    ctx.roundRect(cupX - 18, cupY - 36, 36, 24, 4);
-    ctx.fill();
-    ctx.stroke();
-
-    // Vertical Medicine Chamber / Reservoir Cup
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
-    ctx.strokeStyle = '#0F172A';
-    ctx.lineWidth = 2.0;
-    ctx.beginPath();
-    ctx.roundRect(cupX - 16, cupY - 12, 32, 56, [0, 0, 8, 8]);
-    ctx.fill();
-    ctx.stroke();
-
-    // Liquid Level (2.5 mL aqueous dornase alfa in light blue)
-    ctx.fillStyle = 'rgba(56, 189, 248, 0.5)';
-    ctx.beginPath();
-    ctx.roundRect(cupX - 14, cupY + 12, 28, 30, [0, 0, 6, 6]);
-    ctx.fill();
-
-    // Volume measurement gradation lines
-    ctx.strokeStyle = '#64748B';
-    ctx.lineWidth = 1.0;
-    for (let mark = 0; mark < 4; mark++) {
-      const my = cupY + 34 - mark * 8;
-      ctx.beginPath();
-      ctx.moveTo(cupX - 14, my);
-      ctx.lineTo(cupX - 8, my);
-      ctx.stroke();
-    }
-
-    // Swirling bubbles & mist generated inside cup
     this.s11CupMist.forEach(cm => {
-      ctx.fillStyle = 'rgba(2, 132, 199, ' + cm.alpha + ')';
+      const p = toScreen(cm.u, cm.v);
+      ctx.fillStyle = `rgba(56, 189, 248, ${cm.alpha.toFixed(2)})`;
       ctx.beginPath();
-      ctx.arc(cupX + cm.x, cupY + cm.y, cm.r, 0, Math.PI * 2);
+      ctx.arc(p.x, p.y, cm.r, 0, Math.PI * 2);
       ctx.fill();
     });
-    ctx.restore();
 
-    // ========================================================
-    // 5. TRACHEA (WINDPipe) WITH CARTILAGINOUS C-RINGS
-    // ========================================================
-    ctx.save();
-    // Pinkish mucosal lumen
-    ctx.fillStyle = '#FFE4E6';
-    ctx.strokeStyle = '#0F172A';
-    ctx.lineWidth = 2.0;
-    ctx.beginPath();
-    ctx.rect(tracheaX - 11, tracheaTopY, 22, carinaY - tracheaTopY);
-    ctx.fill();
-    ctx.stroke();
-
-    // Segmented C-shaped cartilage rings (pale blue with 3D sheen)
-    for (let ry = tracheaTopY + 5; ry < carinaY - 4; ry += 7.5) {
-      ctx.fillStyle = '#F1F5F9';
-      ctx.strokeStyle = '#0F172A';
-      ctx.lineWidth = 1.2;
-      ctx.beginPath();
-      ctx.roundRect(tracheaX - 12, ry - 2.5, 24, 5, 2.5);
-      ctx.fill();
-      ctx.stroke();
-      // Cartilage highlight
-      ctx.fillStyle = '#38BDF8';
-      ctx.beginPath();
-      ctx.arc(tracheaX - 6, ry, 1.2, 0, Math.PI * 2);
-      ctx.arc(tracheaX + 6, ry, 1.2, 0, Math.PI * 2);
-      ctx.fill();
-    }
-    ctx.restore();
-
-    // ========================================================
-    // 6. BILATERAL LUNGS (5 LOBES + CARDIAC NOTCH) & BRONCHIAL TREE
-    // ========================================================
-    const rLungX = -236;
-    const lLungX = -120;
-    const lungY = 145;
-    const rExp = chestExpand;
-    const lExp = chestExpand * 0.9;
-
-    ctx.save();
-    // >>> RIGHT LUNG (3 Lobes: Superior, Middle, Inferior) <<<
-    const rLungGrad = ctx.createRadialGradient(rLungX, lungY, 15, rLungX, lungY, 80 + rExp);
-    rLungGrad.addColorStop(0, '#FFE4E6');
-    rLungGrad.addColorStop(0.5, '#FDA4AF');
-    rLungGrad.addColorStop(1, '#FB7185');
-    ctx.fillStyle = rLungGrad;
-    ctx.strokeStyle = '#0F172A';
-    ctx.lineWidth = 2.0;
-
-    ctx.beginPath();
-    ctx.moveTo(tracheaX - 6, carinaY);
-    ctx.quadraticCurveTo(rLungX + 15, carinaY - 10, rLungX - 15, carinaY + 5);
-    ctx.quadraticCurveTo(rLungX - 58 - rExp, carinaY + 30, rLungX - 58 - rExp, lungY);
-    ctx.quadraticCurveTo(rLungX - 62 - rExp, lungY + 45, rLungX - 45 - rExp, lungY + 70);
-    ctx.quadraticCurveTo(rLungX - 10, lungY + 84, rLungX + 22, lungY + 78);
-    ctx.quadraticCurveTo(rLungX + 38, lungY + 40, tracheaX - 6, carinaY + 45);
-    ctx.closePath();
-    ctx.fill();
-    ctx.stroke();
-
-    // Right lung fissures (dividing into 3 lobes)
-    ctx.strokeStyle = 'rgba(159, 18, 57, 0.45)';
-    ctx.lineWidth = 1.4;
-    ctx.beginPath();
-    ctx.moveTo(rLungX + 20, lungY - 10);
-    ctx.quadraticCurveTo(rLungX - 15, lungY - 12, rLungX - 58 - rExp, lungY - 10);
-    ctx.moveTo(rLungX + 10, lungY - 30);
-    ctx.quadraticCurveTo(rLungX - 25, lungY + 25, rLungX - 42, lungY + 68);
-    ctx.stroke();
-
-    // >>> LEFT LUNG (2 Lobes with Signature Cardiac Notch) <<<
-    const lLungGrad = ctx.createRadialGradient(lLungX, lungY, 15, lLungX, lungY, 78 + lExp);
-    lLungGrad.addColorStop(0, '#FFE4E6');
-    lLungGrad.addColorStop(0.5, '#FDA4AF');
-    lLungGrad.addColorStop(1, '#FB7185');
-    ctx.fillStyle = lLungGrad;
-    ctx.strokeStyle = '#0F172A';
-    ctx.lineWidth = 2.0;
-
-    ctx.beginPath();
-    ctx.moveTo(tracheaX + 6, carinaY);
-    ctx.quadraticCurveTo(lLungX - 15, carinaY - 10, lLungX + 15, carinaY + 5);
-    ctx.quadraticCurveTo(lLungX + 54 + lExp, carinaY + 30, lLungX + 54 + lExp, lungY);
-    ctx.quadraticCurveTo(lLungX + 56 + lExp, lungY + 50, lLungX + 35 + lExp, lungY + 74);
-    ctx.quadraticCurveTo(lLungX - 5, lungY + 82, lLungX - 26, lungY + 68);
-    // Medial Cardiac Notch (concave impression)
-    ctx.quadraticCurveTo(lLungX - 14, lungY + 40, lLungX - 22, lungY + 15);
-    ctx.quadraticCurveTo(lLungX - 12, carinaY + 25, tracheaX + 6, carinaY + 45);
-    ctx.closePath();
-    ctx.fill();
-    ctx.stroke();
-
-    // Left lung oblique fissure
-    ctx.strokeStyle = 'rgba(159, 18, 57, 0.45)';
-    ctx.lineWidth = 1.4;
-    ctx.beginPath();
-    ctx.moveTo(lLungX + 35, lungY - 20);
-    ctx.quadraticCurveTo(lLungX - 5, lungY + 25, lLungX - 18, lungY + 65);
-    ctx.stroke();
-    ctx.restore();
-
-    // --- BRONCHUS / BRONCHI TREE ARBORIZATION ---
-    ctx.save();
-    // Primary Mainstem Bronchi
-    ctx.strokeStyle = '#FFFFFF';
-    ctx.lineWidth = 9;
-    ctx.lineCap = 'round';
-    ctx.beginPath();
-    // Right bronchus
-    ctx.moveTo(tracheaX, carinaY);
-    ctx.quadraticCurveTo(rLungX + 15, carinaY + 16, rLungX, carinaY + 34);
-    // Left bronchus
-    ctx.moveTo(tracheaX, carinaY);
-    ctx.quadraticCurveTo(lLungX - 15, carinaY + 16, lLungX, carinaY + 36);
-    ctx.stroke();
-
-    ctx.strokeStyle = '#0F172A';
-    ctx.lineWidth = 1.8;
-    ctx.beginPath();
-    ctx.moveTo(tracheaX - 9, carinaY);
-    ctx.quadraticCurveTo(rLungX + 10, carinaY + 12, rLungX - 5, carinaY + 34);
-    ctx.moveTo(tracheaX + 9, carinaY);
-    ctx.quadraticCurveTo(lLungX - 10, carinaY + 12, lLungX + 5, carinaY + 36);
-    ctx.stroke();
-
-    // Branching Secondary & Tertiary Bronchioles
-    ctx.strokeStyle = '#FFFFFF';
-    ctx.lineWidth = 4.2;
-    // Right branches
-    ctx.beginPath();
-    ctx.moveTo(rLungX, carinaY + 34); ctx.quadraticCurveTo(rLungX - 15, lungY - 12, rLungX - 35, lungY - 25);
-    ctx.moveTo(rLungX, carinaY + 34); ctx.quadraticCurveTo(rLungX - 25, lungY + 15, rLungX - 42, lungY + 28);
-    ctx.moveTo(rLungX, carinaY + 34); ctx.quadraticCurveTo(rLungX - 10, lungY + 35, rLungX - 22, lungY + 58);
-    // Left branches
-    ctx.moveTo(lLungX, carinaY + 36); ctx.quadraticCurveTo(lLungX + 18, lungY - 12, lLungX + 36, lungY - 22);
-    ctx.moveTo(lLungX, carinaY + 36); ctx.quadraticCurveTo(lLungX + 24, lungY + 18, lLungX + 38, lungY + 34);
-    ctx.moveTo(lLungX, carinaY + 36); ctx.quadraticCurveTo(lLungX + 12, lungY + 40, lLungX + 20, lungY + 62);
-    ctx.stroke();
-
-    // Inner lumen for branching
-    ctx.strokeStyle = '#BAE6FD';
-    ctx.lineWidth = 2.0;
-    ctx.stroke();
-
-    // Terminal Alveoli clusters (Grape-like air sacs at lower lobes)
-    const drawAlveoliCluster = (ax, ay) => {
-      ctx.fillStyle = '#FECDD3';
-      ctx.strokeStyle = '#E11D48';
-      ctx.lineWidth = 1.0;
-      for (let sac = 0; sac < 7; sac++) {
-        const sang = (sac / 7) * Math.PI * 2;
-        ctx.beginPath();
-        ctx.arc(ax + Math.cos(sang) * 4.5, ay + Math.sin(sang) * 4.5, 3.2, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.stroke();
+    // Airway Path Interpolation Helper
+    // Returns interpolated (u, v) position along respiratory tract for prog in [0, 1]
+    const getAirwayPos = (prog, branch) => {
+      if (prog < 0.20) {
+        // Segment 1: Mouthpiece (u ~ 0.515 to 0.435, v ~ 0.285)
+        const t = prog / 0.20;
+        return {
+          u: 0.515 + t * (0.435 - 0.515),
+          v: 0.285 + Math.sin(t * Math.PI) * 0.005
+        };
+      } else if (prog < 0.40) {
+        // Segment 2: Oral cavity curving down into pharynx
+        const t = (prog - 0.20) / 0.20;
+        return {
+          u: 0.435 + t * (0.362 - 0.435),
+          v: 0.285 + t * (0.335 - 0.285)
+        };
+      } else if (prog < 0.65) {
+        // Segment 3: Straight down the vertical Trachea (Windpipe)
+        const t = (prog - 0.40) / 0.25;
+        return {
+          u: 0.362 + t * (0.350 - 0.362),
+          v: 0.335 + t * (0.505 - 0.335)
+        };
+      } else {
+        // Segment 4: Bifurcating at Carina into Bronchial Trees
+        const t = (prog - 0.65) / 0.35;
+        if (branch === 0) {
+          // Right lung (anatomical right, left side of image)
+          const targetU = 0.265;
+          const targetV = 0.680;
+          return {
+            u: 0.350 + t * (targetU - 0.350) + Math.sin(t * Math.PI) * -0.015,
+            v: 0.505 + t * (targetV - 0.505)
+          };
+        } else {
+          // Left lung (anatomical left, right side of image)
+          const targetU = 0.420;
+          const targetV = 0.680;
+          return {
+            u: 0.350 + t * (targetU - 0.350) + Math.sin(t * Math.PI) * 0.015,
+            v: 0.505 + t * (targetV - 0.505)
+          };
+        }
       }
     };
-    drawAlveoliCluster(rLungX - 22, lungY + 58);
-    drawAlveoliCluster(lLungX + 20, lungY + 62);
-    ctx.restore();
 
-    // ========================================================
-    // 7. ANIMATED AEROSOL MIST & DIRECTIONAL FLOW CHEVRONS
-    // ========================================================
-    // A. Aerosol Droplet Stream (Fine mist from cup -> mouth -> trachea -> lungs)
-    ctx.save();
+    // B. Shimmering Aerosol Particle Stream traversing the airway
     this.s11AerosolStream.forEach((p, idx) => {
-      const prog = p.prog;
-      let px, py;
+      const pos = getAirwayPos(p.prog, p.branch);
+      const s = toScreen(pos.u, pos.v);
 
-      if (prog < 0.22) {
-        // Mouthpiece to oral cavity
-        const t = prog / 0.22;
-        px = cupX - 8 + t * (mouthX - (cupX - 8));
-        py = mouthY + Math.sin(p.wobble + this.nebTimer * 6) * 3;
-      } else if (prog < 0.46) {
-        // Oral cavity down pharynx to trachea
-        const t = (prog - 0.22) / 0.24;
-        px = mouthX + t * (tracheaX - mouthX);
-        py = mouthY + t * (tracheaTopY - mouthY) + Math.sin(p.wobble + this.nebTimer * 5) * 3;
-      } else if (prog < 0.70) {
-        // Down vertical trachea to carina
-        const t = (prog - 0.46) / 0.24;
-        px = tracheaX + Math.sin(p.wobble + idx) * 3;
-        py = tracheaTopY + t * (carinaY - tracheaTopY);
-      } else {
-        // Splitting into left or right lung branches
-        const t = (prog - 0.70) / 0.30;
-        const targetX = p.branch === 0 ? rLungX - 22 : lLungX + 20;
-        const targetY = lungY + 60;
-        px = tracheaX + t * (targetX - tracheaX) + Math.sin(p.wobble + this.nebTimer * 4) * 2;
-        py = carinaY + t * (targetY - carinaY);
-      }
-
-      ctx.fillStyle = (idx % 5 === 0) ? '#0284C7' : 'rgba(56, 189, 248, 0.85)';
+      ctx.fillStyle = (idx % 6 === 0) ? '#FFFFFF' : ((idx % 3 === 0) ? '#0284C7' : 'rgba(56, 189, 248, 0.88)');
+      ctx.shadowColor = '#38BDF8';
+      ctx.shadowBlur = (idx % 5 === 0) ? 6 : 0;
       ctx.beginPath();
-      ctx.arc(px, py, p.r, 0, Math.PI * 2);
+      ctx.arc(s.x, s.y, p.r, 0, Math.PI * 2);
       ctx.fill();
     });
+    ctx.shadowBlur = 0;
 
-    // B. Directional Blue Flow Chevrons (matching reference arrows)
-    const drawFlowArrow = (x, y, angle) => {
+    // C. Glowing Directional Chevron Flow Pulses (matching blue arrows)
+    this.s11FlowPulses.forEach(fp => {
+      const pos = getAirwayPos(fp.prog, fp.branch);
+      const nextPos = getAirwayPos(Math.min(1.0, fp.prog + 0.03), fp.branch);
+      const s = toScreen(pos.u, pos.v);
+      const sNext = toScreen(nextPos.u, nextPos.v);
+
+      const angle = Math.atan2(sNext.y - s.y, sNext.x - s.x);
+
       ctx.save();
-      ctx.translate(x, y);
+      ctx.translate(s.x, s.y);
       ctx.rotate(angle);
       ctx.fillStyle = '#0284C7';
       ctx.strokeStyle = '#FFFFFF';
-      ctx.lineWidth = 1.0;
+      ctx.lineWidth = 1.2;
+      ctx.shadowColor = '#38BDF8';
+      ctx.shadowBlur = 8;
       ctx.beginPath();
       ctx.moveTo(5, 0);
       ctx.lineTo(-4, -4);
@@ -5814,171 +5405,31 @@ class PresentationEngine {
       ctx.fill();
       ctx.stroke();
       ctx.restore();
-    };
-
-    this.s11FlowChevrons.forEach(ch => {
-      const prog = ch.prog;
-      if (prog < 0.25) {
-        const t = prog / 0.25;
-        drawFlowArrow((cupX - 8) + t * (mouthX - (cupX - 8)), mouthY, Math.PI); // flowing left into mouth
-      } else if (prog < 0.50) {
-        const t = (prog - 0.25) / 0.25;
-        drawFlowArrow(mouthX + t * (tracheaX - mouthX), mouthY + t * (tracheaTopY - mouthY), Math.PI * 0.65);
-      } else if (prog < 0.75) {
-        const t = (prog - 0.50) / 0.25;
-        drawFlowArrow(tracheaX, tracheaTopY + t * (carinaY - tracheaTopY), Math.PI * 0.5); // flowing down trachea
-      } else {
-        const t = (prog - 0.75) / 0.25;
-        if (ch.branch === 0) {
-          drawFlowArrow(tracheaX + t * (rLungX - 15 - tracheaX), carinaY + t * (lungY + 40 - carinaY), Math.PI * 0.68);
-        } else {
-          drawFlowArrow(tracheaX + t * (lLungX + 15 - tracheaX), carinaY + t * (lungY + 40 - carinaY), Math.PI * 0.35);
-        }
-      }
-    });
-    ctx.restore();
-
-    // ========================================================
-    // 8. MAGNIFIED INSET CIRCLE: "ALVEOLAR LEVEL" (BOTTOM-RIGHT)
-    // ========================================================
-    const insetX = 358;
-    const insetY = 110;
-    const insetR = 64;
-
-    ctx.save();
-    // Inset Background Circle
-    ctx.fillStyle = '#FFFFFF';
-    ctx.strokeStyle = '#0F172A';
-    ctx.lineWidth = 2.4;
-    ctx.beginPath();
-    ctx.arc(insetX, insetY, insetR, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.stroke();
-
-    // Clip inside the circle
-    ctx.save();
-    ctx.beginPath();
-    ctx.arc(insetX, insetY, insetR - 1.5, 0, Math.PI * 2);
-    ctx.clip();
-
-    // Terminal Bronchiole tube entering from top-left
-    ctx.fillStyle = '#FFE4E6';
-    ctx.strokeStyle = '#E11D48';
-    ctx.lineWidth = 2.0;
-    ctx.beginPath();
-    ctx.moveTo(insetX - 44, insetY - 55);
-    ctx.lineTo(insetX - 18, insetY - 18);
-    ctx.lineTo(insetX - 6, insetY - 26);
-    ctx.lineTo(insetX - 32, insetY - 62);
-    ctx.closePath();
-    ctx.fill();
-    ctx.stroke();
-
-    // Pulmonary Arteriole (Blue deoxygenated vessel wrapping alveoli)
-    ctx.strokeStyle = '#0284C7';
-    ctx.lineWidth = 3.5;
-    ctx.lineCap = 'round';
-    ctx.beginPath();
-    ctx.moveTo(insetX - 10, insetY - 55);
-    ctx.quadraticCurveTo(insetX + 15, insetY - 35, insetX + 28, insetY - 10);
-    ctx.quadraticCurveTo(insetX + 42, insetY + 25, insetX + 18, insetY + 52);
-    ctx.stroke();
-
-    // Pulmonary Venule (Red oxygenated vessel wrapping alveoli)
-    ctx.strokeStyle = '#DC2626';
-    ctx.lineWidth = 3.5;
-    ctx.beginPath();
-    ctx.moveTo(insetX - 48, insetY - 20);
-    ctx.quadraticCurveTo(insetX - 45, insetY + 25, insetX - 18, insetY + 45);
-    ctx.quadraticCurveTo(insetX + 12, insetY + 55, insetX + 22, insetY + 52);
-    ctx.stroke();
-
-    // Alveoli Sac Clusters (Grape-like air sacs with thin diffusion membranes)
-    const sacOffsets = [
-      { x: -10, y: -8, r: 14 },
-      { x: 10, y: -6, r: 15 },
-      { x: 18, y: 12, r: 13 },
-      { x: 2, y: 22, r: 15 },
-      { x: -14, y: 14, r: 14 },
-      { x: 2, y: 6, r: 13 }
-    ];
-
-    sacOffsets.forEach(sac => {
-      const sGrad = ctx.createRadialGradient(insetX + sac.x, insetY + sac.y, 2, insetX + sac.x, insetY + sac.y, sac.r);
-      sGrad.addColorStop(0, '#FFF1F2');
-      sGrad.addColorStop(0.7, '#FECDD3');
-      sGrad.addColorStop(1, '#FDA4AF');
-      ctx.fillStyle = sGrad;
-      ctx.strokeStyle = '#E11D48';
-      ctx.lineWidth = 1.4;
-      ctx.beginPath();
-      ctx.arc(insetX + sac.x, insetY + sac.y, sac.r, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.stroke();
     });
 
-    // Aerosol Mist Droplets depositing inside the alveoli
+    // D. "Alveolar Level" Inset Circle Animation (Bottom-Right)
+    const insetCenter = toScreen(0.892, 0.825);
+    const insetR = 0.088 * imgW; // ~58px
+
+    // Pulsing highlight aura around inset
+    const pulseAlpha = 0.35 + Math.sin(this.nebTimer * 3.0) * 0.25;
+    ctx.strokeStyle = `rgba(2, 132, 199, ${pulseAlpha.toFixed(2)})`;
+    ctx.lineWidth = 2.5;
+    ctx.beginPath();
+    ctx.arc(insetCenter.x, insetCenter.y, insetR + 2, 0, Math.PI * 2);
+    ctx.stroke();
+
+    // Shimmering deposited aerosol droplets inside the alveolar clusters
     this.s11AlveolarDroplets.forEach(ad => {
-      const sac = sacOffsets[ad.sacIdx];
-      const dx = insetX + sac.x + Math.cos(ad.angle) * (ad.dist % (sac.r - 3));
-      const dy = insetY + sac.y + Math.sin(ad.angle) * (ad.dist % (sac.r - 3));
-      ctx.fillStyle = 'rgba(2, 132, 199, ' + ad.alpha + ')';
+      const dx = insetCenter.x + Math.cos(ad.angle) * ad.dist;
+      const dy = insetCenter.y + Math.sin(ad.angle) * ad.dist;
+      ctx.fillStyle = `rgba(2, 132, 199, ${ad.alpha.toFixed(2)})`;
       ctx.beginPath();
       ctx.arc(dx, dy, ad.r, 0, Math.PI * 2);
       ctx.fill();
     });
 
-    ctx.restore(); // Restore inset clipping
-    ctx.restore(); // Restore inset state
-
-    // Inset Title Label underneath
-    ctx.font = '800 12px "Plus Jakarta Sans", sans-serif';
-    ctx.fillStyle = '#0F172A';
-    ctx.textAlign = 'center';
-    ctx.fillText('Alveolar Level', insetX, insetY + insetR + 18);
-
-    // ========================================================
-    // 9. TECHNICAL CALLOUT LABELS MATCHING REFERENCE DIAGRAM
-    // ========================================================
-    drawRefCallout(cupX, cupY - 34, 15, vpY + 45, 'Nebulizer', 'left');
-    drawRefCallout(mouthX + 12, mouthY, 155, vpY + 80, 'Aerosolized Medication\n(fine mist)', 'left');
-    drawRefCallout(tracheaX - 11, tracheaTopY + 22, -370, vpY + 160, 'Trachea\n(Windpipe)', 'right');
-    drawRefCallout(lLungX + 24, lungY - 14, 190, vpY + 215, 'Bronchus / Bronchi', 'left');
-    drawRefCallout(lLungX + 48, lungY + 30, 190, vpY + 265, 'Lungs', 'left');
-    drawRefCallout(lLungX + 20, lungY + 62, 190, vpY + 330, 'Alveoli\n(Air sacs)', 'left');
-
-    // ========================================================
-    // 10. CLINICAL AEROSOL METRICS SUMMARY CARD (TOP RIGHT)
-    // ========================================================
-    const metricCardX = 140;
-    const metricCardY = vpY + 12;
-    const metricCardW = 310;
-    const metricCardH = 75;
-
-    ctx.fillStyle = '#FFFFFF';
-    ctx.strokeStyle = '#BAE6FD';
-    ctx.lineWidth = 1.2;
-    ctx.beginPath();
-    ctx.roundRect(metricCardX, metricCardY, metricCardW, metricCardH, 8);
-    ctx.fill();
-    ctx.stroke();
-
-    ctx.fillStyle = '#0284C7';
-    ctx.beginPath();
-    ctx.roundRect(metricCardX + 1, metricCardY + 1, metricCardW - 2, 3, [7, 7, 0, 0]);
-    ctx.fill();
-
-    ctx.font = '800 9.5px "JetBrains Mono", monospace';
-    ctx.fillStyle = '#0369A1';
-    ctx.textAlign = 'left';
-    ctx.fillText('★ PULMONARY TARGETING SPECIFICATIONS:', metricCardX + 12, metricCardY + 18);
-
-    ctx.font = '500 8.5px "Plus Jakarta Sans", sans-serif';
-    ctx.fillStyle = '#334155';
-    ctx.fillText('• 2.1–2.8 µm MMAD: >80% in respirable range (bypasses mouth filter).', metricCardX + 12, metricCardY + 36);
-    ctx.fillText('• Generative Delivery: Penetrates 10th–16th airway generations.', metricCardX + 12, metricCardY + 52);
-    ctx.fillText('• Dosage: 2.5 mg QD single-use ampule via dedicated jet nebulizer.', metricCardX + 12, metricCardY + 68);
-
+    ctx.restore();
     ctx.restore();
   }
 
