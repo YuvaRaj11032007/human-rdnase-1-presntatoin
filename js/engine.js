@@ -7295,79 +7295,67 @@ class PresentationEngine {
            bridges with yellow flash sparks, Golgi stacking branched N-glycans onto Asn18/Asn106,
            and secretory vesicles exocytosing active, shimmering rhDNase 1!
      ======================================================== */
-  initStage15HostOrganismCho() {
+initStage15HostOrganismCho() {
     this.stage15Timer = 0;
 
     // E. coli Ribosomes (dense 70S macromolecular crowding in bacterial cytosol)
     this.s15EcoliRibosomes = [];
-    for (let i = 0; i < 95; i++) {
+    for (let i = 0; i < 90; i++) {
       this.s15EcoliRibosomes.push({
-        x: -242 + (Math.random() - 0.5) * 230,
-        y: -10 + (Math.random() - 0.5) * 95,
-        r: 1.1 + Math.random() * 0.9
+        x: (Math.random() - 0.5) * 130,
+        y: (Math.random() - 0.5) * 55,
+        r: 1.2 + Math.random() * 0.8
       });
     }
 
-    // E. coli Flagella (4 peritrichous sinusoidal helical filaments with basal motors)
-    this.s15Flagella = [
-      { startX: -375, startY: -35, baseAngle: Math.PI * 0.92, len: 120, freq: 3.5, amp: 12 },
-      { startX: -380, startY: 25, baseAngle: Math.PI * 1.05, len: 130, freq: 3.2, amp: 14 },
-      { startX: -260, startY: 65, baseAngle: Math.PI * 0.55, len: 110, freq: 3.8, amp: 11 },
-      { startX: -125, startY: 20, baseAngle: -Math.PI * 0.12, len: 115, freq: 3.4, amp: 13 }
-    ];
-
     // E. coli Pili / Fimbriae (Fine filamentous adhesion organelles radiating from capsule)
     this.s15Pili = [];
-    const numPili = 48;
+    const numPili = 44;
     for (let i = 0; i < numPili; i++) {
       const angle = (i / numPili) * Math.PI * 2;
       this.s15Pili.push({
         u: i / numPili,
         angle: angle,
-        len: 17 + (i % 5) * 2.5 + Math.random() * 4,
+        len: 14 + (i % 4) * 2.5 + Math.random() * 4,
         wiggle: Math.random() * Math.PI * 2,
         flexPhase: Math.random() * Math.PI * 2,
         flexFreq: 1.8 + Math.random() * 1.5
       });
     }
 
-    // Shedding LPS Outer Membrane Vesicles (OMVs) & endotoxins
-    this.s15Omvs = [];
-    for (let i = 0; i < 9; i++) {
-      this.s15Omvs.push({
-        angle: Math.random() * Math.PI * 2,
-        dist: 72 + Math.random() * 40,
-        speed: 10 + Math.random() * 14,
-        r: 2.5 + Math.random() * 2.5
-      });
-    }
+    // E. coli Plasmids (3 small circular double-ring DNA plasmids)
+    this.s15Plasmids = [
+      { x: 30, y: 15, r: 8 },
+      { x: 50, y: -8, r: 7 },
+      { x: 42, y: 22, r: 6.5 }
+    ];
 
     // CHO Cell COPII Transport Vesicles (Rough ER -> cis-Golgi)
     this.s15ChoCopVesicles = [];
-    for (let i = 0; i < 5; i++) {
+    for (let i = 0; i < 6; i++) {
       this.s15ChoCopVesicles.push({
-        prog: i / 5,
+        prog: i / 6,
         speed: 0.22 + Math.random() * 0.08
       });
     }
 
     // CHO Cell Secretory Vesicles (trans-Golgi -> Plasma Membrane Exocytosis)
     this.s15ChoSecVesicles = [];
-    for (let i = 0; i < 6; i++) {
+    for (let i = 0; i < 7; i++) {
       this.s15ChoSecVesicles.push({
-        prog: i / 6,
+        prog: i / 7,
         speed: 0.16 + Math.random() * 0.05
       });
     }
 
     // Active extracellular rhDNase 1 molecules secreted into medium
     this.s15SecretedMolecules = [];
-    for (let i = 0; i < 18; i++) {
+    for (let i = 0; i < 16; i++) {
       this.s15SecretedMolecules.push({
-        x: 385 + Math.random() * 70,
-        y: -65 + Math.random() * 130,
-        vx: 14 + Math.random() * 16,
-        vy: (Math.random() - 0.5) * 16,
+        x: 350 + Math.random() * 95,
+        y: -100 + Math.random() * 160,
+        vx: 12 + Math.random() * 14,
+        vy: (Math.random() - 0.5) * 14,
         phase: Math.random() * Math.PI * 2
       });
     }
@@ -7388,19 +7376,13 @@ class PresentationEngine {
       if (v.prog > 1.0) v.prog -= 1.0;
     });
 
-    // OMVs shedding from E. coli
-    this.s15Omvs.forEach(o => {
-      o.dist += o.speed * dt;
-      if (o.dist > 130) o.dist = 72;
-    });
-
     // Secreted rhDNase 1 molecules drifting in media
     this.s15SecretedMolecules.forEach(m => {
       m.x += m.vx * dt;
       m.y += m.vy * dt;
       if (m.x > 465) {
-        m.x = 385;
-        m.y = -60 + Math.random() * 120;
+        m.x = 340;
+        m.y = -90 + Math.random() * 150;
       }
     });
   }
@@ -7426,7 +7408,7 @@ class PresentationEngine {
     ctx.strokeStyle = '#CBD5E1';
     ctx.lineWidth = 1;
     ctx.beginPath();
-    ctx.roundRect(-275, -252, 550, 26, 13);
+    ctx.roundRect(-285, -252, 570, 26, 13);
     ctx.fill();
     ctx.stroke();
 
@@ -7434,21 +7416,47 @@ class PresentationEngine {
     ctx.fillStyle = '#0284C7';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    ctx.fillText('● CELLULAR BIOLOGY & HOST SELECTION • PROKARYOTIC vs. MAMMALIAN EXPRESSION', 0, -239);
+    ctx.fillText('● CELLULAR BIOLOGY • PROKARYOTE vs. EUKARYOTE BIOPROCESS HOSTS', 0, -239);
 
     ctx.font = '800 21px "Plus Jakarta Sans", sans-serif';
     ctx.fillStyle = '#0F172A';
-    ctx.fillText('The Host Organism: Why CHO Cells (and Why Bacteria Fail)', 0, -210);
+    ctx.fillText('COMPARISON OF BIOPROCESS HOSTS: E. COLI vs. CHO CELL', 0, -210);
 
     ctx.font = '500 11.5px "Plus Jakarta Sans", sans-serif';
     ctx.fillStyle = '#64748B';
-    ctx.fillText('Comparative cytology: Escherichia coli (Gram-negative prokaryote) vs. Chinese Hamster Ovary CHO-K1 (mammalian cell)', 0, -188);
+    ctx.fillText('Structural Cytology: Escherichia coli (~1–2 µm) vs. Chinese Hamster Ovary Cell (~15–20 µm)', 0, -188);
 
     const vpW = 458;
-    const vpH = 400;
+    const vpH = 405;
     const vpY = -172;
 
-    // --- LEFT CARD: ESCHERICHIA COLI (GRAM-NEGATIVE SAFRANIN PINK) ---
+    // Helper to draw clean callout with dot & line matching the reference image
+    const drawRefCallout = (targetX, targetY, labelX, labelY, label, align = 'left') => {
+      ctx.save();
+      ctx.strokeStyle = '#334155';
+      ctx.lineWidth = 1.0;
+      ctx.beginPath();
+      ctx.moveTo(targetX, targetY);
+      ctx.lineTo(labelX, labelY);
+      ctx.stroke();
+
+      ctx.fillStyle = '#0F172A';
+      ctx.beginPath();
+      ctx.arc(targetX, targetY, 2.2, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.font = '600 9px "Plus Jakarta Sans", sans-serif';
+      ctx.fillStyle = '#0F172A';
+      ctx.textAlign = align;
+      ctx.textBaseline = 'middle';
+      const offset = align === 'left' ? 4 : -4;
+      ctx.fillText(label, labelX + offset, labelY);
+      ctx.restore();
+    };
+
+    // ========================================================
+    // LEFT CARD: A. ESCHERICHIA COLI (PROKARYOTE) ~1–2 µm
+    // ========================================================
     const leftX = -470;
     ctx.fillStyle = '#FFFFFF';
     ctx.strokeStyle = '#CBD5E1';
@@ -7458,9 +7466,9 @@ class PresentationEngine {
     ctx.fill();
     ctx.stroke();
 
-    // Card Header Pill
-    ctx.fillStyle = '#FFF1F2';
-    ctx.strokeStyle = '#FDA4AF';
+    // Card Header Banner
+    ctx.fillStyle = '#F0FDF4';
+    ctx.strokeStyle = '#86EFAC';
     ctx.lineWidth = 1;
     ctx.beginPath();
     ctx.roundRect(leftX + 14, vpY + 12, vpW - 28, 28, 6);
@@ -7468,155 +7476,258 @@ class PresentationEngine {
     ctx.stroke();
 
     ctx.font = '800 10px "JetBrains Mono", monospace';
-    ctx.fillStyle = '#E11D48';
+    ctx.fillStyle = '#15803D';
     ctx.textAlign = 'left';
-    ctx.fillText('ESCHERICHIA COLI • BACTERIAL PROKARYOTE', leftX + 24, vpY + 26);
+    ctx.fillText('A. Escherichia coli (Prokaryote) ~1–2 µm', leftX + 24, vpY + 26);
     ctx.font = '700 8.5px "JetBrains Mono", monospace';
-    ctx.fillStyle = '#BE123C';
+    ctx.fillStyle = '#166534';
     ctx.textAlign = 'right';
-    ctx.fillText('[GRAM-NEGATIVE BACILLUS]', leftX + vpW - 24, vpY + 26);
+    ctx.fillText('[BACTERIAL PROKARYOTE]', leftX + vpW - 24, vpY + 26);
 
-    // E. coli Bacterium Anatomy Center
-    const bX = leftX + vpW / 2;
-    const bY = vpY + 142;
-    const bW = 270;
-    const bH = 120;
-    const bR = 46;
+    // E. coli Center & Tilted Angle (~-30 degrees like reference diagram)
+    const bX = leftX + 235;
+    const bY = vpY + 130;
+    const bRot = -0.46; // ~-26.5 deg tilt
 
-    // 1. Peritrichous Flagella
-    this.s15Flagella.forEach(f => {
-      ctx.save();
-      ctx.strokeStyle = '#FB7185';
-      ctx.lineWidth = 1.6;
-      ctx.beginPath();
-      for (let s = 0; s <= f.len; s += 4) {
-        const wave = Math.sin(s * 0.075 - this.stage15Timer * f.freq) * f.amp * (s / f.len);
-        const px = f.startX + Math.cos(f.baseAngle) * s - Math.sin(f.baseAngle) * wave;
-        const py = f.startY + Math.sin(f.baseAngle) * s + Math.cos(f.baseAngle) * wave;
-        if (s === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
-      }
-      ctx.stroke();
-      ctx.restore();
-    });
-
-    // 2. Fine Filamentous Pili / Fimbriae around Capsule Perimeter
-    if (this.s15Pili) {
-      ctx.save();
-      ctx.strokeStyle = '#F43F5E';
-      ctx.lineWidth = 0.9;
-      this.s15Pili.forEach(pil => {
-        const rad = (typeof pil.angle === 'number' && !isNaN(pil.angle)) ? pil.angle : ((pil.u || 0) * Math.PI * 2);
-        const pLen = (typeof pil.len === 'number' && !isNaN(pil.len)) ? pil.len : 20;
-        const pWiggle = (typeof pil.wiggle === 'number' && !isNaN(pil.wiggle)) ? pil.wiggle : 0;
-        const cx = bX + Math.cos(rad) * (bW / 2 - 20);
-        const cy = bY + Math.sin(rad) * (bH / 2 - 12);
-        const wave = Math.sin(this.stage15Timer * 4.5 + pWiggle) * 2.5;
-        const ex = cx + Math.cos(rad + wave * 0.06) * pLen;
-        const ey = cy + Math.sin(rad + wave * 0.06) * pLen;
-        ctx.beginPath();
-        ctx.moveTo(cx, cy);
-        ctx.lineTo(ex, ey);
-        ctx.stroke();
-      });
-      ctx.restore();
-    }
-
-    // 3. Gram-Negative Safranin Pink Bacillus Body
     ctx.save();
-    const bacGrad = ctx.createLinearGradient(bX - bW / 2, 0, bX + bW / 2, 0);
-    bacGrad.addColorStop(0, '#FECDD3');
-    bacGrad.addColorStop(0.5, '#FDA4AF');
-    bacGrad.addColorStop(1, '#FECDD3');
-    ctx.fillStyle = bacGrad;
-    ctx.strokeStyle = '#E11D48';
-    ctx.lineWidth = 2.4;
-    ctx.beginPath();
-    ctx.roundRect(bX - bW / 2, bY - bH / 2, bW, bH, bR);
-    ctx.fill();
-    ctx.stroke();
+    ctx.translate(bX, bY);
+    ctx.rotate(bRot);
 
-    // Inner Peptidoglycan & Inner Membrane
-    ctx.strokeStyle = '#FB7185';
+    // Capsule Body Dimensions
+    const capW = 168;
+    const capH = 74;
+    const capR = 36;
+
+    // 1. Pili / Fimbriae radiating around capsule perimeter
+    ctx.save();
+    ctx.strokeStyle = '#4D7C0F';
     ctx.lineWidth = 1.2;
-    ctx.beginPath();
-    ctx.roundRect(bX - bW / 2 + 5, bY - bH / 2 + 5, bW - 10, bH - 10, bR - 4);
-    ctx.stroke();
-
-    // 4. Insoluble Inactive INCLUSION BODIES (Misfolded rhDNase Precipitate in Dark Maroon)
-    const incBodies = [
-      { x: bX - 70, y: bY - 14, r: 16 },
-      { x: bX + 65, y: bY + 12, r: 18 },
-      { x: bX - 10, y: bY + 18, r: 14 }
-    ];
-    incBodies.forEach(ib => {
-      ctx.fillStyle = '#881337';
-      ctx.strokeStyle = '#BE123C';
-      ctx.lineWidth = 1.5;
+    this.s15Pili.forEach(pil => {
+      const rad = (typeof pil.angle === 'number' && !isNaN(pil.angle)) ? pil.angle : ((pil.u || 0) * Math.PI * 2);
+      const pLen = (typeof pil.len === 'number' && !isNaN(pil.len)) ? pil.len : 18;
+      const pWiggle = (typeof pil.wiggle === 'number' && !isNaN(pil.wiggle)) ? pil.wiggle : 0;
+      // Elliptical boundary anchor
+      const ex = Math.cos(rad) * (capW / 2 - 4);
+      const ey = Math.sin(rad) * (capH / 2 - 4);
+      const sway = Math.sin(this.stage15Timer * 3.5 + pWiggle) * 2.2;
+      const tx = ex + Math.cos(rad + sway * 0.08) * pLen;
+      const ty = ey + Math.sin(rad + sway * 0.08) * pLen;
       ctx.beginPath();
-      ctx.arc(ib.x, ib.y, ib.r, 0, Math.PI * 2);
-      ctx.fill();
+      ctx.moveTo(ex, ey);
+      ctx.lineTo(tx, ty);
       ctx.stroke();
-
-      ctx.fillStyle = '#FFE4E6';
-      ctx.font = '700 7px "JetBrains Mono", monospace';
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
-      ctx.fillText('INCLUSION BODY', ib.x, ib.y);
     });
+    ctx.restore();
 
-    // 5. Nucleoid DNA loops (Pale Lavender)
-    ctx.strokeStyle = '#C084FC';
-    ctx.lineWidth = 1.4;
+    // 2. Trailing Sinusoidal Flagellum from Left Pole
+    ctx.save();
+    ctx.strokeStyle = '#3F6212';
+    ctx.lineWidth = 2.4;
+    ctx.lineCap = 'round';
     ctx.beginPath();
-    for (let loop = 0; loop < 18; loop++) {
-      const lx = bX - 50 + loop * 6 + Math.sin(this.stage15Timer * 2 + loop) * 4;
-      const ly = bY - 8 + Math.cos(loop * 1.5) * 14;
-      if (loop === 0) ctx.moveTo(lx, ly); else ctx.lineTo(lx, ly);
+    const flgStartX = -capW / 2 + 6;
+    const flgStartY = 4;
+    ctx.moveTo(flgStartX, flgStartY);
+    for (let s = 0; s <= 140; s += 3) {
+      const fx = flgStartX - s;
+      const wave = Math.sin(s * 0.055 - this.stage15Timer * 4.8) * 18 * Math.min(1.0, s / 30);
+      const fy = flgStartY + wave + s * 0.15;
+      ctx.lineTo(fx, fy);
     }
     ctx.stroke();
     ctx.restore();
 
-    // Critique Box for E. coli
-    const critY = vpY + 220;
+    // 3. Multi-Layer Capsule & Wall (3D Cutaway)
+    // Layer 1: Outer Green Capsule
+    const capGrad = ctx.createLinearGradient(-capW / 2, 0, capW / 2, 0);
+    capGrad.addColorStop(0, '#65A30D');
+    capGrad.addColorStop(0.5, '#84CC16');
+    capGrad.addColorStop(1, '#65A30D');
+    ctx.fillStyle = capGrad;
+    ctx.strokeStyle = '#3F6212';
+    ctx.lineWidth = 2.0;
+    ctx.beginPath();
+    ctx.roundRect(-capW / 2, -capH / 2, capW, capH, capR);
+    ctx.fill();
+    ctx.stroke();
+
+    // Cutaway Opening: Longitudinal slice revealing yellow cell wall and orange membrane
+    // Layer 2: Yellow Cell Wall
+    ctx.fillStyle = '#FACC15';
+    ctx.strokeStyle = '#CA8A04';
+    ctx.lineWidth = 1.4;
+    ctx.beginPath();
+    ctx.roundRect(-capW / 2 + 7, -capH / 2 + 7, capW - 14, capH - 14, capR - 5);
+    ctx.fill();
+    ctx.stroke();
+
+    // Layer 3: Orange Cell Membrane
+    ctx.fillStyle = '#FB923C';
+    ctx.strokeStyle = '#EA580C';
+    ctx.lineWidth = 1.4;
+    ctx.beginPath();
+    ctx.roundRect(-capW / 2 + 13, -capH / 2 + 13, capW - 26, capH - 26, capR - 9);
+    ctx.fill();
+    ctx.stroke();
+
+    // Layer 4: Pale Golden Cytoplasm Interior
+    const cytoGrad = ctx.createLinearGradient(0, -capH / 2 + 18, 0, capH / 2 - 18);
+    cytoGrad.addColorStop(0, '#FEF9C3');
+    cytoGrad.addColorStop(0.6, '#FEF08A');
+    cytoGrad.addColorStop(1, '#FDE047');
+    ctx.fillStyle = cytoGrad;
+    ctx.beginPath();
+    ctx.roundRect(-capW / 2 + 18, -capH / 2 + 18, capW - 36, capH - 36, capR - 13);
+    ctx.fill();
+
+    // 4. Ribosomes (70S small dark protein dots)
+    ctx.fillStyle = '#1E293B';
+    this.s15EcoliRibosomes.forEach(rb => {
+      ctx.beginPath();
+      ctx.arc(rb.x * 0.7, rb.y * 0.65, rb.r, 0, Math.PI * 2);
+      ctx.fill();
+    });
+
+    // 5. Nucleoid: Convoluted Circular Bacterial DNA (Green loop)
+    ctx.strokeStyle = '#15803D';
+    ctx.lineWidth = 2.0;
+    ctx.beginPath();
+    const nucPts = 24;
+    for (let np = 0; np < nucPts; np++) {
+      const nAng = (np / nucPts) * Math.PI * 2;
+      const nRad = 18 + Math.sin(np * 2.8 + this.stage15Timer * 2) * 6;
+      const nx = -15 + Math.cos(nAng) * (nRad * 1.6);
+      const ny = Math.sin(nAng) * nRad;
+      if (np === 0) ctx.moveTo(nx, ny); else ctx.lineTo(nx, ny);
+    }
+    ctx.closePath();
+    ctx.stroke();
+
+    // Inner coil shading for DNA
+    ctx.strokeStyle = '#22C55E';
+    ctx.lineWidth = 1.2;
+    ctx.beginPath();
+    for (let c = 0; c < 6; c++) {
+      const cx = -32 + c * 7;
+      const cy = Math.sin(c * 1.4 + this.stage15Timer * 3) * 6;
+      ctx.arc(cx, cy, 5, 0, Math.PI * 2);
+    }
+    ctx.stroke();
+
+    // 6. Plasmids (Circular small DNA rings)
+    this.s15Plasmids.forEach((pl, plIdx) => {
+      ctx.strokeStyle = plIdx === 0 ? '#0284C7' : '#D97706';
+      ctx.lineWidth = 1.4;
+      ctx.beginPath();
+      ctx.arc(pl.x, pl.y, pl.r, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.arc(pl.x, pl.y, pl.r - 2.5, 0, Math.PI * 2);
+      ctx.stroke();
+    });
+
+    // 7. Inactive Inclusion Bodies (Misfolded rhDNase Precipitates)
+    const incBodies = [
+      { x: -50, y: -8, r: 10 },
+      { x: 42, y: -10, r: 9 }
+    ];
+    incBodies.forEach(ib => {
+      ctx.fillStyle = '#881337';
+      ctx.strokeStyle = '#BE123C';
+      ctx.lineWidth = 1.2;
+      ctx.beginPath();
+      ctx.arc(ib.x, ib.y, ib.r, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.stroke();
+    });
+
+    ctx.restore(); // Restore E. coli rotation matrix
+
+    // 8. Callout Labels matching Reference Image
+    // Points transformed back to world space:
+    drawRefCallout(bX - 110, bY + 30, leftX + 18, vpY + 58, 'Flagellum', 'left');
+    drawRefCallout(bX - 35, bY - 45, leftX + 22, vpY + 84, 'Pili / Fimbriae', 'left');
+    drawRefCallout(bX + 45, bY - 48, leftX + 85, vpY + 68, 'Capsule', 'left');
+    drawRefCallout(bX + 75, bY - 32, leftX + 130, vpY + 54, 'Cell Wall', 'left');
+    drawRefCallout(bX + 88, bY - 14, leftX + vpW - 120, vpY + 60, 'Cell Membrane', 'left');
+    drawRefCallout(bX - 15, bY - 12, leftX + vpW - 130, vpY + 85, 'Nucleoid (circular DNA)', 'left');
+    drawRefCallout(bX + 32, bY + 12, leftX + vpW - 95, vpY + 110, 'Plasmids', 'left');
+    drawRefCallout(bX - 45, bY + 15, leftX + 18, vpY + 125, 'Ribosomes', 'left');
+
+    // Scale Bar at bottom of E. coli illustration
+    const scaleBarY = vpY + 222;
+    ctx.strokeStyle = '#0F172A';
+    ctx.lineWidth = 1.4;
+    ctx.beginPath();
+    ctx.moveTo(bX - 45, scaleBarY); ctx.lineTo(bX + 45, scaleBarY);
+    ctx.moveTo(bX - 45, scaleBarY - 4); ctx.lineTo(bX - 45, scaleBarY + 4);
+    ctx.moveTo(bX + 45, scaleBarY - 4); ctx.lineTo(bX + 45, scaleBarY + 4);
+    ctx.stroke();
+
+    ctx.font = '700 8.5px "JetBrains Mono", monospace';
+    ctx.fillStyle = '#0F172A';
+    ctx.textAlign = 'center';
+    ctx.fillText('~1–2 µm', bX, scaleBarY - 6);
+
+    // Summary Box for E. coli Failure
+    const critY = vpY + 242;
     ctx.fillStyle = '#FFF1F2';
     ctx.strokeStyle = '#FECDD3';
     ctx.lineWidth = 1;
     ctx.beginPath();
-    ctx.roundRect(leftX + 16, critY, vpW - 32, 160, 8);
+    ctx.roundRect(leftX + 14, critY, vpW - 28, 148, 8);
     ctx.fill();
     ctx.stroke();
 
     ctx.font = '800 9.5px "JetBrains Mono", monospace';
     ctx.fillStyle = '#9F1239';
     ctx.textAlign = 'left';
-    ctx.fillText('WHY PROKARYOTES (E. COLI) FAIL FOR rhDNase 1:', leftX + 26, critY + 20);
+    ctx.fillText('✕ WHY PROKARYOTES (E. COLI) FAIL FOR rhDNase 1:', leftX + 24, critY + 18);
 
     const ecoBullets = [
-      '• NO ENDOPLASMIC RETICULUM OR GOLGI: Lacks cellular organelle machinery.',
-      '• NO N-GLYCOSYLATION: Cannot synthesize complex sugars at Asn18 & Asn106.',
-      '• INACTIVE INCLUSION BODIES: High-yield expression precipitates as insoluble junk.',
-      '• TOXIC LPS ENDOTOXIN: Gram-negative outer membrane sheds pyrogens lethal in lungs.',
-      '• REFOLDING YIELD <2%: In vitro refolding from denaturants is commercially non-viable.'
+      '• NO ER OR GOLGI APPARATUS: Completely lacks N-glycosylation machinery.',
+      '• CANNOT FOLD DISULFIDES: Reducing cytoplasm triggers misfolded aggregates.',
+      '• INACTIVE INCLUSION BODIES: Overexpressed protein precipitates as dense junk.',
+      '• TOXIC LPS ENDOTOXIN: Gram-negative pyrogens trigger fatal airway shock in CF.',
+      '• REFOLDING YIELD <2%: In vitro chemical denaturation is commercially non-viable.'
     ];
-    ctx.font = '500 8.5px "Plus Jakarta Sans", sans-serif';
+    ctx.font = '500 8.2px "Plus Jakarta Sans", sans-serif';
     ctx.fillStyle = '#881337';
     ecoBullets.forEach((eb, eIdx) => {
-      ctx.fillText(eb, leftX + 26, critY + 44 + eIdx * 22);
+      ctx.fillText(eb, leftX + 24, critY + 38 + eIdx * 21);
     });
 
-    // --- RIGHT CARD: CHINESE HAMSTER OVARY CHO-K1 (AUTHENTIC HISTOLOGY PEACH/APRICOT) ---
+    // ========================================================
+    // CENTER "NOT TO SCALE" BADGE
+    // ========================================================
+    ctx.fillStyle = '#FFFFFF';
+    ctx.strokeStyle = '#CBD5E1';
+    ctx.lineWidth = 1.2;
+    ctx.beginPath();
+    ctx.roundRect(-42, scaleBarY - 12, 84, 22, 4);
+    ctx.fill();
+    ctx.stroke();
+
+    ctx.font = '800 8px "JetBrains Mono", monospace';
+    ctx.fillStyle = '#475569';
+    ctx.textAlign = 'center';
+    ctx.fillText('NOT TO SCALE', 0, scaleBarY + 2);
+
+    // ========================================================
+    // RIGHT CARD: B. CHO CELL (EUKARYOTE) ~15–20 µm
+    // ========================================================
     const rightX = 12;
     ctx.fillStyle = '#FFFFFF';
-    ctx.strokeStyle = '#0284C7';
+    ctx.strokeStyle = '#CBD5E1';
     ctx.lineWidth = 1.6;
     ctx.beginPath();
     ctx.roundRect(rightX, vpY, vpW, vpH, 10);
     ctx.fill();
     ctx.stroke();
 
-    // Card Header Pill
-    ctx.fillStyle = '#E0F2FE';
-    ctx.strokeStyle = '#0284C7';
+    // Card Header Banner
+    ctx.fillStyle = '#EFF6FF';
+    ctx.strokeStyle = '#93C5FD';
     ctx.lineWidth = 1;
     ctx.beginPath();
     ctx.roundRect(rightX + 14, vpY + 12, vpW - 28, 28, 6);
@@ -7624,110 +7735,234 @@ class PresentationEngine {
     ctx.stroke();
 
     ctx.font = '800 10px "JetBrains Mono", monospace';
-    ctx.fillStyle = '#0369A1';
+    ctx.fillStyle = '#1D4ED8';
     ctx.textAlign = 'left';
-    ctx.fillText('CHINESE HAMSTER OVARY (CHO-K1) • MAMMALIAN EXPRESSION', rightX + 24, vpY + 26);
+    ctx.fillText('B. CHO Cell (Eukaryote) ~15–20 µm', rightX + 24, vpY + 26);
     ctx.font = '700 8.5px "JetBrains Mono", monospace';
-    ctx.fillStyle = '#059669';
+    ctx.fillStyle = '#1E40AF';
     ctx.textAlign = 'right';
-    ctx.fillText('[FULLY FUNCTIONAL GLYCOSYLATION]', rightX + vpW - 24, vpY + 26);
+    ctx.fillText('[MAMMALIAN HOST CELL]', rightX + vpW - 24, vpY + 26);
 
-    // Mammalian CHO Cell Center
-    const cX = rightX + vpW / 2;
-    const cY = vpY + 142;
-    const cR = 64;
+    // CHO Cell Center & Radius
+    const cX = rightX + 235;
+    const cY = vpY + 130;
+    const cR = 76;
 
     ctx.save();
-    // 1. Plasma Membrane & Peach/Apricot Cytoplasm
-    const choGrad = ctx.createRadialGradient(cX, cY, 15, cX, cY, cR);
-    choGrad.addColorStop(0, '#FFF7ED');
-    choGrad.addColorStop(0.6, '#FED7AA');
-    choGrad.addColorStop(1, '#FB923C');
+    // 1. Plasma Membrane (Soft Organic Eukaryotic Boundary)
+    const choGrad = ctx.createRadialGradient(cX - 15, cY - 10, 15, cX, cY, cR);
+    choGrad.addColorStop(0, '#EFF6FF');
+    choGrad.addColorStop(0.65, '#DBEAFE');
+    choGrad.addColorStop(0.9, '#BFDBFE');
+    choGrad.addColorStop(1, '#60A5FA');
+
     ctx.fillStyle = choGrad;
-    ctx.strokeStyle = '#F59E0B';
+    ctx.strokeStyle = '#2563EB';
     ctx.lineWidth = 2.4;
     ctx.beginPath();
-    ctx.arc(cX, cY, cR, 0, Math.PI * 2);
+    // Natural organic cellular perimeter
+    const memPts = 32;
+    for (let mp = 0; mp < memPts; mp++) {
+      const mAng = (mp / memPts) * Math.PI * 2;
+      const ripple = Math.sin(mAng * 3 + this.stage15Timer * 2) * 2.2;
+      const mx = cX + Math.cos(mAng) * (cR + ripple);
+      const my = cY + Math.sin(mAng) * (cR * 0.92 + ripple);
+      if (mp === 0) ctx.moveTo(mx, my); else ctx.lineTo(mx, my);
+    }
+    ctx.closePath();
     ctx.fill();
     ctx.stroke();
 
-    // 2. Large Eukaryotic Nucleus (Deep Chromatin Violet/Purple)
-    const nucGrad = ctx.createRadialGradient(cX - 12, cY - 8, 4, cX - 12, cY - 8, 30);
-    nucGrad.addColorStop(0, '#818CF8');
-    nucGrad.addColorStop(0.7, '#4338CA');
-    nucGrad.addColorStop(1, '#312E81');
+    // 2. Cytosol Ribosomes (Free cytosolic dots)
+    ctx.fillStyle = '#475569';
+    for (let cr = 0; cr < 45; cr++) {
+      const crAng = cr * 0.8;
+      const crDist = 25 + (cr % 4) * 11;
+      ctx.beginPath();
+      ctx.arc(cX + Math.cos(crAng) * crDist, cY + Math.sin(crAng) * crDist * 0.8, 1.1, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    // 3. Central Nucleus (Large spherical double membrane)
+    const nucX = cX - 10;
+    const nucY = cY - 8;
+    const nucR = 27;
+
+    const nucGrad = ctx.createRadialGradient(nucX - 5, nucY - 5, 4, nucX, nucY, nucR);
+    nucGrad.addColorStop(0, '#C7D2FE');
+    nucGrad.addColorStop(0.6, '#A5B4FC');
+    nucGrad.addColorStop(0.9, '#818CF8');
+    nucGrad.addColorStop(1, '#4F46E5');
+
     ctx.fillStyle = nucGrad;
-    ctx.strokeStyle = '#6366F1';
+    ctx.strokeStyle = '#4338CA';
     ctx.lineWidth = 1.8;
     ctx.beginPath();
-    ctx.arc(cX - 12, cY - 8, 28, 0, Math.PI * 2);
+    ctx.arc(nucX, nucY, nucR, 0, Math.PI * 2);
     ctx.fill();
     ctx.stroke();
 
-    // Dense Nucleolus inside Nucleus
-    ctx.fillStyle = '#1E1B4B';
+    // Dense Nucleolus in Nucleus
+    ctx.fillStyle = '#312E81';
     ctx.beginPath();
-    ctx.arc(cX - 18, cY - 14, 8, 0, Math.PI * 2);
+    ctx.arc(nucX + 6, nucY + 4, 8.5, 0, Math.PI * 2);
     ctx.fill();
 
-    // 3. Endoplasmic Reticulum & Golgi Ribbons (Lavender)
-    ctx.strokeStyle = '#A855F7';
+    // 4. Rough Endoplasmic Reticulum (RER: folded purple cisternae studded with ribosomes)
+    ctx.strokeStyle = '#8B5CF6';
     ctx.lineWidth = 2.0;
-    for (let r = 0; r < 4; r++) {
+    for (let rer = 0; rer < 3; rer++) {
+      const rRad = nucR + 6 + rer * 5.5;
       ctx.beginPath();
-      ctx.arc(cX + 12, cY + 4, 34 + r * 6, -0.4, 1.4);
+      ctx.arc(nucX, nucY, rRad, -0.8, 1.2);
+      ctx.stroke();
+
+      // Ribosome studs along RER
+      ctx.fillStyle = '#312E81';
+      for (let rs = -0.7; rs < 1.1; rs += 0.22) {
+        const rx = nucX + Math.cos(rs) * (rRad + 1.2);
+        const ry = nucY + Math.sin(rs) * (rRad + 1.2);
+        ctx.beginPath();
+        ctx.arc(rx, ry, 1.0, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+
+    // 5. Smooth Endoplasmic Reticulum (SER: tubular interconnected network)
+    ctx.strokeStyle = '#A78BFA';
+    ctx.lineWidth = 1.6;
+    ctx.beginPath();
+    ctx.moveTo(nucX + 18, nucY - 22);
+    ctx.quadraticCurveTo(nucX + 35, nucY - 32, nucX + 44, nucY - 18);
+    ctx.quadraticCurveTo(nucX + 52, nucY - 6, nucX + 38, nucY - 4);
+    ctx.stroke();
+
+    // 6. Golgi Apparatus (Stacked curved pink/magenta cisternae)
+    const golgiX = cX + 22;
+    const golgiY = cY + 34;
+    ctx.strokeStyle = '#EC4899';
+    ctx.lineWidth = 2.2;
+    for (let g = 0; g < 4; g++) {
+      ctx.beginPath();
+      ctx.arc(golgiX, golgiY, 14 + g * 4.5, -0.3, 1.8);
       ctx.stroke();
     }
 
-    // 4. Secretory Transport Vesicles Budding Out Active rhDNase 1
-    const vPhase = this.stage15Timer * 2.5;
-    for (let v = 0; v < 8; v++) {
-      const vAng = v * (Math.PI / 4) + vPhase * 0.2;
-      const vDist = cR + 10 + Math.sin(vPhase + v) * 12;
-      const vx = cX + Math.cos(vAng) * vDist;
-      const vy = cY + Math.sin(vAng) * vDist;
+    // Budding Transport Vesicles from Golgi
+    ctx.fillStyle = '#F472B6';
+    ctx.beginPath();
+    ctx.arc(golgiX + 20, golgiY + 6, 2.5, 0, Math.PI * 2);
+    ctx.arc(golgiX + 16, golgiY + 16, 2.8, 0, Math.PI * 2);
+    ctx.arc(golgiX + 8, golgiY + 22, 2.4, 0, Math.PI * 2);
+    ctx.fill();
 
-      ctx.fillStyle = '#0284C7';
-      ctx.strokeStyle = '#38BDF8';
+    // 7. Mitochondria (Oval reddish-purple with folded inner cristae)
+    const drawMito = (mx, my, ang) => {
+      ctx.save();
+      ctx.translate(mx, my);
+      ctx.rotate(ang);
+      ctx.fillStyle = '#F43F5E';
+      ctx.strokeStyle = '#9F1239';
       ctx.lineWidth = 1.2;
       ctx.beginPath();
-      ctx.arc(vx, vy, 4.2, 0, Math.PI * 2);
+      ctx.ellipse(0, 0, 12, 6.5, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.stroke();
+      // Inner cristae folds
+      ctx.strokeStyle = '#FFE4E6';
+      ctx.lineWidth = 1.0;
+      ctx.beginPath();
+      ctx.moveTo(-7, -2); ctx.lineTo(-4, 2);
+      ctx.moveTo(-1, -2); ctx.lineTo(1, 2);
+      ctx.moveTo(4, -2); ctx.lineTo(7, 2);
+      ctx.stroke();
+      ctx.restore();
+    };
+
+    drawMito(cX - 46, cY - 26, -0.6);
+    drawMito(cX - 42, cY + 28, 0.4);
+    drawMito(cX + 38, cY - 32, 0.8);
+
+    // 8. Lysosomes
+    ctx.fillStyle = '#C084FC';
+    ctx.strokeStyle = '#7E22CE';
+    ctx.lineWidth = 1.0;
+    ctx.beginPath();
+    ctx.arc(cX - 24, cY + 44, 4.2, 0, Math.PI * 2);
+    ctx.fill(); ctx.stroke();
+
+    // 9. Active rhDNase 1 Exocytosis & Secretion into Broth
+    this.s15SecretedMolecules.forEach(sec => {
+      ctx.fillStyle = '#0284C7';
+      ctx.strokeStyle = '#38BDF8';
+      ctx.lineWidth = 1.0;
+      ctx.beginPath();
+      ctx.arc(sec.x, sec.y, 3.5, 0, Math.PI * 2);
       ctx.fill();
       ctx.stroke();
 
-      // Glycan branch marker
-      ctx.fillStyle = '#F59E0B';
+      // Dual N-Glycan branches (Asn18, Asn106)
+      ctx.strokeStyle = '#F59E0B';
+      ctx.lineWidth = 1.2;
       ctx.beginPath();
-      ctx.arc(vx + 3, vy - 3, 1.8, 0, Math.PI * 2);
-      ctx.fill();
-    }
-    ctx.restore();
+      ctx.moveTo(sec.x + 2, sec.y - 2); ctx.lineTo(sec.x + 5, sec.y - 5);
+      ctx.moveTo(sec.x - 2, sec.y + 2); ctx.lineTo(sec.x - 5, sec.y + 5);
+      ctx.stroke();
+    });
+
+    ctx.restore(); // Restore CHO transform
+
+    // 10. Callout Labels matching Reference Image
+    drawRefCallout(cX - cR + 8, cY - 10, rightX + 22, vpY + 54, 'Plasma Membrane', 'left');
+    drawRefCallout(nucX - 10, nucY - 14, rightX + 22, vpY + 76, 'Nucleus', 'left');
+    drawRefCallout(nucX + 6, nucY + 4, rightX + 22, vpY + 98, 'Nucleolus', 'left');
+    drawRefCallout(nucX + 18, nucY + 12, rightX + vpW - 140, vpY + 54, 'Rough Endoplasmic Reticulum', 'left');
+    drawRefCallout(nucX + 38, nucY - 18, rightX + vpW - 140, vpY + 74, 'Smooth Endoplasmic Reticulum', 'left');
+    drawRefCallout(golgiX + 8, golgiY + 10, rightX + vpW - 95, vpY + 125, 'Golgi Apparatus', 'left');
+    drawRefCallout(cX + 38, cY - 32, rightX + vpW - 85, vpY + 95, 'Mitochondria', 'left');
+    drawRefCallout(cX - 24, cY + 44, rightX + 22, vpY + 122, 'Lysosome', 'left');
+    drawRefCallout(cX - 15, cY + 28, rightX + 22, vpY + 142, 'Cytoplasm', 'left');
+    drawRefCallout(cX + 8, cY - 48, rightX + vpW - 80, vpY + 145, 'Ribosomes', 'left');
+
+    // Scale Bar at bottom of CHO illustration
+    ctx.strokeStyle = '#0F172A';
+    ctx.lineWidth = 1.4;
+    ctx.beginPath();
+    ctx.moveTo(cX - 65, scaleBarY); ctx.lineTo(cX + 65, scaleBarY);
+    ctx.moveTo(cX - 65, scaleBarY - 4); ctx.lineTo(cX - 65, scaleBarY + 4);
+    ctx.moveTo(cX + 65, scaleBarY - 4); ctx.lineTo(cX + 65, scaleBarY + 4);
+    ctx.stroke();
+
+    ctx.font = '700 8.5px "JetBrains Mono", monospace';
+    ctx.fillStyle = '#0F172A';
+    ctx.textAlign = 'center';
+    ctx.fillText('~15–20 µm', cX, scaleBarY - 6);
 
     // Success Advantages Box for CHO
     ctx.fillStyle = '#F0FDF4';
     ctx.strokeStyle = '#BBF7D0';
     ctx.lineWidth = 1;
     ctx.beginPath();
-    ctx.roundRect(rightX + 16, critY, vpW - 32, 160, 8);
+    ctx.roundRect(rightX + 14, critY, vpW - 28, 148, 8);
     ctx.fill();
     ctx.stroke();
 
     ctx.font = '800 9.5px "JetBrains Mono", monospace';
     ctx.fillStyle = '#15803D';
     ctx.textAlign = 'left';
-    ctx.fillText('WHY CHO CELLS ARE MANDATORY FOR PULMOZYME®:', rightX + 26, critY + 20);
+    ctx.fillText('✓ WHY CHO CELLS ARE MANDATORY FOR PULMOZYME®:', rightX + 24, critY + 18);
 
     const choBullets = [
-      '• DUAL N-GLYCOSYLATION (Asn18 & Asn106): Adds essential oligosaccharide chains.',
-      '• CORRECT DISULFIDE PAIRING: Cys101-Cys104 & Cys173-Cys209 form active pocket.',
-      '• DIRECT BROTH SECRETION: CHO secretes folded, soluble enzyme directly into media.',
-      '• PROVEN HUMAN BIOCOMPATIBILITY: Over 30 years of zero adverse immunogenicity.',
-      '• SUSPENSION SCALABILITY: Grows in 10,000L stirred bioreactors at >1.5 g/L titers.'
+      '• COMPLETE SECRETORY PATHWAY: ER chaperones fold complex 3D structures.',
+      '• AUTHENTIC DUAL N-GLYCOSYLATION: Adds branched glycans at Asn18 & Asn106.',
+      '• CORRECT DISULFIDE PAIRING: Cys101-104 & Cys173-209 form active site.',
+      '• SOLUBLE ACTIVE SECRETION: Secretes pure active monomer directly into broth.',
+      '• 30+ YEARS SAFE CLINICAL RECORD: Zero immunogenicity in cystic fibrosis patients.'
     ];
-    ctx.font = '500 8.5px "Plus Jakarta Sans", sans-serif';
+    ctx.font = '500 8.2px "Plus Jakarta Sans", sans-serif';
     ctx.fillStyle = '#14532D';
     choBullets.forEach((cb, cIdx) => {
-      ctx.fillText(cb, rightX + 26, critY + 44 + cIdx * 22);
+      ctx.fillText(cb, rightX + 24, critY + 38 + cIdx * 21);
     });
 
     ctx.restore();
@@ -7743,17 +7978,18 @@ class PresentationEngine {
      - Real-time automated feeds: Glucose/Gln, base pump for pH 7.00, Ca²⁺ stabilization
      - Interactive Biphasic Temperature Shift HUD: 37°C growth ⟶ 32.5°C production cold-shift!
      ======================================================== */
-  initStage16BioreactorProcess() {
+initStage16BioreactorProcess() {
     this.stage16Timer = 0;
+    this.s16ImpellerAngle = 0;
 
-    // Submerged sintered micro-sparger rising micro-bubble plume (DO 45%)
+    // Submerged Aerator rising micro-bubbles (DO 45%)
     this.s16Bubbles = [];
-    for (let i = 0; i < 75; i++) {
+    for (let i = 0; i < 55; i++) {
       this.s16Bubbles.push({
-        x: -180 + (Math.random() - 0.5) * 120,
-        y: 80 + Math.random() * 50,
+        x: -235 + (Math.random() - 0.5) * 115,
+        y: 85 + Math.random() * 40,
         vy: 38 + Math.random() * 45,
-        r: 1.2 + Math.random() * 1.8,
+        r: 1.2 + Math.random() * 2.2,
         wobble: Math.random() * Math.PI * 2,
         phase: Math.random() * Math.PI * 2
       });
@@ -7761,99 +7997,97 @@ class PresentationEngine {
 
     // Suspended mammalian CHO-K1 cells tumbling in low-shear streamlines
     this.s16ChoCells = [];
-    for (let i = 0; i < 34; i++) {
+    for (let i = 0; i < 28; i++) {
       this.s16ChoCells.push({
-        x: -180 + (Math.random() - 0.5) * 170,
-        y: -45 + (Math.random() - 0.5) * 175,
-        vx: (Math.random() - 0.5) * 14,
-        vy: (Math.random() - 0.5) * 14,
-        r: 4.8 + Math.random() * 2.2,
+        x: -235 + (Math.random() - 0.5) * 125,
+        y: -10 + (Math.random() - 0.5) * 110,
+        vx: (Math.random() - 0.5) * 15,
+        vy: (Math.random() - 0.5) * 15,
+        r: 4.2 + Math.random() * 2.0,
         angle: Math.random() * Math.PI * 2,
-        rotSpeed: 0.5 + (Math.random() - 0.5) * 1.2,
-        secreteTimer: Math.random() * 2
+        rotSpeed: 0.6 + (Math.random() - 0.5) * 1.2
       });
     }
 
     // Secreted rhDNase 1 micro-droplets in culture broth
     this.s16ProductDroplets = [];
-    for (let i = 0; i < 35; i++) {
+    for (let i = 0; i < 26; i++) {
       this.s16ProductDroplets.push({
-        x: -180 + (Math.random() - 0.5) * 180,
-        y: -40 + (Math.random() - 0.5) * 180,
+        x: -235 + (Math.random() - 0.5) * 135,
+        y: -10 + (Math.random() - 0.5) * 115,
         vx: (Math.random() - 0.5) * 18,
         vy: (Math.random() - 0.5) * 18,
         phase: Math.random() * Math.PI * 2
       });
     }
 
-    // Coolant flow circulation particles in thermal jacket
-    this.s16JacketFlow = [];
-    for (let i = 0; i < 14; i++) {
-      this.s16JacketFlow.push({
-        side: i % 2 === 0 ? -1 : 1, // left or right jacket
-        y: -100 + (i / 14) * 230,
-        speed: 32 + Math.random() * 18
+    // Top nutrient feed drops dripping from feeding pump into broth
+    this.s16FeedDrops = [];
+    for (let i = 0; i < 5; i++) {
+      this.s16FeedDrops.push({
+        x: -270 + (i % 2) * 8,
+        y: -50 + Math.random() * 25,
+        speed: 55 + Math.random() * 25
       });
     }
 
-    // Nutrient feed drops entering from top sterile manifold
-    this.s16FeedDrops = [];
+    // Effluent harvest flow pulse nodes through bottom drain pipe
+    this.s16EffluentPulses = [];
     for (let i = 0; i < 6; i++) {
-      this.s16FeedDrops.push({
-        x: -225 + (i % 2) * 90,
-        y: -135 + Math.random() * 45,
-        speed: 65 + Math.random() * 25
+      this.s16EffluentPulses.push({
+        prog: i / 6,
+        speed: 0.28 + Math.random() * 0.08
       });
     }
   }
 
   updateStage16(dt) {
     this.stage16Timer += dt;
+    this.s16ImpellerAngle += dt * 4.2; // ~40-60 RPM smooth visual rotation
 
-    // Bubbles rising from sintered sparger ring
+    // Bubbles rising from submerged aerator
     this.s16Bubbles.forEach(b => {
       b.y -= b.vy * dt;
       b.x += Math.sin(this.stage16Timer * 4 + b.wobble) * 0.45;
-      if (b.y < -95) {
-        b.y = 118;
-        b.x = -180 + (Math.random() - 0.5) * 110;
+      if (b.y < -30) {
+        b.y = 110;
+        b.x = -235 + (Math.random() - 0.5) * 110;
       }
     });
 
-    // CHO cells tumbling in low-shear toroidal streamlines
+    // CHO cells tumbling in gentle toroidal streamlines
     this.s16ChoCells.forEach(c => {
       c.x += c.vx * dt;
       c.y += c.vy * dt;
       c.angle += c.rotSpeed * dt;
-      c.secreteTimer += dt;
 
       // Gentle boundary restitution inside reactor broth
-      if (c.x < -275) c.vx = Math.abs(c.vx);
-      if (c.x > -85) c.vx = -Math.abs(c.vx);
-      if (c.y < -92) c.vy = Math.abs(c.vy);
-      if (c.y > 115) c.vy = -Math.abs(c.vy);
+      if (c.x < -300) c.vx = Math.abs(c.vx);
+      if (c.x > -170) c.vx = -Math.abs(c.vx);
+      if (c.y < -28) c.vy = Math.abs(c.vy);
+      if (c.y > 105) c.vy = -Math.abs(c.vy);
     });
 
     // Secreted rhDNase 1 droplets drifting
     this.s16ProductDroplets.forEach(p => {
       p.x += p.vx * dt;
       p.y += p.vy * dt;
-      if (p.x < -280) p.vx = Math.abs(p.vx);
-      if (p.x > -80) p.vx = -Math.abs(p.vx);
-      if (p.y < -95) p.vy = Math.abs(p.vy);
-      if (p.y > 120) p.vy = -Math.abs(p.vy);
-    });
-
-    // Jacket coolant flow
-    this.s16JacketFlow.forEach(j => {
-      j.y += j.speed * dt;
-      if (j.y > 130) j.y = -105;
+      if (p.x < -305) p.vx = Math.abs(p.vx);
+      if (p.x > -165) p.vx = -Math.abs(p.vx);
+      if (p.y < -30) p.vy = Math.abs(p.vy);
+      if (p.y > 110) p.vy = -Math.abs(p.vy);
     });
 
     // Top sterile feed drops dripping
     this.s16FeedDrops.forEach(d => {
       d.y += d.speed * dt;
-      if (d.y > -80) d.y = -135;
+      if (d.y > -28) d.y = -52;
+    });
+
+    // Bottom effluent flow
+    this.s16EffluentPulses.forEach(ef => {
+      ef.prog += ef.speed * dt;
+      if (ef.prog > 1.0) ef.prog -= 1.0;
     });
   }
 
@@ -7878,7 +8112,7 @@ class PresentationEngine {
     ctx.strokeStyle = '#CBD5E1';
     ctx.lineWidth = 1;
     ctx.beginPath();
-    ctx.roundRect(-275, -252, 550, 26, 13);
+    ctx.roundRect(-285, -252, 570, 26, 13);
     ctx.fill();
     ctx.stroke();
 
@@ -7886,22 +8120,44 @@ class PresentationEngine {
     ctx.fillStyle = '#0284C7';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    ctx.fillText('● UPSTREAM BIOPROCESSING • 10,000L FED-BATCH STIRRED TANK BIOREACTOR', 0, -239);
+    ctx.fillText('● UPSTREAM BIOPROCESSING • INDUSTRIAL STIRRED TANK BIOREACTOR', 0, -239);
 
     ctx.font = '800 21px "Plus Jakarta Sans", sans-serif';
     ctx.fillStyle = '#0F172A';
-    ctx.fillText('Upstream Bioreactor Engineering: Production of rhDNase 1 in CHO Cells', 0, -210);
+    ctx.fillText('10,000L Fed-Batch Bioreactor: Precision Agitation & Environmental Control', 0, -210);
 
     ctx.font = '500 11.5px "Plus Jakarta Sans", sans-serif';
     ctx.fillStyle = '#64748B';
-    ctx.fillText('Low-shear marine impellers, microsparge aeration, and biphasic hypothermic shift maximize recombinant enzyme yield', 0, -188);
+    ctx.fillText('Low-shear 3-tier impeller agitation, submerged micro-aeration, and real-time automated sensory feedback', 0, -188);
 
-    const vpW = 458;
-    const vpH = 400;
+    const vpW = 470;
+    const vpH = 405;
     const vpY = -172;
 
-    // --- LEFT PANEL: 10,000L STAINLESS STEEL BIOREACTOR CUTAWAY ---
-    const rX = -470;
+    // Helper for technical callout labels matching the reference diagram
+    const drawReactorCallout = (targetX, targetY, labelX, labelY, label, align = 'left') => {
+      ctx.save();
+      ctx.strokeStyle = '#0F172A';
+      ctx.lineWidth = 1.2;
+      ctx.beginPath();
+      ctx.moveTo(targetX, targetY);
+      ctx.lineTo(labelX, labelY);
+      ctx.stroke();
+
+      ctx.font = '700 11px "Plus Jakarta Sans", sans-serif';
+      ctx.fillStyle = '#0F172A';
+      ctx.textAlign = align;
+      ctx.textBaseline = 'middle';
+      const offset = align === 'left' ? 4 : -4;
+      ctx.fillText(label, labelX + offset, labelY);
+      ctx.restore();
+    };
+
+    // ========================================================
+    // LEFT PANEL: 10,000L INDUSTRIAL BIOREACTOR (REFERENCE MODEL)
+    // ========================================================
+    const leftX = -470;
+    const rX = leftX;
     ctx.fillStyle = '#FFFFFF';
     ctx.strokeStyle = '#CBD5E1';
     ctx.lineWidth = 1.6;
@@ -7910,138 +8166,492 @@ class PresentationEngine {
     ctx.fill();
     ctx.stroke();
 
-    // Top Header Pill
-    ctx.fillStyle = '#F1F5F9';
-    ctx.strokeStyle = '#94A3B8';
-    ctx.lineWidth = 1;
+    // Bioreactor Vessel Geometry
+    const vCenter = rX + 238; // -232
+    const tankW = 180;
+    const tankTopY = vpY + 115; // -57
+    const tankBtmY = vpY + 285; // 113
+    const tankH = tankBtmY - tankTopY; // 170
+
+    // ----------------------------------------------------
+    // 1. THERMAL JACKET (YELLOW / AMBER OUTER HEATING JACKET)
+    // ----------------------------------------------------
+    const jktTopY = vpY + 148;
+    const jktW = tankW + 28;
+    const jktBtmY = tankBtmY + 8;
+
+    ctx.save();
+    ctx.fillStyle = '#FBBF24';
+    ctx.strokeStyle = '#0F172A';
+    ctx.lineWidth = 2.2;
+
+    // Jacket Body hugging cylindrical vessel & dished bottom
     ctx.beginPath();
-    ctx.roundRect(rX + 14, vpY + 12, vpW - 28, 28, 6);
+    ctx.moveTo(vCenter - jktW / 2, jktTopY);
+    ctx.lineTo(vCenter - jktW / 2, tankBtmY - 10);
+    ctx.quadraticCurveTo(vCenter - jktW / 2, jktBtmY, vCenter, jktBtmY);
+    ctx.quadraticCurveTo(vCenter + jktW / 2, jktBtmY, vCenter + jktW / 2, tankBtmY - 10);
+    ctx.lineTo(vCenter + jktW / 2, jktTopY);
+    ctx.closePath();
     ctx.fill();
     ctx.stroke();
 
-    ctx.font = '800 10px "JetBrains Mono", monospace';
-    ctx.fillStyle = '#334155';
-    ctx.textAlign = 'left';
-    ctx.fillText('316L ELECTROPOLISHED STAINLESS VESSEL • 10,000L', rX + 24, vpY + 26);
-    ctx.font = '700 8.5px "JetBrains Mono", monospace';
-    ctx.fillStyle = '#0284C7';
-    ctx.textAlign = 'right';
-    ctx.fillText('[LOW-SHEAR MAMMALIAN SYSTEM]', rX + vpW - 24, vpY + 26);
+    // 4 Outer Mounting Lugs / Brackets on Jacket (2 Left, 2 Right)
+    const drawLug = (lx, ly, side) => {
+      ctx.fillStyle = '#EA580C';
+      ctx.strokeStyle = '#0F172A';
+      ctx.lineWidth = 1.8;
+      ctx.beginPath();
+      const dir = side === 'left' ? -1 : 1;
+      ctx.roundRect(lx, ly, dir * 14, 18, 4);
+      ctx.fill();
+      ctx.stroke();
+    };
 
-    // Vessel Dimensions & Coordinates
-    const vCenter = rX + vpW / 2;
-    const vMiddle = vpY + 210;
-    const vWidth = 230;
-    const vHeight = 250;
+    drawLug(vCenter - jktW / 2, vpY + 175, 'left');
+    drawLug(vCenter - jktW / 2, vpY + 245, 'left');
+    drawLug(vCenter + jktW / 2, vpY + 175, 'right');
+    drawLug(vCenter + jktW / 2, vpY + 245, 'right');
+    ctx.restore();
 
-    // 1. External Thermal Cooling Jacket (Polished Steel Jacket)
-    ctx.fillStyle = '#E2E8F0';
-    ctx.strokeStyle = '#94A3B8';
+    // ----------------------------------------------------
+    // 2. MAIN REACTOR TANK VESSEL
+    // ----------------------------------------------------
+    ctx.save();
+    // Inner Vessel Shell (White base)
+    ctx.fillStyle = '#FFFFFF';
+    ctx.strokeStyle = '#0F172A';
     ctx.lineWidth = 2.4;
     ctx.beginPath();
-    ctx.roundRect(vCenter - vWidth / 2 - 12, vMiddle - vHeight / 2 - 8, vWidth + 24, vHeight + 16, 26);
+    // Domed Top Head
+    ctx.moveTo(vCenter - tankW / 2, tankTopY + 25);
+    ctx.quadraticCurveTo(vCenter - tankW / 2, tankTopY, vCenter, tankTopY);
+    ctx.quadraticCurveTo(vCenter + tankW / 2, tankTopY, vCenter + tankW / 2, tankTopY + 25);
+    // Cylindrical Body
+    ctx.lineTo(vCenter + tankW / 2, tankBtmY - 15);
+    // Dished Bottom Head
+    ctx.quadraticCurveTo(vCenter + tankW / 2, tankBtmY, vCenter, tankBtmY);
+    ctx.quadraticCurveTo(vCenter - tankW / 2, tankBtmY, vCenter - tankW / 2, tankBtmY - 15);
+    ctx.closePath();
     ctx.fill();
     ctx.stroke();
 
-    // Circulating Glycol Coolant in Jacket
-    this.s16JacketFlow.forEach(jf => {
-      const jx = jf.side === -1 ? vCenter - vWidth / 2 - 6 : vCenter + vWidth / 2 + 6;
-      ctx.fillStyle = '#38BDF8';
-      ctx.beginPath();
-      ctx.arc(jx, vMiddle + (jf.y - 12), 2.4, 0, Math.PI * 2);
-      ctx.fill();
-    });
-
-    // 2. 316L Stainless Steel Internal Vessel Wall
-    const steelGrad = ctx.createLinearGradient(vCenter - vWidth / 2, 0, vCenter + vWidth / 2, 0);
-    steelGrad.addColorStop(0, '#E2E8F0');
-    steelGrad.addColorStop(0.2, '#F8FAFC');
-    steelGrad.addColorStop(0.5, '#CBD5E1');
-    steelGrad.addColorStop(0.8, '#F8FAFC');
-    steelGrad.addColorStop(1, '#E2E8F0');
-    ctx.fillStyle = steelGrad;
-    ctx.strokeStyle = '#64748B';
-    ctx.lineWidth = 2.0;
+    // ----------------------------------------------------
+    // 3. CELL CULTURE BROTH (LIGHT GREEN LIQUID MILIEU)
+    // ----------------------------------------------------
+    const brothTopY = vpY + 138;
+    ctx.save();
+    // Clip inside the lower vessel
     ctx.beginPath();
-    ctx.roundRect(vCenter - vWidth / 2 - 3, vMiddle - vHeight / 2 - 3, vWidth + 6, vHeight + 6, 22);
-    ctx.fill();
-    ctx.stroke();
+    ctx.moveTo(vCenter - tankW / 2 + 3, brothTopY);
+    ctx.lineTo(vCenter + tankW / 2 - 3, brothTopY);
+    ctx.lineTo(vCenter + tankW / 2 - 3, tankBtmY - 15);
+    ctx.quadraticCurveTo(vCenter + tankW / 2 - 3, tankBtmY - 3, vCenter, tankBtmY - 3);
+    ctx.quadraticCurveTo(vCenter - tankW / 2 + 3, tankBtmY - 3, vCenter - tankW / 2 + 3, tankBtmY - 15);
+    ctx.closePath();
+    ctx.clip();
 
-    // 3. Culture Broth Liquid (Warm Golden-Amber Cell Culture Medium)
-    const brothGrad = ctx.createLinearGradient(0, vMiddle - vHeight / 2, 0, vMiddle + vHeight / 2);
-    brothGrad.addColorStop(0, '#FEF3C7');
-    brothGrad.addColorStop(0.5, '#FDE68A');
-    brothGrad.addColorStop(1, '#F59E0B');
+    // Light Green Culture Broth Gradient
+    const brothGrad = ctx.createLinearGradient(0, brothTopY, 0, tankBtmY);
+    brothGrad.addColorStop(0, '#BEF264');
+    brothGrad.addColorStop(0.4, '#A3E635');
+    brothGrad.addColorStop(1, '#84CC16');
     ctx.fillStyle = brothGrad;
-    ctx.beginPath();
-    ctx.roundRect(vCenter - vWidth / 2, vMiddle - vHeight / 2 + 18, vWidth, vHeight - 20, 18);
-    ctx.fill();
+    ctx.fillRect(vCenter - tankW / 2, brothTopY - 4, tankW, tankH + 20);
 
-    // Liquid Meniscus Surface Waves
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
+    // Fluid Meniscus Surface Wave
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.45)';
     ctx.beginPath();
-    ctx.moveTo(vCenter - vWidth / 2, vMiddle - vHeight / 2 + 20);
-    for (let wx = -vWidth / 2; wx <= vWidth / 2; wx += 10) {
-      const waveY = vMiddle - vHeight / 2 + 20 + Math.sin(this.stage16Timer * 4 + wx * 0.08) * 2;
-      ctx.lineTo(vCenter + wx, waveY);
+    ctx.moveTo(vCenter - tankW / 2, brothTopY);
+    for (let wx = -tankW / 2; wx <= tankW / 2; wx += 12) {
+      const wy = brothTopY + Math.sin(this.stage16Timer * 4.5 + wx * 0.08) * 2.2;
+      ctx.lineTo(vCenter + wx, wy);
     }
-    ctx.lineTo(vCenter + vWidth / 2, vMiddle - vHeight / 2 + 26);
-    ctx.lineTo(vCenter - vWidth / 2, vMiddle - vHeight / 2 + 26);
+    ctx.lineTo(vCenter + tankW / 2, brothTopY + 8);
+    ctx.lineTo(vCenter - tankW / 2, brothTopY + 8);
     ctx.closePath();
     ctx.fill();
 
-    // 4. Central Agitator Shaft & Low-Shear Marine Impellers (Stainless Steel)
-    const shaftX = vCenter;
-    ctx.fillStyle = '#64748B';
-    ctx.fillRect(shaftX - 4, vMiddle - vHeight / 2 + 6, 8, vHeight - 24);
-
-    // Impeller Stages
-    const impY1 = vMiddle - 20;
-    const impY2 = vMiddle + 60;
-    const iRot = this.stage16Timer * 3.5;
-
-    [impY1, impY2].forEach(iy => {
-      const bW = Math.cos(iRot) * 48;
-      ctx.fillStyle = '#94A3B8';
-      ctx.strokeStyle = '#475569';
-      ctx.lineWidth = 1.5;
+    // ----------------------------------------------------
+    // 4. SUSPENDED CELLS & RISING BUBBLES IN BROTH
+    // ----------------------------------------------------
+    // Rising Oxygen Micro-Bubbles from Submerged Aerator
+    this.s16Bubbles.forEach(bub => {
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
       ctx.beginPath();
-      ctx.roundRect(shaftX - bW / 2, iy - 6, bW, 12, 3);
+      ctx.arc(bub.x, bub.y, bub.r, 0, Math.PI * 2);
+      ctx.fill();
+    });
+
+    // Suspended Mammalian CHO Cells
+    this.s16ChoCells.forEach(cp => {
+      ctx.fillStyle = '#FB923C';
+      ctx.strokeStyle = '#EA580C';
+      ctx.lineWidth = 1.0;
+      ctx.beginPath();
+      ctx.arc(cp.x, cp.y, cp.r, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.stroke();
+      // Cell Nucleus
+      ctx.fillStyle = '#4F46E5';
+      ctx.beginPath();
+      ctx.arc(cp.x - 0.8, cp.y - 0.8, cp.r * 0.45, 0, Math.PI * 2);
+      ctx.fill();
+    });
+
+    // Secreted rhDNase 1 Molecules in Broth
+    this.s16ProductDroplets.forEach(prd => {
+      ctx.fillStyle = '#0284C7';
+      ctx.beginPath();
+      ctx.arc(prd.x, prd.y, 2.2, 0, Math.PI * 2);
+      ctx.fill();
+    });
+
+    ctx.restore(); // Restore broth clipping
+
+    // ----------------------------------------------------
+    // 5. SUBMERGED AERATOR (BOTTOM SPARGER PIPE & AIR INLET)
+    // ----------------------------------------------------
+    const aeratorY = tankBtmY - 14;
+    const aeratorW = 118;
+    const airPipeX = vCenter - tankW / 2 + 16;
+
+    // Air Inlet Line running down inner wall from top to aerator
+    ctx.strokeStyle = '#0F172A';
+    ctx.lineWidth = 2.2;
+    ctx.beginPath();
+    ctx.moveTo(airPipeX - 22, tankTopY + 30);
+    ctx.lineTo(airPipeX, tankTopY + 30);
+    ctx.lineTo(airPipeX, aeratorY);
+    ctx.lineTo(vCenter - aeratorW / 2, aeratorY);
+    ctx.stroke();
+
+    // Air Arrow Inlet on Left
+    ctx.fillStyle = '#FFFFFF';
+    ctx.strokeStyle = '#0F172A';
+    ctx.lineWidth = 2.0;
+    ctx.beginPath();
+    ctx.moveTo(airPipeX - 42, tankTopY + 24);
+    ctx.lineTo(airPipeX - 24, tankTopY + 30);
+    ctx.lineTo(airPipeX - 42, tankTopY + 36);
+    ctx.closePath();
+    ctx.fill();
+    ctx.stroke();
+
+    // Submerged Aerator Sparger Pipe at Bottom
+    ctx.fillStyle = '#F8FAFC';
+    ctx.strokeStyle = '#0F172A';
+    ctx.lineWidth = 2.2;
+    ctx.beginPath();
+    ctx.roundRect(vCenter - aeratorW / 2, aeratorY - 4, aeratorW, 8, 4);
+    ctx.fill();
+    ctx.stroke();
+
+    // Sintered Micro-Holes on Sparger
+    ctx.fillStyle = '#0F172A';
+    for (let sh = -aeratorW / 2 + 10; sh <= aeratorW / 2 - 10; sh += 12) {
+      ctx.beginPath();
+      ctx.arc(vCenter + sh, aeratorY - 4, 1.2, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    // ----------------------------------------------------
+    // 6. AGITATION SYSTEM (TOP MOTOR, SHAFT & 3-TIER IMPELLERS)
+    // ----------------------------------------------------
+    const motorW = 44;
+    const motorH = 50;
+    const motorTopY = tankTopY - motorH - 8;
+
+    // Motor Support Mounting Bracket
+    ctx.fillStyle = '#475569';
+    ctx.fillRect(vCenter - 14, tankTopY - 8, 28, 9);
+
+    // Motor Bracket Side Strut (matching reference)
+    ctx.strokeStyle = '#0F172A';
+    ctx.lineWidth = 2.0;
+    ctx.beginPath();
+    ctx.moveTo(vCenter + motorW / 2, motorTopY + 12);
+    ctx.lineTo(vCenter + motorW / 2 + 8, motorTopY + 12);
+    ctx.lineTo(vCenter + motorW / 2 + 8, tankTopY - 4);
+    ctx.stroke();
+
+    // Orange/Copper Motor Body
+    ctx.fillStyle = '#EA580C';
+    ctx.strokeStyle = '#0F172A';
+    ctx.lineWidth = 2.2;
+    ctx.beginPath();
+    ctx.roundRect(vCenter - motorW / 2, motorTopY, motorW, motorH, 10);
+    ctx.fill();
+    ctx.stroke();
+
+    // Vertical Black Cooling Ribs on Motor
+    ctx.strokeStyle = '#0F172A';
+    ctx.lineWidth = 2.0;
+    for (let mr = -motorW / 2 + 7; mr <= motorW / 2 - 7; mr += 6) {
+      ctx.beginPath();
+      ctx.moveTo(vCenter + mr, motorTopY + 7);
+      ctx.lineTo(vCenter + mr, motorTopY + motorH - 7);
+      ctx.stroke();
+    }
+
+    // Central Vertical Impeller Shaft (Steel grey)
+    ctx.fillStyle = '#CBD5E1';
+    ctx.strokeStyle = '#0F172A';
+    ctx.lineWidth = 2.0;
+    ctx.fillRect(vCenter - 3.5, tankTopY - 4, 7, tankH - 12);
+    ctx.strokeRect(vCenter - 3.5, tankTopY - 4, 7, tankH - 12);
+
+    // 3-Tier Horizontal Impellers (Multi-Blade Flat Paddles)
+    const impLevels = [
+      tankTopY + 68,  // Tier 1 (Upper)
+      tankTopY + 108, // Tier 2 (Middle)
+      tankTopY + 148  // Tier 3 (Lower)
+    ];
+
+    const iRot = this.s16ImpellerAngle;
+    impLevels.forEach((iy, tierIdx) => {
+      // 3D Sinusoidal blade rotation
+      const bladeW = Math.cos(iRot) * 54;
+      const bladeH = 14;
+
+      ctx.fillStyle = '#94A3B8';
+      ctx.strokeStyle = '#0F172A';
+      ctx.lineWidth = 2.0;
+      ctx.beginPath();
+      ctx.roundRect(vCenter - bladeW, iy - bladeH / 2, bladeW * 2, bladeH, 4);
       ctx.fill();
       ctx.stroke();
 
-      ctx.fillStyle = '#475569';
+      // Central shaft hub mount
+      ctx.fillStyle = '#64748B';
       ctx.beginPath();
-      ctx.arc(shaftX, iy, 7, 0, Math.PI * 2);
+      ctx.arc(vCenter, iy, 6, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.stroke();
+    });
+
+    // Curved Stirring Rotation Arrows around Shaft (matching diagram)
+    ctx.strokeStyle = '#0F172A';
+    ctx.lineWidth = 2.0;
+    // Left arc arrow
+    ctx.beginPath();
+    ctx.arc(vCenter - 14, tankTopY + 45, 12, 0.4, 2.7);
+    ctx.stroke();
+    ctx.fillStyle = '#0F172A';
+    ctx.beginPath();
+    ctx.moveTo(vCenter - 26, tankTopY + 52);
+    ctx.lineTo(vCenter - 18, tankTopY + 56);
+    ctx.lineTo(vCenter - 22, tankTopY + 46);
+    ctx.closePath();
+    ctx.fill();
+
+    // Right arc arrow
+    ctx.beginPath();
+    ctx.arc(vCenter + 14, tankTopY + 45, 12, Math.PI + 0.4, Math.PI + 2.7);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(vCenter + 26, tankTopY + 38);
+    ctx.lineTo(vCenter + 18, tankTopY + 34);
+    ctx.lineTo(vCenter + 22, tankTopY + 44);
+    ctx.closePath();
+    ctx.fill();
+
+    // ----------------------------------------------------
+    // 7. FEEDING PUMP & MEDIUM INLET (TOP-LEFT)
+    // ----------------------------------------------------
+    const feedPipeX = vCenter - 54;
+    const pumpX = vCenter - 105;
+    const pumpY = tankTopY - 24;
+
+    // Pipe from Medium funnel through pump into reactor head
+    ctx.strokeStyle = '#65A30D';
+    ctx.lineWidth = 6;
+    ctx.beginPath();
+    ctx.moveTo(vCenter - 160, pumpY);
+    ctx.lineTo(feedPipeX, pumpY);
+    ctx.lineTo(feedPipeX, tankTopY + 14);
+    ctx.stroke();
+
+    ctx.strokeStyle = '#0F172A';
+    ctx.lineWidth = 2.0;
+    ctx.beginPath();
+    ctx.moveTo(vCenter - 160, pumpY - 4);
+    ctx.lineTo(feedPipeX - 4, pumpY - 4);
+    ctx.lineTo(feedPipeX - 4, tankTopY + 14);
+    ctx.moveTo(vCenter - 160, pumpY + 4);
+    ctx.lineTo(feedPipeX + 4, pumpY + 4);
+    ctx.lineTo(feedPipeX + 4, tankTopY + 14);
+    ctx.stroke();
+
+    // Medium Funnel Inlet
+    ctx.fillStyle = '#A3E635';
+    ctx.strokeStyle = '#0F172A';
+    ctx.lineWidth = 2.0;
+    ctx.beginPath();
+    ctx.moveTo(vCenter - 160, pumpY - 8);
+    ctx.lineTo(vCenter - 172, pumpY - 14);
+    ctx.lineTo(vCenter - 172, pumpY + 14);
+    ctx.lineTo(vCenter - 160, pumpY + 8);
+    ctx.closePath();
+    ctx.fill();
+    ctx.stroke();
+
+    // Feeding Pump Body (Oval ribbed pump)
+    ctx.fillStyle = '#FFFFFF';
+    ctx.strokeStyle = '#0F172A';
+    ctx.lineWidth = 2.2;
+    ctx.beginPath();
+    ctx.roundRect(pumpX - 22, pumpY - 14, 44, 28, 14);
+    ctx.fill();
+    ctx.stroke();
+
+    // Horizontal Cooling Ribs on Feeding Pump
+    ctx.strokeStyle = '#0F172A';
+    ctx.lineWidth = 2.0;
+    for (let pr = -8; pr <= 8; pr += 5) {
+      ctx.beginPath();
+      ctx.moveTo(pumpX - 12, pumpY + pr);
+      ctx.lineTo(pumpX + 12, pumpY + pr);
+      ctx.stroke();
+    }
+
+    // Dripping Nutrient Media Drops into Broth
+    this.s16FeedDrops.forEach(fd => {
+      ctx.fillStyle = '#84CC16';
+      ctx.beginPath();
+      ctx.arc(feedPipeX, fd.y, 2.2, 0, Math.PI * 2);
       ctx.fill();
     });
 
-    // 5. Suspended CHO Mammalian Cells & Oxygen Microbubbles in Broth
-    this.s16ChoCells.forEach(cp => {
-      ctx.fillStyle = '#FB923C';
-      ctx.beginPath();
-      ctx.arc(vCenter + cp.x, vMiddle + cp.y, cp.r, 0, Math.PI * 2);
-      ctx.fill();
-    });
+    // ----------------------------------------------------
+    // 8. SENSOR PROBES & SYSTEM MONITOR (TOP-RIGHT)
+    // ----------------------------------------------------
+    const p1X = vCenter + 36;
+    const p2X = vCenter + 54;
+    const probeY = tankTopY + 55;
 
-    this.s16Bubbles.forEach(bub => {
-      ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
-      ctx.beginPath();
-      ctx.arc(vCenter + bub.x, vMiddle + bub.y, bub.r, 0, Math.PI * 2);
-      ctx.fill();
-    });
+    // Sensor ports on top dome
+    ctx.fillStyle = '#475569';
+    ctx.fillRect(p1X - 6, tankTopY + 4, 12, 10);
+    ctx.fillRect(p2X - 6, tankTopY + 4, 12, 10);
 
-    // Sparger Ring at bottom
-    ctx.fillStyle = '#94A3B8';
-    ctx.fillRect(vCenter - 45, vMiddle + vHeight / 2 - 20, 90, 4);
+    // Sensor Cables ascending to System Monitor
+    ctx.strokeStyle = '#0F172A';
+    ctx.lineWidth = 2.0;
+    // Blue probe cable
+    ctx.beginPath();
+    ctx.moveTo(p1X, tankTopY + 6);
+    ctx.lineTo(p1X, tankTopY - 26);
+    ctx.lineTo(p1X + 25, tankTopY - 26);
+    ctx.stroke();
 
-    // --- RIGHT PANEL: BIOPROCESS PROCESS STRATEGY (NO TELEMETRY BOX!) ---
-    const rightX = 12;
+    // Orange probe cable
+    ctx.beginPath();
+    ctx.moveTo(p2X, tankTopY + 6);
+    ctx.lineTo(p2X, tankTopY - 42);
+    ctx.lineTo(p2X + 15, tankTopY - 42);
+    ctx.stroke();
+
+    // Probe 1: Blue Probe (DO / Temp)
+    ctx.fillStyle = '#0284C7';
+    ctx.strokeStyle = '#0F172A';
+    ctx.lineWidth = 1.8;
+    ctx.beginPath();
+    ctx.roundRect(p1X - 5, probeY - 14, 10, 20, 5);
+    ctx.fill();
+    ctx.stroke();
+
+    // Probe 2: Orange Probe (pH)
+    ctx.fillStyle = '#EA580C';
+    ctx.strokeStyle = '#0F172A';
+    ctx.lineWidth = 1.8;
+    ctx.beginPath();
+    ctx.roundRect(p2X - 5, probeY - 6, 10, 20, 5);
+    ctx.fill();
+    ctx.stroke();
+
+    // ----------------------------------------------------
+    // 9. EFFLUENT DRAIN & HARVEST PUMP (BOTTOM)
+    // ----------------------------------------------------
+    const drainPipeY = tankBtmY + 28;
+    const effPumpX = vCenter + 45;
+
+    // Drain Pipe from Tank Bottom
+    ctx.strokeStyle = '#65A30D';
+    ctx.lineWidth = 6;
+    ctx.beginPath();
+    ctx.moveTo(vCenter, tankBtmY);
+    ctx.lineTo(vCenter, drainPipeY);
+    ctx.lineTo(vCenter + 95, drainPipeY);
+    ctx.stroke();
+
+    ctx.strokeStyle = '#0F172A';
+    ctx.lineWidth = 2.0;
+    ctx.beginPath();
+    ctx.moveTo(vCenter - 4, tankBtmY);
+    ctx.lineTo(vCenter - 4, drainPipeY - 4);
+    ctx.lineTo(vCenter + 95, drainPipeY - 4);
+    ctx.moveTo(vCenter + 4, tankBtmY);
+    ctx.lineTo(vCenter + 4, drainPipeY + 4);
+    ctx.lineTo(vCenter + 95, drainPipeY + 4);
+    ctx.stroke();
+
+    // Effluent Harvest Pump (Circle with Arrow Triangle)
+    ctx.fillStyle = '#FFFFFF';
+    ctx.strokeStyle = '#0F172A';
+    ctx.lineWidth = 2.2;
+    ctx.beginPath();
+    ctx.arc(effPumpX, drainPipeY, 13, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.stroke();
+
+    // Pump directional triangle
+    ctx.fillStyle = '#0F172A';
+    ctx.beginPath();
+    ctx.moveTo(effPumpX - 6, drainPipeY - 7);
+    ctx.lineTo(effPumpX + 7, drainPipeY);
+    ctx.lineTo(effPumpX - 6, drainPipeY + 7);
+    ctx.closePath();
+    ctx.fill();
+
+    // Green Effluent Arrow pointing right
+    ctx.fillStyle = '#A3E635';
+    ctx.strokeStyle = '#0F172A';
+    ctx.lineWidth = 2.0;
+    ctx.beginPath();
+    ctx.moveTo(vCenter + 95, drainPipeY - 7);
+    ctx.lineTo(vCenter + 107, drainPipeY);
+    ctx.lineTo(vCenter + 95, drainPipeY + 7);
+    ctx.closePath();
+    ctx.fill();
+    ctx.stroke();
+
+    // ----------------------------------------------------
+    // 10. CALLOUT LABELS MATCHING REFERENCE DIAGRAM
+    // ----------------------------------------------------
+    drawReactorCallout(vCenter + motorW / 2 + 2, motorTopY + 12, leftX + 135, vpY + 36, 'Agitation System', 'left');
+    drawReactorCallout(pumpX, pumpY - 14, leftX + 65, vpY + 72, 'Feeding Pump', 'left');
+    drawReactorCallout(vCenter - 172, pumpY, leftX + 32, vpY + 108, 'Medium', 'left');
+    drawReactorCallout(airPipeX - 42, tankTopY + 30, leftX + 80, vpY + 160, 'Air', 'left');
+    drawReactorCallout(vCenter - tankW / 2, tankTopY + 75, leftX + 45, vpY + 205, 'Reactor Tank', 'left');
+    drawReactorCallout(vCenter - jktW / 2, tankBtmY - 12, leftX + 58, vpY + 330, 'Submerged Aerator', 'left');
+    drawReactorCallout(vCenter + jktW / 2, vpY + 205, leftX + vpW - 130, vpY + 205, 'Thermal Jacket', 'left');
+    drawReactorCallout(p1X, probeY - 5, leftX + vpW - 142, vpY + 140, 'Sensors Probes', 'left');
+    drawReactorCallout(p2X + 15, tankTopY - 42, leftX + vpW - 142, vpY + 92, 'System Monitor', 'left');
+    drawReactorCallout(vCenter + 107, drainPipeY, leftX + vpW - 115, vpY + 352, 'Effluent', 'left');
+
+    ctx.restore();
+
+    // ========================================================
+    // RIGHT PANEL: UPSTREAM BIOPROCESS CONTROL STRATEGY
+    // ========================================================
+    const rightX = 14;
+    const rPanelW = 456;
     ctx.fillStyle = '#FFFFFF';
     ctx.strokeStyle = '#CBD5E1';
     ctx.lineWidth = 1.6;
     ctx.beginPath();
-    ctx.roundRect(rightX, vpY, vpW, vpH, 10);
+    ctx.roundRect(rightX, vpY, rPanelW, vpH, 10);
     ctx.fill();
     ctx.stroke();
 
@@ -8050,7 +8660,7 @@ class PresentationEngine {
     ctx.strokeStyle = '#CBD5E1';
     ctx.lineWidth = 1;
     ctx.beginPath();
-    ctx.roundRect(rightX + 14, vpY + 12, vpW - 28, 28, 6);
+    ctx.roundRect(rightX + 14, vpY + 12, rPanelW - 28, 28, 6);
     ctx.fill();
     ctx.stroke();
 
@@ -8061,85 +8671,85 @@ class PresentationEngine {
     ctx.font = '700 8.5px "JetBrains Mono", monospace';
     ctx.fillStyle = '#0284C7';
     ctx.textAlign = 'right';
-    ctx.fillText('[cGMP VALIDATED BIOPROCESS]', rightX + vpW - 24, vpY + 26);
+    ctx.fillText('[cGMP VALIDATED BIOPROCESS]', rightX + rPanelW - 24, vpY + 26);
 
-    // Strategy Card 1: Biphasic Temperature Shift
+    // Strategy Card 1: 3-Tier Impeller Agitation & Low-Shear Dynamics
     const sc1Y = vpY + 54;
     ctx.fillStyle = '#F8FAFC';
     ctx.strokeStyle = '#CBD5E1';
     ctx.lineWidth = 1.2;
     ctx.beginPath();
-    ctx.roundRect(rightX + 14, sc1Y, vpW - 28, 100, 8);
+    ctx.roundRect(rightX + 14, sc1Y, rPanelW - 28, 102, 8);
+    ctx.fill();
+    ctx.stroke();
+
+    ctx.fillStyle = '#EA580C';
+    ctx.beginPath();
+    ctx.roundRect(rightX + 15, sc1Y + 1, rPanelW - 30, 3, [7, 7, 0, 0]);
+    ctx.fill();
+
+    ctx.font = '800 10px "Plus Jakarta Sans", sans-serif';
+    ctx.fillStyle = '#0F172A';
+    ctx.textAlign = 'left';
+    ctx.fillText('1. LOW-SHEAR AGITATION & 3-TIER IMPELLER HYDRODYNAMICS', rightX + 24, sc1Y + 20);
+
+    ctx.font = '500 8.5px "Plus Jakarta Sans", sans-serif';
+    ctx.fillStyle = '#475569';
+    ctx.fillText('• 3-tier horizontal pitched-blade marine impellers maintain uniform bulk blending.', rightX + 24, sc1Y + 42);
+    ctx.fillText('• Operates at 40–60 RPM (tip speed <1.5 m/s) to prevent cellular shear lysis', rightX + 24, sc1Y + 62);
+    ctx.fillText('  of wall-less CHO membranes while delivering rapid gas-liquid transfer (kLa > 25 h⁻¹).', rightX + 24, sc1Y + 82);
+
+    // Strategy Card 2: Biphasic Temperature Shift
+    const sc2Y = sc1Y + 114;
+    ctx.fillStyle = '#F8FAFC';
+    ctx.strokeStyle = '#CBD5E1';
+    ctx.lineWidth = 1.2;
+    ctx.beginPath();
+    ctx.roundRect(rightX + 14, sc2Y, rPanelW - 28, 102, 8);
     ctx.fill();
     ctx.stroke();
 
     ctx.fillStyle = '#0284C7';
     ctx.beginPath();
-    ctx.roundRect(rightX + 15, sc1Y + 1, vpW - 30, 3, [7, 7, 0, 0]);
+    ctx.roundRect(rightX + 15, sc2Y + 1, rPanelW - 30, 3, [7, 7, 0, 0]);
     ctx.fill();
 
     ctx.font = '800 10px "Plus Jakarta Sans", sans-serif';
     ctx.fillStyle = '#0F172A';
     ctx.textAlign = 'left';
-    ctx.fillText('1. BIPHASIC TEMPERATURE SHIFT PROTOCOL', rightX + 24, sc1Y + 22);
+    ctx.fillText('2. BIPHASIC HYPOTHERMIC TEMPERATURE SHIFT (37°C ⟶ 32.5°C)', rightX + 24, sc2Y + 20);
 
     ctx.font = '500 8.5px "Plus Jakarta Sans", sans-serif';
     ctx.fillStyle = '#475569';
-    ctx.fillText('• Phase 1 (Days 0–6 @ 37.0°C): Rapid biomass proliferation to 12×10⁶ cells/mL.', rightX + 24, sc1Y + 44);
-    ctx.fillText('• Phase 2 (Days 7–18 @ 32.5°C): Hypothermic shift arrests CHO cells in G1 phase,', rightX + 24, sc1Y + 64);
-    ctx.fillText('  quadrupling specific rhDNase secretion rate while cutting protease release by 60%.', rightX + 24, sc1Y + 84);
+    ctx.fillText('• Phase 1 (Days 0–6 @ 37.0°C): Rapid biomass growth to >15×10⁶ cells/mL.', rightX + 24, sc2Y + 42);
+    ctx.fillText('• Phase 2 (Days 7–18 @ 32.5°C): Hypothermic shift arrests CHO cells in G1 phase,', rightX + 24, sc2Y + 62);
+    ctx.fillText('  quadrupling specific rhDNase secretion while cutting host protease release by 60%.', rightX + 24, sc2Y + 82);
 
-    // Strategy Card 2: Low-Shear Mammalian Aeration
-    const sc2Y = sc1Y + 112;
+    // Strategy Card 3: Real-Time Multi-Sensor Regulation
+    const sc3Y = sc2Y + 114;
     ctx.fillStyle = '#F8FAFC';
     ctx.strokeStyle = '#CBD5E1';
     ctx.lineWidth = 1.2;
     ctx.beginPath();
-    ctx.roundRect(rightX + 14, sc2Y, vpW - 28, 100, 8);
+    ctx.roundRect(rightX + 14, sc3Y, rPanelW - 28, 102, 8);
     ctx.fill();
     ctx.stroke();
 
     ctx.fillStyle = '#10B981';
     ctx.beginPath();
-    ctx.roundRect(rightX + 15, sc2Y + 1, vpW - 30, 3, [7, 7, 0, 0]);
+    ctx.roundRect(rightX + 15, sc3Y + 1, rPanelW - 30, 3, [7, 7, 0, 0]);
     ctx.fill();
 
     ctx.font = '800 10px "Plus Jakarta Sans", sans-serif';
     ctx.fillStyle = '#0F172A';
     ctx.textAlign = 'left';
-    ctx.fillText('2. LOW-SHEAR AGITATION & MICRO-BUBBLE AERATION', rightX + 24, sc2Y + 22);
+    ctx.fillText('3. SUBMERGED AERATION & REAL-TIME SENSOR REGULATION', rightX + 24, sc3Y + 20);
 
     ctx.font = '500 8.5px "Plus Jakarta Sans", sans-serif';
     ctx.fillStyle = '#475569';
-    ctx.fillText('• Wall-less mammalian CHO membranes are highly sensitive to hydrodynamic shear.', rightX + 24, sc2Y + 44);
-    ctx.fillText('• Gentle pitched-blade marine impellers (40–55 RPM) ensure uniform mixing.', rightX + 24, sc2Y + 64);
-    ctx.fillText('• Pluronic F-68 surfactant shields cell surfaces against bubble-bursting damage.', rightX + 24, sc2Y + 84);
-
-    // Strategy Card 3: Continuous Automated Feeding
-    const sc3Y = sc2Y + 112;
-    ctx.fillStyle = '#F8FAFC';
-    ctx.strokeStyle = '#CBD5E1';
-    ctx.lineWidth = 1.2;
-    ctx.beginPath();
-    ctx.roundRect(rightX + 14, sc3Y, vpW - 28, 100, 8);
-    ctx.fill();
-    ctx.stroke();
-
-    ctx.fillStyle = '#F59E0B';
-    ctx.beginPath();
-    ctx.roundRect(rightX + 15, sc3Y + 1, vpW - 30, 3, [7, 7, 0, 0]);
-    ctx.fill();
-
-    ctx.font = '800 10px "Plus Jakarta Sans", sans-serif';
-    ctx.fillStyle = '#0F172A';
-    ctx.textAlign = 'left';
-    ctx.fillText('3. FED-BATCH NUTRIENT FEED & CALCIUM STABILIZATION', rightX + 24, sc3Y + 22);
-
-    ctx.font = '500 8.5px "Plus Jakarta Sans", sans-serif';
-    ctx.fillStyle = '#475569';
-    ctx.fillText('• Automated glucose & L-glutamine bolus feeding prevents toxic lactate build-up.', rightX + 24, sc3Y + 44);
-    ctx.fillText('• Continuous trace Ca²⁺ (1.2 mM) supplementation locks rhDNase 1 tertiary structure,', rightX + 24, sc3Y + 64);
-    ctx.fillText('  protecting active catalytic sites from host-cell proteolytic degradation in broth.', rightX + 24, sc3Y + 84);
+    ctx.fillText('• Dissolved Oxygen strictly regulated at 40–50% via submerged micro-bubble sparger.', rightX + 24, sc3Y + 42);
+    ctx.fillText('• pH held at 7.00 ± 0.05 via automated CO₂ sparging (acid) and 0.5M NaOH titration.', rightX + 24, sc3Y + 62);
+    ctx.fillText('• Trace Ca²⁺ (1.2 mM) feed binds nascent rhDNase 1, shielding against proteolytic cleavage.', rightX + 24, sc3Y + 82);
 
     ctx.restore();
   }
