@@ -486,12 +486,13 @@ class PresentationEngine {
   }
 
   setStage(stageNum) {
-    if (this.currentStage === stageNum) return;
+    if (this.currentStage === stageNum && !this.transition.active) return;
 
-    // Immediately resolve any ongoing transition to prevent overlap
+    // Immediately resolve any ongoing transition cleanly to prevent overlap
     if (this.transition.active) {
       this.transition.active = false;
       this.currentStage = this.transition.toStage;
+      if (this.currentStage === stageNum) return;
     }
 
     const direction = (stageNum > this.currentStage) ? 1 : -1;
@@ -500,7 +501,7 @@ class PresentationEngine {
       fromStage: this.currentStage,
       toStage: stageNum,
       progress: 0,
-      duration: 0.32,
+      duration: 1.15,
       direction: direction
     };
 
@@ -5309,11 +5310,12 @@ class PresentationEngine {
 
     // --- 1. REALISTIC HUMAN UPPER BODY & PROFILE ---
     ctx.save();
-    // Warm natural human flesh base
+    // Warm natural human flesh base with realistic anatomical depth
     const skinGrad = ctx.createLinearGradient(-350, -140, -50, 220);
-    skinGrad.addColorStop(0, '#FDF0EC');
-    skinGrad.addColorStop(0.5, '#FCE4DC');
-    skinGrad.addColorStop(1, '#F8D6CB');
+    skinGrad.addColorStop(0, '#FDF2EE');
+    skinGrad.addColorStop(0.3, '#FDE8E0');
+    skinGrad.addColorStop(0.7, '#F8D9CD');
+    skinGrad.addColorStop(1, '#F3CBBF');
 
     ctx.fillStyle = skinGrad;
     ctx.strokeStyle = '#D4A394';
@@ -5323,29 +5325,29 @@ class PresentationEngine {
     // Left shoulder / thoracic margin
     ctx.moveTo(-345, 224);
     ctx.quadraticCurveTo(-345, 140, -315, 92);
-    // Neck base left
+    // Neck base left / trapezius
     ctx.quadraticCurveTo(-275, 72, -235, 18);
-    // Mandible / jawline
+    // Mandible angle & jawline
     ctx.lineTo(-254, -34);
-    // Chin
-    ctx.quadraticCurveTo(-260, -42, -252, -48);
-    // Lower lip
-    ctx.lineTo(-246, -48);
-    // Oral fissure (mouth opening)
-    ctx.lineTo(-254, -55);
-    // Upper lip & cupid's bow
-    ctx.lineTo(-248, -62);
-    // Philtrum
-    ctx.lineTo(-252, -68);
-    // Nostril wing / alar curve
+    // Rounded chin with mental cleft
+    ctx.quadraticCurveTo(-262, -42, -252, -47);
+    // Lower vermilion border & lip gripping mouthpiece
+    ctx.lineTo(-248, -48);
+    // Oral fissure (mouth opening around mouthpiece)
+    ctx.lineTo(-256, -55);
+    // Upper lip with subtle cupid's bow
+    ctx.lineTo(-249, -62);
+    // Philtrum column
+    ctx.lineTo(-253, -68);
+    // Nostril wing / alar base curve
     ctx.quadraticCurveTo(-268, -72, -270, -78);
-    // Nose bridge
+    // Straight human nasal dorsum & bridge
     ctx.quadraticCurveTo(-256, -92, -248, -96);
-    // Brow ridge & forehead
+    // Gentle supraorbital notch & forehead curve
     ctx.quadraticCurveTo(-238, -128, -195, -135);
-    // Cranial vertex & posterior scalp
+    // Cranial vertex & posterior occiput
     ctx.quadraticCurveTo(-140, -138, -130, -95);
-    // Posterior cervical spine / neck
+    // Posterior cervical spine & nape of neck
     ctx.quadraticCurveTo(-128, -45, -135, 18);
     // Right shoulder slope
     ctx.quadraticCurveTo(-115, 72, -62, 92);
@@ -5354,59 +5356,65 @@ class PresentationEngine {
     ctx.fill();
     ctx.stroke();
 
-    // Natural Muscle & Collarbone Shading (Sternocleidomastoid & Clavicle)
-    ctx.strokeStyle = 'rgba(212, 163, 148, 0.45)';
+    // Natural Muscle & Collarbone Shading (Sternocleidomastoid, Clavicles & Pectoral Margin)
+    ctx.strokeStyle = 'rgba(212, 163, 148, 0.55)';
     ctx.lineWidth = 1.4;
-    // Left Clavicle
+    // Left Clavicle with anatomical S-curve
     ctx.beginPath();
     ctx.moveTo(-285, 82);
-    ctx.quadraticCurveTo(-245, 76, -215, 84);
+    ctx.quadraticCurveTo(-250, 75, -215, 84);
     ctx.stroke();
     // Right Clavicle
     ctx.beginPath();
     ctx.moveTo(-185, 84);
-    ctx.quadraticCurveTo(-155, 76, -115, 82);
+    ctx.quadraticCurveTo(-150, 75, -115, 82);
     ctx.stroke();
-    // Neck muscle shading
+    // Jugular notch between clavicles
     ctx.beginPath();
-    ctx.moveTo(-185, -20);
-    ctx.quadraticCurveTo(-210, 25, -230, 72);
+    ctx.arc(-200, 84, 5, 0.2, Math.PI - 0.2);
+    ctx.stroke();
+    // Sternocleidomastoid muscle neck contour
+    ctx.beginPath();
+    ctx.moveTo(-185, -15);
+    ctx.quadraticCurveTo(-210, 28, -230, 74);
     ctx.stroke();
 
     // Natural Chestnut Brown Hair (Layered with highlights - Kenhub Style)
-    // Deep base hair
-    ctx.fillStyle = '#5A2A14';
+    // Deep base hair volume covering scalp down to neck
+    ctx.fillStyle = '#4E2410';
     ctx.beginPath();
     ctx.moveTo(-232, -122);
-    ctx.quadraticCurveTo(-190, -145, -135, -128);
-    ctx.quadraticCurveTo(-112, -92, -122, -45);
-    ctx.quadraticCurveTo(-126, -5, -136, 12);
-    ctx.quadraticCurveTo(-130, -25, -140, -65);
-    ctx.quadraticCurveTo(-152, -102, -190, -122);
+    ctx.quadraticCurveTo(-190, -148, -132, -130);
+    ctx.quadraticCurveTo(-108, -90, -120, -42);
+    ctx.quadraticCurveTo(-124, -2, -134, 18);
+    ctx.quadraticCurveTo(-128, -22, -138, -62);
+    ctx.quadraticCurveTo(-150, -98, -188, -118);
     ctx.closePath();
     ctx.fill();
 
-    // Warm hair midtone wave layers
-    ctx.fillStyle = '#7C3F22';
+    // Warm hair midtone flowing waves
+    ctx.fillStyle = '#733719';
     ctx.beginPath();
-    ctx.moveTo(-225, -126);
-    ctx.quadraticCurveTo(-185, -140, -142, -125);
-    ctx.quadraticCurveTo(-120, -90, -128, -48);
-    ctx.quadraticCurveTo(-135, -78, -155, -108);
+    ctx.moveTo(-226, -125);
+    ctx.quadraticCurveTo(-186, -142, -138, -126);
+    ctx.quadraticCurveTo(-116, -88, -125, -45);
+    ctx.quadraticCurveTo(-132, -75, -152, -105);
     ctx.closePath();
     ctx.fill();
 
-    // Hair highlight streaks
-    ctx.strokeStyle = '#A85A32';
-    ctx.lineWidth = 1.2;
+    // Hair highlight streaks following anatomical flow
+    ctx.strokeStyle = '#9C4F28';
+    ctx.lineWidth = 1.3;
     ctx.beginPath();
-    ctx.moveTo(-215, -128);
-    ctx.quadraticCurveTo(-180, -138, -150, -124);
-    ctx.moveTo(-195, -134);
-    ctx.quadraticCurveTo(-165, -136, -140, -110);
+    ctx.moveTo(-218, -127);
+    ctx.quadraticCurveTo(-182, -137, -146, -125);
+    ctx.moveTo(-198, -133);
+    ctx.quadraticCurveTo(-166, -134, -138, -108);
+    ctx.moveTo(-178, -130);
+    ctx.quadraticCurveTo(-148, -118, -128, -75);
     ctx.stroke();
 
-    // Anatomical Ear (Helix, Tragus & Lobe)
+    // Anatomical Ear (Helix, Tragus, Antihelix & Lobe)
     ctx.fillStyle = '#FCE4DC';
     ctx.strokeStyle = '#C98D7C';
     ctx.lineWidth = 1.4;
@@ -5414,50 +5422,74 @@ class PresentationEngine {
     ctx.ellipse(-155, -68, 9, 15, 0.12, 0, Math.PI * 2);
     ctx.fill();
     ctx.stroke();
-    // Inner ear antihelix
+    // Inner ear antihelix & concha bowl
     ctx.beginPath();
     ctx.arc(-154, -70, 5, -0.6, 1.8);
+    ctx.moveTo(-158, -68);
+    ctx.lineTo(-155, -64);
     ctx.stroke();
 
-    // Relaxed Natural Eye & Brow
-    ctx.strokeStyle = '#4A200E';
+    // Relaxed Natural Closed Eye & Eyelash/Eyebrow details
+    ctx.strokeStyle = '#3E1C0D';
     ctx.lineWidth = 1.8;
     ctx.beginPath();
     ctx.arc(-232, -85, 5, 0.2, Math.PI - 0.2);
     ctx.stroke();
-    // Eyebrow
+    // Delicate eyelash fringe
+    ctx.lineWidth = 1.0;
+    ctx.beginPath();
+    ctx.moveTo(-236, -84); ctx.lineTo(-239, -82);
+    ctx.moveTo(-232, -83); ctx.lineTo(-233, -80);
+    ctx.moveTo(-228, -84); ctx.lineTo(-227, -81);
+    ctx.stroke();
+    // Arched Eyebrow
+    ctx.lineWidth = 1.8;
     ctx.beginPath();
     ctx.moveTo(-242, -95);
-    ctx.quadraticCurveTo(-232, -100, -222, -95);
+    ctx.quadraticCurveTo(-232, -101, -220, -96);
     ctx.stroke();
 
-    // Soft Cheek Blush
-    ctx.fillStyle = 'rgba(244, 114, 130, 0.15)';
+    // Soft Malar Cheekbone Shading & Rosy Blush
+    ctx.fillStyle = 'rgba(244, 114, 130, 0.14)';
     ctx.beginPath();
     ctx.arc(-220, -68, 14, 0, Math.PI * 2);
     ctx.fill();
     ctx.restore();
 
-    // --- 2. CRANIAL & CERVICAL AIRWAY CUTAWAY ---
+    // --- 2. CRANIAL & CERVICAL AIRWAY SAGITTAL CUTAWAY (KENHUB MODEL) ---
     ctx.save();
-    // Nasal cavity (warm mucosal pink with 3 anatomical turbinates)
+    // Nasal cavity (anatomical sagittal piriform/conchal space)
     ctx.fillStyle = '#FEE2E2';
     ctx.strokeStyle = '#F87171';
-    ctx.lineWidth = 1.2;
+    ctx.lineWidth = 1.3;
     ctx.beginPath();
-    ctx.roundRect(-245, -96, 35, 22, 6);
+    ctx.moveTo(-245, -96);
+    ctx.quadraticCurveTo(-230, -100, -210, -94);
+    ctx.quadraticCurveTo(-206, -78, -212, -74);
+    ctx.lineTo(-246, -74);
+    ctx.quadraticCurveTo(-250, -84, -245, -96);
+    ctx.closePath();
     ctx.fill();
     ctx.stroke();
 
-    // Turbinate folds (Superior, Middle, Inferior conchae)
+    // 3 Curved Mucosal Nasal Conchae (Superior, Middle, Inferior Turbinates)
     ctx.strokeStyle = '#E11D48';
     ctx.lineWidth = 1.4;
     for (let tc = 0; tc < 3; tc++) {
       ctx.beginPath();
-      ctx.moveTo(-240, -92 + tc * 6);
-      ctx.quadraticCurveTo(-228, -90 + tc * 6, -218, -93 + tc * 6);
+      ctx.moveTo(-242, -91 + tc * 6.5);
+      ctx.quadraticCurveTo(-226, -88 + tc * 6.5, -214, -92 + tc * 6.5);
       ctx.stroke();
     }
+
+    // Hard & Soft Palate (Dividing Nasal Cavity from Oral Cavity)
+    ctx.fillStyle = '#F8FAFC';
+    ctx.strokeStyle = '#94A3B8';
+    ctx.lineWidth = 1.2;
+    ctx.beginPath();
+    ctx.roundRect(-245, -74, 34, 5, 2);
+    ctx.fill();
+    ctx.stroke();
 
     // Oral cavity lumen & dental arch
     ctx.fillStyle = '#FFE4E6';
@@ -5472,15 +5504,27 @@ class PresentationEngine {
     ctx.fill();
     ctx.stroke();
 
-    // Muscular crimson tongue
+    // Muscular crimson anatomical tongue with papillae arch
     ctx.fillStyle = '#9E1B32';
     ctx.beginPath();
     ctx.moveTo(-240, -50);
-    ctx.quadraticCurveTo(-222, -42, -204, -45);
-    ctx.quadraticCurveTo(-220, -36, -240, -50);
+    ctx.quadraticCurveTo(-222, -41, -204, -45);
+    ctx.quadraticCurveTo(-220, -35, -240, -50);
     ctx.fill();
 
-    // Pharynx descending to larynx
+    // Epiglottis flap projecting upward behind tongue base
+    ctx.fillStyle = '#FB7185';
+    ctx.strokeStyle = '#E11D48';
+    ctx.lineWidth = 1.2;
+    ctx.beginPath();
+    ctx.moveTo(-202, -44);
+    ctx.quadraticCurveTo(-198, -36, -200, -28);
+    ctx.lineTo(-204, -28);
+    ctx.quadraticCurveTo(-204, -36, -202, -44);
+    ctx.fill();
+    ctx.stroke();
+
+    // Oropharynx & Laryngopharynx descending directly into larynx
     ctx.fillStyle = '#FFE4E6';
     ctx.strokeStyle = '#FDA4AF';
     ctx.lineWidth = 1.5;
@@ -5493,7 +5537,7 @@ class PresentationEngine {
     ctx.fill();
     ctx.stroke();
 
-    // Larynx (Thyroid & Cricoid Cartilage)
+    // Larynx (Thyroid & Cricoid Cartilage Shield)
     ctx.fillStyle = '#E2E8F0';
     ctx.strokeStyle = '#64748B';
     ctx.lineWidth = 1.6;
@@ -6043,6 +6087,7 @@ class PresentationEngine {
         y: (Math.random() - 0.5) * 260,
         vx: (Math.random() - 0.5) * 40,
         vy: (Math.random() - 0.5) * 40,
+        size: 9.5,
         angle: Math.random() * Math.PI * 2,
         angularSpeed: (Math.random() - 0.5) * 1.5,
         dockedNode: null,
@@ -6445,12 +6490,13 @@ class PresentationEngine {
       ctx.rotate(enz.angle);
 
       // Enzyme Catalytic Aura
-      const aGrad = ctx.createRadialGradient(0, 0, 4, 0, 0, enz.size + 14);
+      const enzSize = (typeof enz.size === 'number' && !isNaN(enz.size)) ? enz.size : 9.5;
+      const aGrad = ctx.createRadialGradient(0, 0, 4, 0, 0, enzSize + 14);
       aGrad.addColorStop(0, 'rgba(2, 132, 199, 0.35)');
       aGrad.addColorStop(1, 'rgba(2, 132, 199, 0.0)');
       ctx.fillStyle = aGrad;
       ctx.beginPath();
-      ctx.arc(0, 0, enz.size + 14, 0, Math.PI * 2);
+      ctx.arc(0, 0, enzSize + 14, 0, Math.PI * 2);
       ctx.fill();
 
       // Globular Enzyme Body
@@ -6458,7 +6504,7 @@ class PresentationEngine {
       ctx.strokeStyle = '#0369A1';
       ctx.lineWidth = 1.5;
       ctx.beginPath();
-      ctx.arc(0, 0, enz.size, 0, Math.PI * 2);
+      ctx.arc(0, 0, enzSize, 0, Math.PI * 2);
       ctx.fill();
       ctx.stroke();
 
@@ -7274,9 +7320,12 @@ class PresentationEngine {
     this.s15Pili = [];
     const numPili = 48;
     for (let i = 0; i < numPili; i++) {
+      const angle = (i / numPili) * Math.PI * 2;
       this.s15Pili.push({
         u: i / numPili,
+        angle: angle,
         len: 17 + (i % 5) * 2.5 + Math.random() * 4,
+        wiggle: Math.random() * Math.PI * 2,
         flexPhase: Math.random() * Math.PI * 2,
         flexFreq: 1.8 + Math.random() * 1.5
       });
@@ -7456,12 +7505,14 @@ class PresentationEngine {
       ctx.strokeStyle = '#F43F5E';
       ctx.lineWidth = 0.9;
       this.s15Pili.forEach(pil => {
-        const rad = pil.angle;
+        const rad = (typeof pil.angle === 'number' && !isNaN(pil.angle)) ? pil.angle : ((pil.u || 0) * Math.PI * 2);
+        const pLen = (typeof pil.len === 'number' && !isNaN(pil.len)) ? pil.len : 20;
+        const pWiggle = (typeof pil.wiggle === 'number' && !isNaN(pil.wiggle)) ? pil.wiggle : 0;
         const cx = bX + Math.cos(rad) * (bW / 2 - 20);
         const cy = bY + Math.sin(rad) * (bH / 2 - 12);
-        const wave = Math.sin(this.stage15Timer * 4.5 + pil.wiggle) * 2.5;
-        const ex = cx + Math.cos(rad + wave * 0.06) * pil.len;
-        const ey = cy + Math.sin(rad + wave * 0.06) * pil.len;
+        const wave = Math.sin(this.stage15Timer * 4.5 + pWiggle) * 2.5;
+        const ex = cx + Math.cos(rad + wave * 0.06) * pLen;
+        const ey = cy + Math.sin(rad + wave * 0.06) * pLen;
         ctx.beginPath();
         ctx.moveTo(cx, cy);
         ctx.lineTo(ex, ey);
@@ -8580,6 +8631,7 @@ class PresentationEngine {
     ctx.fillStyle = '#15803D';
     ctx.fillText('PACKAGING: 2.5 mL BFS AMPULE', s4X + colW / 2, flowY + colH - 22);
 
+    ctx.restore();
     ctx.restore();
   }
 

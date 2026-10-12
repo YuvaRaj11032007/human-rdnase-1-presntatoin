@@ -443,6 +443,11 @@ class SlideManager {
     if (index >= 0 && index < SLIDES.length) {
       this.currentIndex = index;
       if (window.soundEngine) window.soundEngine.playClick();
+      // Ensure any active transition completes cleanly before switching
+      if (this.engine && this.engine.transition && this.engine.transition.active) {
+        this.engine.transition.active = false;
+        this.engine.currentStage = this.engine.transition.toStage;
+      }
       this.updateUI();
     }
   }
