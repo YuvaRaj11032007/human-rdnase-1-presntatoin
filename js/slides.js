@@ -5,6 +5,22 @@
 
 const SLIDES = [
   {
+    stage: 0,
+    badge: "TITLE COVER",
+    title: "Recombinant DNase 1 for Cystic Fibrosis",
+    speakerNotes: `
+      <h4>Title Slide: Recombinant DNase 1 for Cystic Fibrosis</h4>
+      <p><strong>Presenter:</strong> P.YuvaRaj (Roll number 124116)</p>
+      <p><strong>Topic:</strong> Recombinant DNase 1 (Dornase Alfa / Pulmozyme®) for Cystic Fibrosis — Pathophysiological Mechanism, Clinical Genetics, and Industrial Bioprocess Engineering in CHO Cells.</p>
+      <ul>
+        <li><strong>Clinical Genetics:</strong> Cystic Fibrosis pathophysiology originating from autosomal recessive CFTR mutations on Chromosome 7q31.2.</li>
+        <li><strong>Pathological Occlusion:</strong> Microbial colonization, massive neutrophil influx, NETosis, and neutrophil extracellular trap DNA meshes causing life-threatening airway obstruction.</li>
+        <li><strong>Therapeutic Revolution:</strong> The transition from the 1950s toxic bovine pancreas extraction dead-end to modern recombinant human DNase 1 engineered by Genentech.</li>
+        <li><strong>Industrial Biomanufacturing:</strong> Host selection (CHO-K1 cells), 10,000-liter fed-batch bioreactor operational dynamics, downstream multi-column chromatography, and BFS sterile inhalation packaging.</li>
+      </ul>
+    `
+  },
+  {
     stage: 1,
     badge: "STAGE 01 / 17",
     title: "Hi Nanna Case Study: Autosomal Recessive Inheritance & Chromosome 7",
@@ -245,6 +261,39 @@ const SLIDES = [
         <li><strong>Final Formulation (Pulmozyme® Ampules):</strong> Formulated as a preservative-free, sterile, isotonic aqueous inhalation solution: 1.0 mg/mL dornase alfa, 8.77 mg/mL NaCl, 0.15 mg/mL CaCl₂·2H₂O, pH 6.3. Packaged into single-use blow-fill-seal (BFS) LDPE plastic ampules designed for jet nebulizers.</li>
       </ul>
     `
+  },
+  {
+    stage: 18,
+    badge: "REFERENCES",
+    title: "Scientific Citations & Primary Literature References",
+    speakerNotes: `
+      <h4>Slide 18: Primary Literature & Regulatory Landmark Citations</h4>
+      <p><strong>Key Peer-Reviewed Literature:</strong></p>
+      <ul>
+        <li><strong>Shak et al. (1990) PNAS:</strong> <em>Recombinant human DNase I reduces the viscosity of cystic fibrosis sputum.</em> PNAS 87(23): 9188–9192. Landmark discovery demonstrating that cloning human DNase 1 in CHO cells and delivering it to purulent CF sputum cleaves extracellular DNA and reduces viscoelasticity by >800-fold.</li>
+        <li><strong>Fuchs et al. (1994) NEJM:</strong> <em>Effect of aerosolized recombinant human DNase on exacerbations of respiratory symptoms and on pulmonary function in patients with cystic fibrosis.</em> N Engl J Med 331(10): 637–642. The pivotal Phase III clinical trial in 968 CF patients proving a 28% to 37% reduction in pulmonary exacerbations and a 15.8% improvement in FEV₁.</li>
+        <li><strong>Genentech, Inc. (1993):</strong> <em>Pulmozyme® (dornase alfa) Inhalation Solution NDA 20-229.</em> FDA Approval Package (Dec 30, 1993). The first recombinant macromolecular enzyme approved specifically for cystic fibrosis.</li>
+        <li><strong>Wong, Shak, & Levinson (1995) J. Biol. Chem.:</strong> <em>Biochemical and structural characterization of recombinant human deoxyribonuclease I produced in Chinese hamster ovary cells.</em> J Biol Chem 270(18): 10817–10824. Detailing complex N-glycosylation at Asn18/Asn106, Ca²⁺/Mg²⁺ cofactor mechanics, and dual intramolecular disulfide bridges.</li>
+        <li><strong>Wanner, Salathé, & O'Riordan (1996) Am. J. Respir. Crit. Care Med.:</strong> <em>Mucociliary clearance and airway surface liquid dynamics in pulmonary cystic fibrosis.</em> Am J Respir Crit Care Med 154(6): 1868–1902. Detailing aerosol MMAD droplet deposition (2.1–2.8 µm) and mucociliary escalator reactivation.</li>
+        <li><strong>Riordan et al. (1989) Science:</strong> <em>Identification of the cystic fibrosis gene: cloning and characterization of complementary DNA.</em> Science 245(4922): 1066–1073. Discovery and mapping of CFTR to chromosome 7q31.2.</li>
+      </ul>
+    `
+  },
+  {
+    stage: 19,
+    badge: "CONCLUSION",
+    title: "Thank You & Final Clinical Summary (Dornase Alfa Therapy)",
+    speakerNotes: `
+      <h4>Slide 19: Concluding Remarks & Acknowledgements</h4>
+      <p><strong>Presented by:</strong> P.YuvaRaj (Roll number 124116)</p>
+      <p><strong>Summary Takeaways:</strong></p>
+      <ul>
+        <li><strong>From Fatal Obstruction to Clear Breathing:</strong> Dornase alfa remains one of modern biotechnology's greatest victories—transforming purulent DNA nets into clear fluid airway secretions.</li>
+        <li><strong>The Victory of Recombinant Biotechnology:</strong> Animal slaughterhouse extraction was an immunogenic dead-end; CHO cell engineering enabled pure, non-immunogenic, glycosylated human protein synthesis at industrial scale.</li>
+        <li><strong>Celebratory Dancing Cow:</strong> Cows no longer need to sacrifice pancreases for impure DNase, and human cystic fibrosis patients can breathe freely!</li>
+        <li><strong>Open Floor:</strong> Thank you for your time and attention! Ready for questions and discussion.</li>
+      </ul>
+    `
   }
 ];
 
@@ -347,7 +396,7 @@ class SlideManager {
     SLIDES.forEach((s, idx) => {
       const dot = document.createElement('div');
       dot.className = `slide-dot ${idx === this.currentIndex ? 'active' : ''}`;
-      dot.title = `Stage ${s.stage}: ${s.title}`;
+      dot.title = `${s.badge}: ${s.title}`;
       dot.addEventListener('click', () => this.goToSlide(idx));
       this.dotsContainer.appendChild(dot);
     });
@@ -399,7 +448,7 @@ class SlideManager {
   }
 
   nextSlide() {
-    if (this.currentIndex === 0 && this.engine && this.engine.currentStage === 1) {
+    if (this.currentIndex === 1 && this.engine && this.engine.currentStage === 1) {
       if (this.engine.geneticsStep === 0) {
         this.engine.triggerGeneticsAnimation();
         return;

@@ -11,11 +11,14 @@ document.addEventListener('DOMContentLoaded', () => {
   window.slideManager = slideManager;
   window.engine = engine;
 
-  // Direct URL navigation (e.g. ?stage=7)
+  // Direct URL navigation (e.g. ?stage=0 or ?stage=7)
   const params = new URLSearchParams(window.location.search);
-  const initialStage = parseInt(params.get('stage') || '1', 10);
-  if (initialStage > 1 && initialStage <= SLIDES.length) {
-    slideManager.goToSlide(initialStage - 1);
+  const stageParam = params.get('stage');
+  if (stageParam !== null) {
+    const targetStage = parseInt(stageParam, 10);
+    if (!isNaN(targetStage) && targetStage >= 0 && targetStage < SLIDES.length) {
+      slideManager.goToSlide(targetStage);
+    }
   }
 
   // 3. User interaction listener to resume audio context

@@ -26,18 +26,30 @@ class PresentationEngine {
     this.isPaused = false;
     this.showLabels = true;
 
-    this.currentStage = 1;
-    this.targetStage = 1;
+    this.currentStage = 0;
+    this.targetStage = 0;
 
     // Transition state
     this.transition = {
       active: false,
-      fromStage: 1,
-      toStage: 1,
+      fromStage: 0,
+      toStage: 0,
       progress: 0,
       duration: 1.15,
       direction: 1
     };
+
+    // Stage 0 Title Cover Animation State
+    this.stage0Timer = 0;
+    this.initStage0Title();
+
+    // Stage 18 Citations State
+    this.stage18Timer = 0;
+    this.initStage18Citations();
+
+    // Stage 19 Thank You Dancing Cow State
+    this.stage19Timer = 0;
+    this.initStage19ThankYou();
 
     // Continuous Multi-Step Zoom Out sequence
     this.zoomOutSequence = {
@@ -73,7 +85,7 @@ class PresentationEngine {
         x: -330,
         y: 10,
         radius: 46,
-        slideIndex: 7, // Stage 8 (0-indexed 7)
+        slideIndex: 8, // Stage 8 (0-indexed 8)
         color: '#D97706',
         accentBg: '#FEF3C7',
         badgeColor: '#B45309',
@@ -88,7 +100,7 @@ class PresentationEngine {
         x: 0,
         y: 10,
         radius: 46,
-        slideIndex: 8, // Stage 9 (0-indexed 8)
+        slideIndex: 9, // Stage 9 (0-indexed 9)
         color: '#0284C7',
         accentBg: '#E0F2FE',
         badgeColor: '#0369A1',
@@ -103,7 +115,7 @@ class PresentationEngine {
         x: 330,
         y: 10,
         radius: 46,
-        slideIndex: 9, // Stage 10 (0-indexed 9)
+        slideIndex: 10, // Stage 10 (0-indexed 10)
         color: '#059669',
         accentBg: '#D1FAE5',
         badgeColor: '#047857',
@@ -369,7 +381,7 @@ class PresentationEngine {
         }
         if (window.soundEngine) window.soundEngine.playClick();
         if (window.slideManager) {
-          window.slideManager.goToSlide(1); // Advance to Stage 2
+          window.slideManager.goToSlide(2); // Advance to Stage 2 (Slide index 2)
         }
         return;
       }
@@ -396,7 +408,7 @@ class PresentationEngine {
         if (inBtn) {
           if (window.soundEngine) window.soundEngine.playClick();
           if (window.slideManager) {
-            window.slideManager.goToSlide(6); // Stage 7 Timeline Hub is slide index 6
+            window.slideManager.goToSlide(7); // Stage 7 Timeline Hub is slide index 7
           }
           return;
         }
@@ -460,6 +472,10 @@ class PresentationEngine {
 
     this.targetStage = stageNum;
 
+    if (stageNum === 0) {
+      this.initStage0Title();
+    }
+
     if (stageNum === 1) {
       this.geneticsStep = 0;
       this.geneticsAnimProgress = 0;
@@ -502,6 +518,14 @@ class PresentationEngine {
       this.initStage17DownstreamPurification();
     }
 
+    if (stageNum === 18) {
+      this.initStage18Citations();
+    }
+
+    if (stageNum === 19) {
+      this.initStage19ThankYou();
+    }
+
     if (window.soundEngine) {
       window.soundEngine.playZoom(direction === 1);
     }
@@ -518,7 +542,7 @@ class PresentationEngine {
   runNextZoomOutStep() {
     if (!this.zoomOutSequence.active) return;
 
-    if (this.zoomOutSequence.currentStep > 1) {
+    if (this.zoomOutSequence.currentStep > 0) {
       const nextStep = this.zoomOutSequence.currentStep - 1;
       this.zoomOutSequence.currentStep = nextStep;
 
@@ -533,7 +557,7 @@ class PresentationEngine {
       this.targetStage = nextStep;
 
       if (window.soundEngine) window.soundEngine.playZoom(false);
-      if (window.slideManager) window.slideManager.syncSlideIndex(nextStep - 1);
+      if (window.slideManager) window.slideManager.syncSlideIndex(nextStep);
     } else {
       this.zoomOutSequence.active = false;
     }
@@ -553,6 +577,11 @@ class PresentationEngine {
           setTimeout(() => this.runNextZoomOutStep(), 120);
         }
       }
+    }
+
+    // Stage 0 Title Cover Animation
+    if (this.currentStage === 0 || this.targetStage === 0) {
+      this.updateStage0Title(dt);
     }
 
     // Stage 1 Genetics animation progress (smooth cinematic progression)
@@ -620,6 +649,12 @@ class PresentationEngine {
     }
     if (this.currentStage === 17 || this.targetStage === 17) {
       this.updateStage17(dt);
+    }
+    if (this.currentStage === 18 || this.targetStage === 18) {
+      this.updateStage18Citations(dt);
+    }
+    if (this.currentStage === 19 || this.targetStage === 19) {
+      this.updateStage19ThankYou(dt);
     }
   }
 
@@ -936,6 +971,7 @@ class PresentationEngine {
 
   renderStage(ctx, stage) {
     switch (stage) {
+      case 0: this.drawStage0Title(ctx); break;
       case 1: this.drawStage1HiNannaGenetics(ctx); break;
       case 2: this.drawStage2Lungs(ctx); break;
       case 3: this.drawStage3Airway(ctx); break;
@@ -953,8 +989,276 @@ class PresentationEngine {
       case 15: this.drawStage15HostOrganismCho(ctx); break;
       case 16: this.drawStage16BioreactorProcess(ctx); break;
       case 17: this.drawStage17DownstreamPurification(ctx); break;
-      default: this.drawStage1HiNannaGenetics(ctx);
+      case 18: this.drawStage18Citations(ctx); break;
+      case 19: this.drawStage19ThankYouDancingCow(ctx); break;
+      default: this.drawStage0Title(ctx);
     }
+  }
+
+  /* ========================================================
+     STAGE 0: Title Cover Page
+     "Recombinant DNase 1 for Cystic Fibrosis"
+     Presented by P.YuvaRaj • Roll number 124116
+     ======================================================== */
+  initStage0Title() {
+    this.stage0Timer = 0;
+    this.s0Particles = [];
+    for (let i = 0; i < 48; i++) {
+      this.s0Particles.push({
+        x: (Math.random() - 0.5) * 940,
+        y: (Math.random() - 0.5) * 460,
+        vx: (Math.random() - 0.5) * 14,
+        vy: (Math.random() - 0.5) * 14,
+        radius: 1.5 + Math.random() * 2.8,
+        alpha: 0.25 + Math.random() * 0.65,
+        color: ['#38BDF8', '#818CF8', '#34D399', '#F59E0B', '#C084FC'][i % 5]
+      });
+    }
+  }
+
+  updateStage0Title(dt) {
+    this.stage0Timer += dt;
+    this.s0Particles.forEach(p => {
+      p.x += p.vx * dt;
+      p.y += p.vy * dt;
+      if (p.x < -480) p.x = 480;
+      if (p.x > 480) p.x = -480;
+      if (p.y < -240) p.y = 240;
+      if (p.y > 240) p.y = -240;
+    });
+  }
+
+  drawStage0Title(ctx) {
+    ctx.save();
+    // 1. Deep Space Slate / Medical Navy Background
+    ctx.fillStyle = '#070C18';
+    ctx.fillRect(-500, -260, 1000, 520);
+
+    // Ambient radial glow behind title
+    const glow = ctx.createRadialGradient(0, -50, 40, 0, -50, 440);
+    glow.addColorStop(0, 'rgba(2, 132, 199, 0.24)');
+    glow.addColorStop(0.5, 'rgba(99, 102, 241, 0.11)');
+    glow.addColorStop(1, 'rgba(7, 12, 24, 0.0)');
+    ctx.fillStyle = glow;
+    ctx.fillRect(-500, -260, 1000, 520);
+
+    // Subtle technical grid
+    ctx.fillStyle = '#1E293B';
+    for (let gx = -460; gx <= 460; gx += 40) {
+      for (let gy = -220; gy <= 220; gy += 40) {
+        ctx.beginPath();
+        ctx.arc(gx, gy, 1.0, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+
+    // Floating buoyant molecular particles
+    this.s0Particles.forEach(p => {
+      ctx.fillStyle = p.color;
+      ctx.globalAlpha = p.alpha;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+      ctx.fill();
+    });
+    ctx.globalAlpha = 1.0;
+
+    // Top Header Badge
+    ctx.fillStyle = '#0F172A';
+    ctx.strokeStyle = '#38BDF8';
+    ctx.lineWidth = 1.2;
+    ctx.beginPath();
+    ctx.roundRect(-270, -242, 540, 26, 13);
+    ctx.fill();
+    ctx.stroke();
+
+    ctx.font = '800 9.5px "JetBrains Mono", monospace';
+    ctx.fillStyle = '#38BDF8';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('● MOLECULAR THERAPEUTICS & BIOPROCESS ENGINEERING • DEGREE PRESENTATION', 0, -229);
+
+    // MAIN TITLE
+    ctx.font = '800 29px "Plus Jakarta Sans", sans-serif';
+    ctx.fillStyle = '#FFFFFF';
+    ctx.textAlign = 'center';
+    ctx.fillText('Recombinant DNase 1 for Cystic Fibrosis', 0, -192);
+
+    // SUBTITLE
+    ctx.font = '500 12px "Plus Jakarta Sans", sans-serif';
+    ctx.fillStyle = '#94A3B8';
+    ctx.fillText('Pathophysiological Mechanism, Extracellular DNA Lysis, and Industrial Biosynthesis in CHO Cells', 0, -165);
+
+    // PRESENTER IDENTITY CARD (Centered & Prominent)
+    const presW = 560;
+    const presH = 68;
+    const presY = -148;
+
+    ctx.fillStyle = 'rgba(15, 23, 42, 0.90)';
+    ctx.strokeStyle = '#334155';
+    ctx.lineWidth = 1.2;
+    ctx.beginPath();
+    ctx.roundRect(-presW / 2, presY, presW, presH, 10);
+    ctx.fill();
+    ctx.stroke();
+
+    // Top accent bar on presenter card
+    ctx.fillStyle = '#0284C7';
+    ctx.beginPath();
+    ctx.roundRect(-presW / 2 + 1, presY + 1, presW - 2, 3, [9, 9, 0, 0]);
+    ctx.fill();
+
+    // Presenter Name
+    ctx.font = '700 9px "JetBrains Mono", monospace';
+    ctx.fillStyle = '#38BDF8';
+    ctx.textAlign = 'left';
+    ctx.fillText('PRESENTED BY:', -presW / 2 + 22, presY + 23);
+
+    ctx.font = '800 18px "Plus Jakarta Sans", sans-serif';
+    ctx.fillStyle = '#FFFFFF';
+    ctx.fillText('P.YuvaRaj', -presW / 2 + 22, presY + 47);
+
+    // Roll Number Pill Badge
+    const rollBadgeX = presW / 2 - 200;
+    const rollBadgeY = presY + 19;
+    const rollBadgeW = 180;
+    const rollBadgeH = 32;
+
+    ctx.fillStyle = 'rgba(16, 185, 129, 0.16)';
+    ctx.strokeStyle = '#10B981';
+    ctx.lineWidth = 1.4;
+    ctx.beginPath();
+    ctx.roundRect(rollBadgeX, rollBadgeY, rollBadgeW, rollBadgeH, 6);
+    ctx.fill();
+    ctx.stroke();
+
+    ctx.font = '800 12.5px "JetBrains Mono", monospace';
+    ctx.fillStyle = '#34D399';
+    ctx.textAlign = 'center';
+    ctx.fillText('Roll number 124116', rollBadgeX + rollBadgeW / 2, rollBadgeY + rollBadgeH / 2);
+
+    // 3 SCIENTIFIC FOUNDATION PILLARS
+    const cardY = -62;
+    const cardW = 296;
+    const cardH = 162;
+    const cardGap = 16;
+    const startX = -(cardW * 3 + cardGap * 2) / 2;
+
+    const pillars = [
+      {
+        badge: 'STAGE 01 — 06',
+        badgeColor: '#0284C7',
+        badgeBg: '#082F49',
+        title: 'Clinical Genetics & NETosis',
+        sub: 'CFTR Gene (7q31.2) & DNA Viscoelastic Gel',
+        items: [
+          '• Autosomal recessive carrier genetics (Hi Nanna)',
+          '• Airway ciliary collapse & Pseudomonas infection',
+          '• Dying WBCs extrude sticky eDNA polymer nets'
+        ]
+      },
+      {
+        badge: 'STAGE 07 — 13',
+        badgeColor: '#818CF8',
+        badgeBg: '#1E1B4B',
+        title: 'The Recombinant Solution',
+        sub: 'Dr. Shak & Levinson (Genentech 1988–1993)',
+        items: [
+          '• Bovine 1950s dead-end: Severe animal allergies',
+          '• Human DNase 1 cDNA cloned in CHO cells',
+          '• 800× viscosity drop: Cleaves eDNA (FEV₁ +15.8%)'
+        ]
+      },
+      {
+        badge: 'STAGE 14 — 17',
+        badgeColor: '#34D399',
+        badgeBg: '#064E3B',
+        title: 'Industrial Bioprocessing',
+        sub: 'Fed-Batch Bioreactors & Downstream cGMP',
+        items: [
+          '• Why CHO cells? Mandatory dual N-glycosylation',
+          '• 10,000L low-shear stirred tank & cold shift',
+          '• 3-stage chromatography & sterile BFS ampules'
+        ]
+      }
+    ];
+
+    pillars.forEach((pil, pIdx) => {
+      const px = startX + pIdx * (cardW + cardGap);
+      ctx.fillStyle = '#0F172A';
+      ctx.strokeStyle = '#334155';
+      ctx.lineWidth = 1.2;
+      ctx.beginPath();
+      ctx.roundRect(px, cardY, cardW, cardH, 8);
+      ctx.fill();
+      ctx.stroke();
+
+      // Top colored badge
+      ctx.fillStyle = pil.badgeBg;
+      ctx.strokeStyle = pil.badgeColor;
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.roundRect(px + 14, cardY + 12, 100, 18, 4);
+      ctx.fill();
+      ctx.stroke();
+
+      ctx.font = '800 8px "JetBrains Mono", monospace';
+      ctx.fillStyle = pil.badgeColor;
+      ctx.textAlign = 'center';
+      ctx.fillText(pil.badge, px + 64, cardY + 21);
+
+      // Card Title & Sub
+      ctx.font = '800 12.5px "Plus Jakarta Sans", sans-serif';
+      ctx.fillStyle = '#FFFFFF';
+      ctx.textAlign = 'left';
+      ctx.fillText(pil.title, px + 14, cardY + 48);
+
+      ctx.font = '500 8.5px "JetBrains Mono", monospace';
+      ctx.fillStyle = '#94A3B8';
+      ctx.fillText(pil.sub, px + 14, cardY + 63);
+
+      // Divider
+      ctx.strokeStyle = '#1E293B';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(px + 14, cardY + 74);
+      ctx.lineTo(px + cardW - 14, cardY + 74);
+      ctx.stroke();
+
+      // Bullet items
+      ctx.font = '400 8.5px "Plus Jakarta Sans", sans-serif';
+      ctx.fillStyle = '#CBD5E1';
+      pil.items.forEach((it, itIdx) => {
+        ctx.fillText(it, px + 14, cardY + 93 + itIdx * 18);
+      });
+    });
+
+    // BOTTOM INTERACTIVE ENTER PROMPT PILL (Pulsing glow)
+    const btnPulse = 1.0 + Math.sin(this.stage0Timer * 4.5) * 0.035;
+    const btnW = 390 * btnPulse;
+    const btnH = 36 * btnPulse;
+    const btnY = 126;
+
+    ctx.save();
+    ctx.shadowColor = 'rgba(2, 132, 199, 0.45)';
+    ctx.shadowBlur = 16;
+    ctx.fillStyle = '#0284C7';
+    ctx.beginPath();
+    ctx.roundRect(-btnW / 2, btnY - btnH / 2, btnW, btnH, 18);
+    ctx.fill();
+    ctx.restore();
+
+    ctx.strokeStyle = '#38BDF8';
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.roundRect(-btnW / 2, btnY - btnH / 2, btnW, btnH, 18);
+    ctx.stroke();
+
+    ctx.font = '800 11.5px "Plus Jakarta Sans", sans-serif';
+    ctx.fillStyle = '#FFFFFF';
+    ctx.textAlign = 'center';
+    ctx.fillText('▶ Click anywhere or press [Space / →] to Enter Presentation', 0, btnY);
+
+    ctx.restore();
   }
 
   /* ========================================================
@@ -6133,7 +6437,7 @@ class PresentationEngine {
     // 5. Live Biophysical Telemetry Glassmorphic Dashboard (Bottom Left)
     const cardX = vpX + 16;
     const cardY = vpY + vpH - 142;
-    const cardW = 345;
+    const cardW = 370;
     const cardH = 126;
 
     ctx.fillStyle = 'rgba(15, 23, 42, 0.92)';
@@ -6161,11 +6465,11 @@ class PresentationEngine {
     // Bar 1
     ctx.fillStyle = '#1E293B';
     ctx.beginPath();
-    ctx.roundRect(cardX + 215, cardY + 28, 115, 10, 3);
+    ctx.roundRect(cardX + 225, cardY + 28, 125, 10, 3);
     ctx.fill();
     ctx.fillStyle = this.lysisLevel > 0.6 ? '#10B981' : '#F59E0B';
     ctx.beginPath();
-    ctx.roundRect(cardX + 215, cardY + 28, Math.max(6, 115 * (1.0 - this.lysisLevel)), 10, 3);
+    ctx.roundRect(cardX + 225, cardY + 28, Math.max(6, 125 * (1.0 - this.lysisLevel)), 10, 3);
     ctx.fill();
 
     // Metric 2: Sputum Viscoelasticity (98% -> 4%)
@@ -6180,11 +6484,11 @@ class PresentationEngine {
     // Bar 2
     ctx.fillStyle = '#1E293B';
     ctx.beginPath();
-    ctx.roundRect(cardX + 215, cardY + 48, 115, 10, 3);
+    ctx.roundRect(cardX + 225, cardY + 48, 125, 10, 3);
     ctx.fill();
     ctx.fillStyle = viscPct < 20 ? '#10B981' : '#EF4444';
     ctx.beginPath();
-    ctx.roundRect(cardX + 215, cardY + 48, Math.max(6, 115 * (viscPct / 100)), 10, 3);
+    ctx.roundRect(cardX + 225, cardY + 48, Math.max(6, 125 * (viscPct / 100)), 10, 3);
     ctx.fill();
 
     // Metric 3: Phosphodiester Bonds Cleaved
@@ -6204,9 +6508,9 @@ class PresentationEngine {
     ctx.lineTo(cardX + cardW - 10, cardY + 92);
     ctx.stroke();
 
-    ctx.font = '600 8.5px "JetBrains Mono", monospace';
+    ctx.font = '600 7.8px "JetBrains Mono", monospace';
     ctx.fillStyle = '#CBD5E1';
-    ctx.fillText('DNA-(P-O-C)ₙ + H₂O ──[rhDNase 1 (Ca²⁺/Mg²⁺)]──> 5\'-P Oligonucleotides', cardX + 12, cardY + 108);
+    ctx.fillText('DNAₙ + H₂O ──[rhDNase 1 (Ca²⁺/Mg²⁺)]──> 5\'-P Oligonucleotides', cardX + 12, cardY + 108);
 
     // Restore clip
     ctx.restore();
@@ -6603,18 +6907,22 @@ class PresentationEngine {
       ctx.fillStyle = '#0284C7';
       ctx.fillText(pil.title, px + 10, bnrY + 48);
 
-      ctx.font = '400 9px/1.35 "Plus Jakarta Sans", sans-serif';
-      ctx.fillStyle = '#475569';
-      // Word wrap text into 2 lines
+      // Word wrap text into 3 clean lines without any clipping
       const words = pil.desc.split(' ');
-      let line1 = '';
-      let line2 = '';
+      let lines = [''];
       words.forEach(w => {
-        if ((line1 + w).length < 38) line1 += w + ' ';
-        else line2 += w + ' ';
+        const curLine = lines[lines.length - 1];
+        if ((curLine + ' ' + w).trim().length <= 36) {
+          lines[lines.length - 1] = (curLine + ' ' + w).trim();
+        } else {
+          lines.push(w);
+        }
       });
-      ctx.fillText(line1, px + 10, bnrY + 66);
-      ctx.fillText(line2, px + 10, bnrY + 80);
+      ctx.font = '400 8.2px/1.3 "Plus Jakarta Sans", sans-serif';
+      ctx.fillStyle = '#475569';
+      lines.slice(0, 3).forEach((ln, lIdx) => {
+        ctx.fillText(ln, px + 10, bnrY + 62 + lIdx * 12);
+      });
     });
 
     ctx.restore();
@@ -7331,6 +7639,18 @@ class PresentationEngine {
       { startX: -125, startY: 20, baseAngle: -Math.PI * 0.12, len: 115, freq: 3.4, amp: 13 }
     ];
 
+    // E. coli Pili / Fimbriae (Fine filamentous adhesion organelles radiating from capsule)
+    this.s15Pili = [];
+    const numPili = 48;
+    for (let i = 0; i < numPili; i++) {
+      this.s15Pili.push({
+        u: i / numPili,
+        len: 17 + (i % 5) * 2.5 + Math.random() * 4,
+        flexPhase: Math.random() * Math.PI * 2,
+        flexFreq: 1.8 + Math.random() * 1.5
+      });
+    }
+
     // Shedding LPS Outer Membrane Vesicles (OMVs) & endotoxins
     this.s15Omvs = [];
     for (let i = 0; i < 9; i++) {
@@ -7552,6 +7872,59 @@ class PresentationEngine {
       ctx.moveTo(sx, sy);
       ctx.lineTo(ex, ey);
       ctx.stroke();
+    }
+
+    // Pili / Fimbriae (Fine straight filamentous adhesion organelles radiating outward from capsule perimeter)
+    ctx.save();
+    ctx.strokeStyle = '#93C5FD'; // Distinct soft cyan-blue filaments
+    ctx.lineWidth = 1.1;
+    let pilusCallout = null;
+    const straightHalfW = (bW / 2) - bR; // 140 - 48 = 92
+
+    this.s15Pili.forEach((pil, pIdx) => {
+      const ang = pil.u * Math.PI * 2;
+      const cosA = Math.cos(ang);
+      const sinA = Math.sin(ang);
+
+      let bx0 = 0, by0 = 0, nx = cosA, ny = sinA;
+      if (Math.abs(cosA) * (bH / 2) > Math.abs(sinA) * straightHalfW) {
+        // Rounded pole hemisphere
+        const poleSign = cosA > 0 ? 1 : -1;
+        const poleCenterX = bX + poleSign * straightHalfW;
+        const poleCenterY = bY;
+        const poleAng = Math.atan2(sinA * (bH / 2), (Math.abs(cosA) * (bW / 2) - straightHalfW) * poleSign);
+        bx0 = poleCenterX + Math.cos(poleAng) * bR;
+        by0 = poleCenterY + Math.sin(poleAng) * (bH / 2);
+        nx = Math.cos(poleAng);
+        ny = Math.sin(poleAng);
+      } else {
+        // Top/bottom cylinder edge
+        const edgeSign = sinA > 0 ? 1 : -1;
+        by0 = bY + edgeSign * (bH / 2);
+        bx0 = bX + (cosA / Math.abs(sinA || 0.001)) * (bH / 2);
+        bx0 = Math.max(bX - straightHalfW, Math.min(bX + straightHalfW, bx0));
+        nx = 0;
+        ny = edgeSign;
+      }
+
+      // Brownian micro-wave flex
+      const flex = Math.sin(this.stage15Timer * pil.flexFreq + pil.flexPhase) * 2.2;
+      const ex = bx0 + nx * pil.len - ny * flex;
+      const ey = by0 + ny * pil.len + nx * flex;
+
+      ctx.beginPath();
+      ctx.moveTo(bx0, by0);
+      ctx.lineTo(ex, ey);
+      ctx.stroke();
+
+      if (pIdx === 36) {
+        pilusCallout = { x: ex, y: ey };
+      }
+    });
+    ctx.restore();
+
+    if (pilusCallout) {
+      this.drawCallout(ctx, pilusCallout.x, pilusCallout.y, leftX + 45, vpY + 70, 'Pili / Fimbriae (Adhesion Organelles)', '#38BDF8');
     }
 
     // B) Periplasmic Space with Peptidoglycan mesh
@@ -8559,215 +8932,159 @@ class PresentationEngine {
     ctx.textAlign = 'right';
     ctx.fillText('BATCH: DAY 12.4 / 18.0', scX + scW - 24, scY + 26);
 
-    // 1. BIPHASIC TEMPERATURE SHIFT GRAPH
+    // 1. TWO PROMINENT BIPHASIC STRATEGY CARDS
     const gX = scX + 22;
-    const gY = scY + 52;
     const gW = scW - 44;
-    const gH = 92;
+    const phaseY = scY + 48;
+    const pW = (gW - 10) / 2;
+    const pH = 64;
 
-    // Graph Frame
+    // Phase 1 Card (Days 0-6: Rapid Growth)
     ctx.fillStyle = '#111827';
+    ctx.strokeStyle = '#D97706';
+    ctx.lineWidth = 1.2;
+    ctx.beginPath();
+    ctx.roundRect(gX, phaseY, pW, pH, 6);
+    ctx.fill();
+    ctx.stroke();
+
+    ctx.font = '800 8.5px "JetBrains Mono", monospace';
+    ctx.fillStyle = '#F59E0B';
+    ctx.textAlign = 'left';
+    ctx.fillText('PHASE 1: DAYS 0–6 (37.0°C)', gX + 10, phaseY + 16);
+    ctx.font = '700 8px "Plus Jakarta Sans", sans-serif';
+    ctx.fillStyle = '#E2E8F0';
+    ctx.fillText('Biomass Growth & Proliferation', gX + 10, phaseY + 30);
+    ctx.font = '400 7.2px "Plus Jakarta Sans", sans-serif';
+    ctx.fillStyle = '#94A3B8';
+    ctx.fillText('Rapid logarithmic division to build', gX + 10, phaseY + 44);
+    ctx.fillText('biomass to >18 × 10⁶ viable cells/mL.', gX + 10, phaseY + 55);
+
+    // Phase 2 Card (Days 7-18: Production Shift)
+    ctx.fillStyle = '#111827';
+    ctx.strokeStyle = '#0284C7';
+    ctx.lineWidth = 1.2;
+    ctx.beginPath();
+    ctx.roundRect(gX + pW + 10, phaseY, pW, pH, 6);
+    ctx.fill();
+    ctx.stroke();
+
+    ctx.font = '800 8.5px "JetBrains Mono", monospace';
+    ctx.fillStyle = '#38BDF8';
+    ctx.fillText('PHASE 2: DAYS 7–18 (32.5°C)', gX + pW + 20, phaseY + 16);
+    ctx.font = '700 8px "Plus Jakarta Sans", sans-serif';
+    ctx.fillStyle = '#E2E8F0';
+    ctx.fillText('Hypothermic Secretion Shift', gX + pW + 20, phaseY + 30);
+    ctx.font = '400 7.2px "Plus Jakarta Sans", sans-serif';
+    ctx.fillStyle = '#94A3B8';
+    ctx.fillText('Arrests G1 cell cycle; suppresses apoptosis', gX + pW + 20, phaseY + 44);
+    ctx.fillText('to hyper-secrete 1.85 g/L rhDNase 1.', gX + pW + 20, phaseY + 55);
+
+    // 2. SCADA DCS PROCESS CONTROL SUB-HEADER
+    const subHdrY = phaseY + pH + 12;
+    ctx.fillStyle = '#1E293B';
     ctx.strokeStyle = '#334155';
     ctx.lineWidth = 1;
     ctx.beginPath();
-    ctx.roundRect(gX, gY, gW, gH, 6);
+    ctx.roundRect(gX, subHdrY, gW, 22, 4);
     ctx.fill();
     ctx.stroke();
 
-    // Graph Gridlines
-    ctx.strokeStyle = 'rgba(51, 65, 85, 0.4)';
-    ctx.lineWidth = 0.8;
-    for (let gy = gY + 18; gy < gY + gH; gy += 18) {
-      ctx.beginPath();
-      ctx.moveTo(gX, gy); ctx.lineTo(gX + gW, gy);
-      ctx.stroke();
-    }
-    for (let gx = gX + 50; gx < gX + gW; gx += 50) {
-      ctx.beginPath();
-      ctx.moveTo(gx, gY); ctx.lineTo(gx, gY + gH);
-      ctx.stroke();
-    }
-
-    // Graph Title
     ctx.font = '700 8px "JetBrains Mono", monospace';
-    ctx.fillStyle = '#38BDF8';
+    ctx.fillStyle = '#2DD4BF';
     ctx.textAlign = 'left';
-    ctx.fillText('★ BIPHASIC TEMPERATURE SHIFT: 37.0°C (GROWTH) ⟶ 32.5°C (PRODUCTION)', gX + 10, gY + 14);
+    ctx.fillText('● CLOSED-LOOP PROCESS CONTROL (PID AUTOMATION)', gX + 10, subHdrY + 14);
+    ctx.fillStyle = '#94A3B8';
+    ctx.textAlign = 'right';
+    ctx.fillText('SAMPLING: 100 ms • REAL-TIME', gX + gW - 10, subHdrY + 14);
 
-    // Shift Day 6.5 dividing line
-    const shiftX = gX + gW * 0.38;
-    ctx.strokeStyle = '#F59E0B';
-    ctx.lineWidth = 1.2;
-    ctx.setLineDash([3, 3]);
-    ctx.beginPath();
-    ctx.moveTo(shiftX, gY + 18);
-    ctx.lineTo(shiftX, gY + gH - 6);
-    ctx.stroke();
-    ctx.setLineDash([]);
-
-    ctx.font = '700 7px "JetBrains Mono", monospace';
-    ctx.fillStyle = '#F59E0B';
-    ctx.textAlign = 'center';
-    ctx.fillText('Day 6.5 Cold Shift', shiftX, gY + gH - 10);
-
-    // Temperature Curve (Amber to Cyan)
-    ctx.strokeStyle = '#F59E0B';
-    ctx.lineWidth = 2.2;
-    ctx.beginPath();
-    ctx.moveTo(gX + 12, gY + 30);
-    ctx.lineTo(shiftX - 6, gY + 30);
-    ctx.stroke();
-
-    // Transition slope
-    ctx.strokeStyle = '#38BDF8';
-    ctx.lineWidth = 2.2;
-    ctx.beginPath();
-    ctx.moveTo(shiftX - 6, gY + 30);
-    ctx.lineTo(shiftX + 10, gY + 62);
-    ctx.lineTo(gX + gW - 12, gY + 62);
-    ctx.stroke();
-
-    // Viable Cell Density (VCD) Curve (Green dash)
-    ctx.strokeStyle = '#10B981';
-    ctx.lineWidth = 1.6;
-    ctx.beginPath();
-    ctx.moveTo(gX + 12, gY + 78);
-    ctx.quadraticCurveTo(shiftX - 20, gY + 34, shiftX + 20, gY + 34);
-    ctx.lineTo(gX + gW - 12, gY + 38);
-    ctx.stroke();
-
-    // Titer Accumulation Curve (Magenta dash)
-    ctx.strokeStyle = '#C084FC';
-    ctx.lineWidth = 1.8;
-    ctx.beginPath();
-    ctx.moveTo(gX + 12, gY + 84);
-    ctx.lineTo(shiftX, gY + 76);
-    ctx.quadraticCurveTo(gX + gW * 0.7, gY + 48, gX + gW - 12, gY + 22);
-    ctx.stroke();
-
-    // Curve Legend
-    ctx.font = '600 7px "JetBrains Mono", monospace';
-    ctx.fillStyle = '#F59E0B'; ctx.fillText('● Temp (°C)', gX + gW - 165, gY + 14);
-    ctx.fillStyle = '#10B981'; ctx.fillText('● VCD (10⁶/mL)', gX + gW - 105, gY + 14);
-    ctx.fillStyle = '#C084FC'; ctx.fillText('● Titer (g/L)', gX + gW - 40, gY + 14);
-
-    // Dynamic Time Scrubber Cursor
-    const scrubX = shiftX + 18 + Math.sin(this.stage16Timer * 0.8) * 20;
-    ctx.strokeStyle = '#FFFFFF';
-    ctx.lineWidth = 1.4;
-    ctx.beginPath();
-    ctx.moveTo(scrubX, gY + 18);
-    ctx.lineTo(scrubX, gY + gH);
-    ctx.stroke();
-
-    // 2. TWO STRATEGY PHASE SUMMARY CARDS
-    const phaseY = gY + gH + 10;
-    const pW = (gW - 10) / 2;
-
-    // Phase 1 Card (Days 0-6: Growth)
-    ctx.fillStyle = '#1E293B';
-    ctx.strokeStyle = '#D97706';
-    ctx.lineWidth = 1;
-    ctx.beginPath();
-    ctx.roundRect(gX, phaseY, pW, 46, 5);
-    ctx.fill();
-    ctx.stroke();
-
-    ctx.font = '700 8px "JetBrains Mono", monospace';
-    ctx.fillStyle = '#F59E0B';
-    ctx.textAlign = 'left';
-    ctx.fillText('PHASE 1: DAYS 0–6 (37.0°C)', gX + 10, phaseY + 14);
-    ctx.font = '400 7.2px "Plus Jakarta Sans", sans-serif';
-    ctx.fillStyle = '#CBD5E1';
-    ctx.fillText('Rapid logarithmic cell proliferation.', gX + 10, phaseY + 26);
-    ctx.fillText('Builds biomass to >18 × 10⁶ cells/mL.', gX + 10, phaseY + 37);
-
-    // Phase 2 Card (Days 7-18: Production)
-    ctx.fillStyle = '#1E293B';
-    ctx.strokeStyle = '#0284C7';
-    ctx.lineWidth = 1;
-    ctx.beginPath();
-    ctx.roundRect(gX + pW + 10, phaseY, pW, 46, 5);
-    ctx.fill();
-    ctx.stroke();
-
-    ctx.font = '700 8px "JetBrains Mono", monospace';
-    ctx.fillStyle = '#38BDF8';
-    ctx.fillText('PHASE 2: DAYS 7–18 (32.5°C)', gX + pW + 20, phaseY + 14);
-    ctx.font = '400 7.2px "Plus Jakarta Sans", sans-serif';
-    ctx.fillStyle = '#CBD5E1';
-    ctx.fillText('Cell cycle arrest in G1; stops division.', gX + pW + 20, phaseY + 26);
-    ctx.fillText('Channel all ATP to rhDNase secretion.', gX + pW + 20, phaseY + 37);
-
-    // 3. FIVE REAL-TIME CRITICAL PROCESS PARAMETERS (CPPs)
-    const cppY = phaseY + 54;
+    // 3. FIVE EXPANDED REAL-TIME CRITICAL PROCESS PARAMETERS (CPPs)
+    const cppY = subHdrY + 28;
     const cppItems = [
       {
         param: 'Dissolved Oxygen (DO):',
         val: '45.0% ± 1.2%',
-        unit: 'Air Sat.',
-        desc: 'Sintered micro-sparge cascade; zero bubble shear rupture',
+        unit: 'Air Saturation',
+        status: 'OPTICAL PROBE • IN-SPEC',
+        desc: 'Sintered micro-sparger cascade; pure O₂ enrichment with zero bubble shear',
         color: '#38BDF8'
       },
       {
         param: 'Vessel pH Regulation:',
         val: '7.00 ± 0.03',
-        unit: 'pH units',
-        desc: 'Automated CO₂ sparge (acidification) & 0.5M NaHCO₃ base feed',
+        unit: 'pH Units',
+        status: 'GEL SENSOR • PID AUTO',
+        desc: 'Automated CO₂ sparge (acidification) & 0.5M NaHCO₃ base dosing cascade',
         color: '#2DD4BF'
       },
       {
         param: 'Hydrofoil Impeller Agitation:',
         val: '55 RPM (Low-Shear)',
-        unit: 'Tip 1.2 m/s',
-        desc: 'A310 hydrofoil axial pump keeps shear stress < 1.0 Pa',
+        unit: 'Tip Speed 1.2 m/s',
+        status: 'VFD SERVO • LOW-SHEAR',
+        desc: 'Dual A310 hydrofoil impellers keep maximum hydrodynamic shear < 1.0 Pa',
         color: '#F59E0B'
       },
       {
         param: 'Calcium (Ca²⁺) Enrichment:',
-        val: '1.2 mM CaCl₂',
-        unit: 'Cofactor',
-        desc: 'Chelates into catalytic cleft, stabilizing active 3D conformation',
-        color: '#A855F7'
+        val: '1.2 mM CaCl₂ Feed',
+        unit: 'Cofactor Bolus',
+        status: 'SPECTRO METRIC • STABLE',
+        desc: 'Chelates directly into catalytic pocket for folding stability & protease defense',
+        color: '#C084FC'
       },
       {
         param: 'Harvest rhDNase 1 Titer:',
-        val: '1.85 g/L',
-        unit: '>99% Monomer',
-        desc: 'Commercial pharmaceutical yield (>70,000 doses per 10kL batch)',
+        val: '1.85 g/L (>99% Monomer)',
+        unit: 'Active Yield',
+        status: 'ONLINE HPLC • HARVEST',
+        desc: 'Commercial pharmaceutical yield (>70,000 clinical doses per 10kL batch)',
         color: '#10B981'
       }
     ];
 
     let curCY = cppY;
-    cppItems.forEach(item => {
+    cppItems.forEach((item, cIdx) => {
       ctx.fillStyle = '#111827';
       ctx.strokeStyle = '#334155';
       ctx.lineWidth = 1;
       ctx.beginPath();
-      ctx.roundRect(gX, curCY, gW, 33, 5);
+      ctx.roundRect(gX, curCY, gW, 40, 5);
       ctx.fill();
       ctx.stroke();
+
+      // Real-time sensor pulse dot
+      const pulseAlpha = 0.5 + Math.sin(this.stage16Timer * 4 + cIdx * 1.2) * 0.5;
+      ctx.fillStyle = item.color;
+      ctx.globalAlpha = pulseAlpha;
+      ctx.beginPath();
+      ctx.arc(gX + 12, curCY + 14, 3, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.globalAlpha = 1.0;
 
       // Parameter Name
       ctx.font = '700 8.5px "Plus Jakarta Sans", sans-serif';
       ctx.fillStyle = '#F8FAFC';
       ctx.textAlign = 'left';
-      ctx.fillText(item.param, gX + 10, curCY + 13);
+      ctx.fillText(item.param, gX + 22, curCY + 14);
 
       // Parameter Value Tag
       ctx.font = '800 9.5px "JetBrains Mono", monospace';
       ctx.fillStyle = item.color;
       ctx.textAlign = 'right';
-      ctx.fillText(`${item.val} [${item.unit}]`, gX + gW - 10, curCY + 13);
+      ctx.fillText(`${item.val} [${item.unit}]`, gX + gW - 10, curCY + 14);
 
-      // Engineering Context Subtitle
-      ctx.font = '400 7.5px "Plus Jakarta Sans", sans-serif';
-      ctx.fillStyle = '#94A3B8';
+      // Status Tag & Engineering Description
+      ctx.font = '600 6.8px "JetBrains Mono", monospace';
+      ctx.fillStyle = item.color;
       ctx.textAlign = 'left';
-      ctx.fillText(item.desc, gX + 10, curCY + 25);
+      ctx.fillText(`[${item.status}]`, gX + 22, curCY + 28);
 
-      curCY += 37;
+      ctx.font = '400 7.2px "Plus Jakarta Sans", sans-serif';
+      ctx.fillStyle = '#94A3B8';
+      ctx.fillText(item.desc, gX + 135, curCY + 28);
+
+      curCY += 44;
     });
 
     ctx.restore();
@@ -9261,6 +9578,731 @@ class PresentationEngine {
     ctx.font = '800 9px "JetBrains Mono", monospace';
     ctx.fillStyle = '#15803D';
     ctx.fillText('PACKAGING: 2.5 mL BFS AMPULE', s4X + colW / 2, flowY + colH - 22);
+
+    ctx.restore();
+  }
+
+  /* ========================================================
+     STAGE 18: Scientific Citations & Primary Academic Literature
+     Peer-reviewed papers, clinical trials, and regulatory approvals
+     ======================================================== */
+  initStage18Citations() {
+    this.stage18Timer = 0;
+  }
+
+  updateStage18Citations(dt) {
+    this.stage18Timer += dt;
+  }
+
+  drawStage18Citations(ctx) {
+    ctx.save();
+    // 1. Deep Neutral Slate Canvas
+    ctx.fillStyle = '#090D18';
+    ctx.fillRect(-500, -260, 1000, 520);
+
+    // Subtle technical grid
+    ctx.fillStyle = '#1E293B';
+    for (let gx = -460; gx <= 460; gx += 40) {
+      for (let gy = -220; gy <= 220; gy += 40) {
+        ctx.beginPath();
+        ctx.arc(gx, gy, 1.0, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+
+    // Top Header Section
+    ctx.fillStyle = '#0F172A';
+    ctx.strokeStyle = '#38BDF8';
+    ctx.lineWidth = 1.2;
+    ctx.beginPath();
+    ctx.roundRect(-270, -252, 540, 26, 13);
+    ctx.fill();
+    ctx.stroke();
+
+    ctx.font = '800 9.5px "JetBrains Mono", monospace';
+    ctx.fillStyle = '#38BDF8';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('● PRIMARY SCIENTIFIC LITERATURE & REGULATORY CITATIONS', 0, -239);
+
+    ctx.font = '800 23px "Plus Jakarta Sans", sans-serif';
+    ctx.fillStyle = '#FFFFFF';
+    ctx.fillText('Scientific Citations & Primary Literature References', 0, -208);
+
+    ctx.font = '500 11.5px "Plus Jakarta Sans", sans-serif';
+    ctx.fillStyle = '#94A3B8';
+    ctx.fillText('Foundational peer-reviewed publications, clinical trials, and FDA approvals establishing dornase alfa therapy', 0, -186);
+
+    // 6 Peer-Reviewed Publication Cards (2 Columns x 3 Rows)
+    const colW = 458;
+    const cardH = 96;
+    const gapX = 20;
+    const gapY = 12;
+    const startX = -468;
+    const startY = -165;
+
+    const citations = [
+      {
+        col: 0, row: 0,
+        badge: 'PNAS • 1990',
+        badgeColor: '#38BDF8',
+        badgeBg: '#082F49',
+        title: 'Shak S, Capon DJ, Hellmiss R, Marsters SA, Baker CL.',
+        paper: 'Recombinant human DNase I reduces the viscosity of cystic fibrosis sputum.',
+        journal: 'Proc. Natl. Acad. Sci. U.S.A. 1990; 87(23): 9188–9192.',
+        keyFinding: '★ Seminal Paper: Cloned human DNase 1 in CHO cells; proved 800× viscosity drop in purulent CF sputum.'
+      },
+      {
+        col: 1, row: 0,
+        badge: 'NEJM • 1994',
+        badgeColor: '#10B981',
+        badgeBg: '#064E3B',
+        title: 'Fuchs HJ, Borowitz DS, Christiansen DH, et al.',
+        paper: 'Effect of aerosolized rhDNase on exacerbations of respiratory symptoms & lung function in CF.',
+        journal: 'N. Engl. J. Med. 1994; 331(10): 637–642.',
+        keyFinding: '★ Landmark Phase III Trial: 968 CF patients; +15.8% FEV₁ gain and 28–37% cut in exacerbations.'
+      },
+      {
+        col: 0, row: 1,
+        badge: 'US FDA NDA • 1993',
+        badgeColor: '#F59E0B',
+        badgeBg: '#451A03',
+        title: 'U.S. Food and Drug Administration (FDA)',
+        paper: 'Pulmozyme® (dornase alfa) Inhalation Solution NDA 20-229 Approval Package.',
+        journal: 'Rockville, MD: Center for Biologics Evaluation & Research; Approved Dec 30, 1993.',
+        keyFinding: '★ First Recombinant Therapeutic: Officially licensed as the first cystic fibrosis medicine in 30 years.'
+      },
+      {
+        col: 1, row: 1,
+        badge: 'J. BIOL. CHEM. • 1995',
+        badgeColor: '#A855F7',
+        badgeBg: '#3B0764',
+        title: 'Wong LTK, Shak S, Levinson AD.',
+        paper: 'Biochemical & structural characterization of rhDNase I produced in Chinese hamster ovary cells.',
+        journal: 'J. Biol. Chem. 1995; 270(18): 10817–10824.',
+        keyFinding: '★ Structural Mechanics: Essential Asn18/Asn106 N-glycans, dual disulfide bridges, and Ca²⁺/Mg²⁺ pocket.'
+      },
+      {
+        col: 0, row: 2,
+        badge: 'AJRCCM • 1996',
+        badgeColor: '#2DD4BF',
+        badgeBg: '#134E4A',
+        title: 'Wanner A, Salathé M, O\'Riordan TG.',
+        paper: 'Mucociliary clearance and airway surface liquid dynamics in pulmonary cystic fibrosis.',
+        journal: 'Am. J. Respir. Crit. Care Med. 1996; 154(6): 1868–1902.',
+        keyFinding: '★ Aerodynamic Physics: 2.1–2.8 µm aerosol MMAD ensures deep bronchial deposition and ciliary rescue.'
+      },
+      {
+        col: 1, row: 2,
+        badge: 'SCIENCE • 1989',
+        badgeColor: '#EC4899',
+        badgeBg: '#500724',
+        title: 'Riordan JR, Rommens JM, Kerem B, et al.',
+        paper: 'Identification of the cystic fibrosis gene: cloning and characterization of complementary DNA.',
+        journal: 'Science 1989; 245(4922): 1066–1073.',
+        keyFinding: '★ Genetic Etiology: Discovered the CFTR ABC transporter gene on chromosome 7q31.2 causing CF.'
+      }
+    ];
+
+    citations.forEach(c => {
+      const cx = startX + c.col * (colW + gapX);
+      const cy = startY + c.row * (cardH + gapY);
+
+      ctx.fillStyle = '#0F172A';
+      ctx.strokeStyle = '#334155';
+      ctx.lineWidth = 1.2;
+      ctx.beginPath();
+      ctx.roundRect(cx, cy, colW, cardH, 8);
+      ctx.fill();
+      ctx.stroke();
+
+      // Top colored indicator tag
+      ctx.fillStyle = c.badgeBg;
+      ctx.strokeStyle = c.badgeColor;
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.roundRect(cx + 12, cy + 10, 110, 16, 4);
+      ctx.fill();
+      ctx.stroke();
+
+      ctx.font = '800 7.5px "JetBrains Mono", monospace';
+      ctx.fillStyle = c.badgeColor;
+      ctx.textAlign = 'center';
+      ctx.fillText(c.badge, cx + 67, cy + 18);
+
+      // Authors
+      ctx.font = '700 8.5px "Plus Jakarta Sans", sans-serif';
+      ctx.fillStyle = '#E2E8F0';
+      ctx.textAlign = 'left';
+      ctx.fillText(c.title, cx + 130, cy + 18);
+
+      // Paper title
+      ctx.font = '600 8.5px "Plus Jakarta Sans", sans-serif';
+      ctx.fillStyle = '#38BDF8';
+      ctx.fillText(c.paper, cx + 12, cy + 39);
+
+      // Journal & Citation details
+      ctx.font = '400 7.5px "JetBrains Mono", monospace';
+      ctx.fillStyle = '#94A3B8';
+      ctx.fillText(c.journal, cx + 12, cy + 54);
+
+      // Bottom Key Finding Bar
+      ctx.fillStyle = '#1E293B';
+      ctx.beginPath();
+      ctx.roundRect(cx + 10, cy + 64, colW - 20, 22, 4);
+      ctx.fill();
+
+      ctx.font = '600 7.2px "Plus Jakarta Sans", sans-serif';
+      ctx.fillStyle = '#34D399';
+      ctx.fillText(c.keyFinding, cx + 18, cy + 75);
+    });
+
+    ctx.restore();
+  }
+
+  /* ========================================================
+     STAGE 19: Thank You Page with Animated Dancing Cow
+     Celebratory conclusion featuring the cow from Slide 8
+     joyfully dancing because recombinant CHO technology saved cows!
+     Presented by P.YuvaRaj • Roll number 124116
+     ======================================================== */
+  initStage19ThankYou() {
+    this.stage19Timer = 0;
+
+    // Confetti particles
+    this.confetti = [];
+    for (let i = 0; i < 48; i++) {
+      this.confetti.push({
+        x: (Math.random() - 0.5) * 940,
+        y: -240 + Math.random() * 480,
+        vx: (Math.random() - 0.5) * 20,
+        vy: 25 + Math.random() * 45,
+        rot: Math.random() * Math.PI * 2,
+        rotSpeed: (Math.random() - 0.5) * 4,
+        size: 4 + Math.random() * 5,
+        color: ['#F59E0B', '#38BDF8', '#10B981', '#EC4899', '#A855F7', '#F43F5E'][i % 6]
+      });
+    }
+
+    // Floating musical notes
+    this.musicNotes = [];
+    const notesSymbols = ['♪', '♫', '♬', '♩'];
+    for (let i = 0; i < 6; i++) {
+      this.musicNotes.push({
+        symbol: notesSymbols[i % notesSymbols.length],
+        x: 220 + (Math.random() - 0.5) * 160,
+        y: 40 + Math.random() * 60,
+        vy: 18 + Math.random() * 14,
+        phase: Math.random() * Math.PI * 2,
+        scale: 0.8 + Math.random() * 0.4
+      });
+    }
+  }
+
+  updateStage19ThankYou(dt) {
+    this.stage19Timer += dt;
+
+    // Confetti physics
+    this.confetti.forEach(c => {
+      c.x += c.vx * dt;
+      c.y += c.vy * dt;
+      c.rot += c.rotSpeed * dt;
+      if (c.y > 240) {
+        c.y = -250;
+        c.x = (Math.random() - 0.5) * 940;
+      }
+    });
+
+    // Musical notes floating up
+    this.musicNotes.forEach(m => {
+      m.y -= m.vy * dt;
+      m.phase += dt * 3;
+      if (m.y < -160) {
+        m.y = 80;
+        m.x = 220 + (Math.random() - 0.5) * 160;
+      }
+    });
+  }
+
+  drawStage19ThankYouDancingCow(ctx) {
+    ctx.save();
+    // 1. Deep Space Slate / Medical Navy Background
+    ctx.fillStyle = '#070C18';
+    ctx.fillRect(-500, -260, 1000, 520);
+
+    // Warm celebratory ambient radial glow behind dancing cow
+    const cowGlow = ctx.createRadialGradient(220, 20, 30, 220, 20, 280);
+    cowGlow.addColorStop(0, 'rgba(245, 158, 11, 0.20)');
+    cowGlow.addColorStop(0.6, 'rgba(2, 132, 199, 0.12)');
+    cowGlow.addColorStop(1, 'rgba(7, 12, 24, 0.0)');
+    ctx.fillStyle = cowGlow;
+    ctx.fillRect(-500, -260, 1000, 520);
+
+    // Subtle technical grid
+    ctx.fillStyle = '#1E293B';
+    for (let gx = -460; gx <= 460; gx += 40) {
+      for (let gy = -220; gy <= 220; gy += 40) {
+        ctx.beginPath();
+        ctx.arc(gx, gy, 1.0, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+
+    // 2. Confetti Falling in Air
+    this.confetti.forEach(c => {
+      ctx.save();
+      ctx.translate(c.x, c.y);
+      ctx.rotate(c.rot);
+      ctx.fillStyle = c.color;
+      ctx.fillRect(-c.size / 2, -c.size / 4, c.size, c.size / 2);
+      ctx.restore();
+    });
+
+    // 3. Top Header Badge
+    ctx.fillStyle = '#0F172A';
+    ctx.strokeStyle = '#F59E0B';
+    ctx.lineWidth = 1.2;
+    ctx.beginPath();
+    ctx.roundRect(-240, -252, 480, 26, 13);
+    ctx.fill();
+    ctx.stroke();
+
+    ctx.font = '800 9.5px "JetBrains Mono", monospace';
+    ctx.fillStyle = '#F59E0B';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('● ACKNOWLEDGEMENTS, CLINICAL VICTORY & SUMMARY', 0, -239);
+
+    // Main Heading
+    ctx.font = '800 28px "Plus Jakarta Sans", sans-serif';
+    ctx.fillStyle = '#FFFFFF';
+    ctx.fillText('Thank You! Questions & Discussion', 0, -206);
+
+    // Subtitle
+    ctx.font = '500 12px "Plus Jakarta Sans", sans-serif';
+    ctx.fillStyle = '#94A3B8';
+    ctx.fillText('Recombinant Human DNase 1 (Dornase Alfa • Pulmozyme®) for Cystic Fibrosis', 0, -180);
+
+    // ==========================================
+    // LEFT SIDE: PRESENTER CARD & SUMMARY TAKEAWAYS
+    // ==========================================
+    const leftX = -465;
+    const leftW = 410;
+
+    // Presenter Card
+    const presY = -158;
+    const presH = 68;
+    ctx.fillStyle = '#0F172A';
+    ctx.strokeStyle = '#38BDF8';
+    ctx.lineWidth = 1.4;
+    ctx.beginPath();
+    ctx.roundRect(leftX, presY, leftW, presH, 10);
+    ctx.fill();
+    ctx.stroke();
+
+    // Top accent bar
+    ctx.fillStyle = '#38BDF8';
+    ctx.beginPath();
+    ctx.roundRect(leftX + 1, presY + 1, leftW - 2, 3, [9, 9, 0, 0]);
+    ctx.fill();
+
+    ctx.font = '700 8.5px "JetBrains Mono", monospace';
+    ctx.fillStyle = '#38BDF8';
+    ctx.textAlign = 'left';
+    ctx.fillText('PRESENTED BY:', leftX + 18, presY + 22);
+
+    ctx.font = '800 18px "Plus Jakarta Sans", sans-serif';
+    ctx.fillStyle = '#FFFFFF';
+    ctx.fillText('P.YuvaRaj', leftX + 18, presY + 46);
+
+    // Roll Number Pill Badge
+    const rollBadgeX = leftX + leftW - 175;
+    const rollBadgeY = presY + 18;
+    const rollBadgeW = 158;
+    const rollBadgeH = 32;
+
+    ctx.fillStyle = 'rgba(16, 185, 129, 0.16)';
+    ctx.strokeStyle = '#10B981';
+    ctx.lineWidth = 1.2;
+    ctx.beginPath();
+    ctx.roundRect(rollBadgeX, rollBadgeY, rollBadgeW, rollBadgeH, 6);
+    ctx.fill();
+    ctx.stroke();
+
+    ctx.font = '800 12px "JetBrains Mono", monospace';
+    ctx.fillStyle = '#34D399';
+    ctx.textAlign = 'center';
+    ctx.fillText('Roll number 124116', rollBadgeX + rollBadgeW / 2, rollBadgeY + rollBadgeH / 2);
+
+    // 3 Takeaway Cards
+    const tCards = [
+      {
+        icon: '🧬',
+        title: 'Monogenic Defect Overcome by Biotechnology',
+        desc: 'Autosomal recessive CFTR mutations cause severe mucociliary dehydration. Recombinant rhDNase 1 liquefies obstructive eDNA nets, restoring FEV₁ lung function by +15.8% and cutting infections by 37%.'
+      },
+      {
+        icon: '🧫',
+        title: 'Chinese Hamster Ovary (CHO) Bio-Factories',
+        desc: 'Bacteria completely fail due to lack of N-glycosylation and reducing cytosolic aggregates (inclusion bodies). Engineered CHO-K1 cells secrete authentic, 37 kDa folded glycoprotein with full safety.'
+      },
+      {
+        icon: '🐮',
+        title: 'No More Slaughterhouses or Animal Allergies!',
+        desc: 'The hazardous 1950s bovine pancreas extraction that triggered life-threatening anaphylactoid bronchospasm was permanently replaced by pure, cell-banked, animal-origin-free cGMP biomanufacturing.'
+      }
+    ];
+
+    let tY = -78;
+    tCards.forEach((tc, tIdx) => {
+      ctx.fillStyle = '#0F172A';
+      ctx.strokeStyle = '#334155';
+      ctx.lineWidth = 1.2;
+      ctx.beginPath();
+      ctx.roundRect(leftX, tY, leftW, 90, 8);
+      ctx.fill();
+      ctx.stroke();
+
+      // Icon & Title
+      ctx.font = '14px sans-serif';
+      ctx.textAlign = 'left';
+      ctx.fillText(tc.icon, leftX + 14, tY + 22);
+
+      ctx.font = '800 11px "Plus Jakarta Sans", sans-serif';
+      ctx.fillStyle = '#38BDF8';
+      ctx.fillText(tc.title, leftX + 36, tY + 22);
+
+      // Word wrap description into 3 clean lines
+      const words = tc.desc.split(' ');
+      let lines = [''];
+      words.forEach(w => {
+        const curLine = lines[lines.length - 1];
+        if ((curLine + ' ' + w).trim().length <= 48) {
+          lines[lines.length - 1] = (curLine + ' ' + w).trim();
+        } else {
+          lines.push(w);
+        }
+      });
+      ctx.font = '400 8.5px/1.35 "Plus Jakarta Sans", sans-serif';
+      ctx.fillStyle = '#CBD5E1';
+      lines.slice(0, 3).forEach((ln, lIdx) => {
+        ctx.fillText(ln, leftX + 14, tY + 40 + lIdx * 14);
+      });
+
+      tY += 100;
+    });
+
+
+    // ==========================================
+    // RIGHT SIDE: THE DANCING COW FROM SLIDE 8!
+    // ==========================================
+    const cowBaseX = 220;
+    const cowBaseY = 35;
+
+    // Musical Notes floating around cow
+    this.musicNotes.forEach(m => {
+      ctx.save();
+      const waveX = Math.sin(m.phase) * 12;
+      ctx.font = `800 ${Math.round(18 * m.scale)}px sans-serif`;
+      ctx.fillStyle = '#F59E0B';
+      ctx.fillText(m.symbol, m.x + waveX, m.y);
+      ctx.restore();
+    });
+
+    // Dance floor shadow
+    ctx.fillStyle = 'rgba(15, 23, 42, 0.4)';
+    ctx.beginPath();
+    ctx.ellipse(cowBaseX, cowBaseY + 95, 120, 20, 0, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.save();
+    // Dance beat variables!
+    const danceBeat = this.stage19Timer * 6.5;
+    const hipSway = Math.sin(danceBeat * 0.8) * 14;
+    const bodyBounce = Math.abs(Math.sin(danceBeat)) * 8;
+    const bodyTilt = Math.sin(danceBeat * 0.8) * 0.08;
+
+    ctx.translate(cowBaseX + hipSway, cowBaseY - bodyBounce);
+    ctx.rotate(bodyTilt);
+
+    // --- COW'S SWISHING EXCITED TAIL ---
+    const tailWag = Math.sin(this.stage19Timer * 9) * 0.7;
+    ctx.save();
+    ctx.translate(-76, -15);
+    ctx.rotate(tailWag - 0.2);
+    ctx.strokeStyle = '#FFFFFF';
+    ctx.lineWidth = 4;
+    ctx.beginPath();
+    ctx.moveTo(0, 0);
+    ctx.quadraticCurveTo(-15, 25, -12, 45);
+    ctx.stroke();
+
+    // Bushy tail tip
+    ctx.fillStyle = '#0F172A';
+    ctx.beginPath();
+    ctx.ellipse(-12, 45, 8, 12, 0.2, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+
+    // --- TAP-DANCING LEGS (High stepping alternating kicks!) ---
+    const legStep1 = Math.sin(danceBeat);
+    const legStep2 = Math.sin(danceBeat + Math.PI);
+
+    const hindLeftLift = Math.max(0, legStep1) * 16;
+    const hindRightLift = Math.max(0, legStep2) * 16;
+    const frontLeftLift = Math.max(0, legStep2) * 18;
+    const frontRightLift = Math.max(0, legStep1) * 18;
+
+    ctx.fillStyle = '#FFFFFF';
+    ctx.strokeStyle = '#94A3B8';
+    ctx.lineWidth = 1.5;
+
+    // Hind Left Leg
+    ctx.beginPath();
+    ctx.roundRect(-66, 10 - hindLeftLift, 15, 52, 4);
+    ctx.fill(); ctx.stroke();
+    // Hind Right Leg
+    ctx.beginPath();
+    ctx.roundRect(-44, 12 - hindRightLift, 14, 50, 4);
+    ctx.fill(); ctx.stroke();
+
+    // Pink Udder with teats (Jiggling happily!)
+    const udderJiggle = Math.sin(danceBeat * 1.5) * 4;
+    ctx.fillStyle = '#FBCFE8';
+    ctx.beginPath();
+    ctx.ellipse(-26 + udderJiggle, 26, 14, 10, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillRect(-32 + udderJiggle, 30, 4, 7);
+    ctx.fillRect(-22 + udderJiggle, 30, 4, 7);
+
+    // Front Left Leg
+    ctx.beginPath();
+    ctx.roundRect(32, 12 - frontLeftLift, 14, 50, 4);
+    ctx.fill(); ctx.stroke();
+    // Front Right Leg
+    ctx.beginPath();
+    ctx.roundRect(52, 10 - frontRightLift, 15, 52, 4);
+    ctx.fill(); ctx.stroke();
+
+    // Black Hooves (Tapping on floor)
+    ctx.fillStyle = '#0F172A';
+    ctx.beginPath();
+    ctx.roundRect(-66, 56 - hindLeftLift, 15, 8, 2);
+    ctx.roundRect(-44, 56 - hindRightLift, 14, 8, 2);
+    ctx.roundRect(32, 56 - frontLeftLift, 14, 8, 2);
+    ctx.roundRect(52, 56 - frontRightLift, 15, 8, 2);
+    ctx.fill();
+
+    // Tap dancing impact sparks on floor under active hooves!
+    if (hindLeftLift < 2) {
+      ctx.fillStyle = '#F59E0B';
+      ctx.beginPath(); ctx.arc(-58, 64, 3, 0, Math.PI * 2); ctx.fill();
+    }
+    if (frontRightLift < 2) {
+      ctx.fillStyle = '#F59E0B';
+      ctx.beginPath(); ctx.arc(60, 64, 3, 0, Math.PI * 2); ctx.fill();
+    }
+
+    // --- COW TORSO (Main White Body) ---
+    ctx.fillStyle = '#FFFFFF';
+    ctx.strokeStyle = '#94A3B8';
+    ctx.lineWidth = 2.2;
+    ctx.beginPath();
+    ctx.ellipse(0, 0, 82, 38, -0.04, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.stroke();
+
+    // Holstein Black Spots
+    ctx.fillStyle = '#0F172A';
+    // Spot 1: Rump
+    ctx.beginPath();
+    ctx.ellipse(-46, -10, 26, 22, 0.3, 0, Math.PI * 2);
+    ctx.fill();
+    // Spot 2: Back
+    ctx.beginPath();
+    ctx.ellipse(2, -18, 22, 16, -0.2, 0, Math.PI * 2);
+    ctx.fill();
+    // Spot 3: Flank
+    ctx.beginPath();
+    ctx.ellipse(28, 6, 20, 16, 0.4, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Cow Neck reaching up to head
+    ctx.fillStyle = '#FFFFFF';
+    ctx.strokeStyle = '#94A3B8';
+    ctx.lineWidth = 1.8;
+    ctx.beginPath();
+    ctx.moveTo(56, -15);
+    ctx.lineTo(92, -22);
+    ctx.lineTo(82, 15);
+    ctx.lineTo(52, 18);
+    ctx.closePath();
+    ctx.fill();
+    ctx.stroke();
+
+    // Neck black patch
+    ctx.fillStyle = '#0F172A';
+    ctx.beginPath();
+    ctx.ellipse(70, -4, 12, 14, 0.3, 0, Math.PI * 2);
+    ctx.fill();
+
+    // --- COW HEAD WITH DANCING HEAD BOB ---
+    const headX = 96;
+    const headY = -18;
+    const headBob = Math.sin(danceBeat) * 6;
+    const headGrooveTilt = Math.sin(danceBeat * 0.5) * 0.15;
+
+    ctx.save();
+    ctx.translate(headX, headY + headBob);
+    ctx.rotate(headGrooveTilt);
+
+    // Horns
+    ctx.fillStyle = '#FEF3C7';
+    ctx.strokeStyle = '#D97706';
+    ctx.lineWidth = 1.4;
+    // Left horn
+    ctx.beginPath();
+    ctx.moveTo(-8, -26);
+    ctx.quadraticCurveTo(-16, -42, -24, -36);
+    ctx.quadraticCurveTo(-14, -30, -6, -22);
+    ctx.fill(); ctx.stroke();
+    // Right horn
+    ctx.beginPath();
+    ctx.moveTo(4, -26);
+    ctx.quadraticCurveTo(12, -42, 20, -36);
+    ctx.quadraticCurveTo(10, -30, 2, -22);
+    ctx.fill(); ctx.stroke();
+
+    // Celebratory Gold Party Hat on Horns! 🎉
+    ctx.fillStyle = '#F59E0B';
+    ctx.strokeStyle = '#D97706';
+    ctx.lineWidth = 1.2;
+    ctx.beginPath();
+    ctx.moveTo(-10, -28);
+    ctx.lineTo(10, -28);
+    ctx.lineTo(0, -56);
+    ctx.closePath();
+    ctx.fill();
+    ctx.stroke();
+    // Hat pom-pom
+    ctx.fillStyle = '#EF4444';
+    ctx.beginPath();
+    ctx.arc(0, -58, 4, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Floppy Cow Ears (Dancing twitch)
+    const earWiggle = Math.sin(danceBeat * 1.5) * 0.2;
+    // Left ear
+    ctx.save();
+    ctx.translate(-14, -14);
+    ctx.rotate(earWiggle - 0.3);
+    ctx.fillStyle = '#0F172A';
+    ctx.beginPath();
+    ctx.ellipse(0, 0, 16, 8, -0.4, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+
+    // Right ear
+    ctx.save();
+    ctx.translate(14, -14);
+    ctx.rotate(-earWiggle + 0.3);
+    ctx.fillStyle = '#FFFFFF';
+    ctx.beginPath();
+    ctx.ellipse(0, 0, 16, 8, 0.4, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = '#FBCFE8';
+    ctx.beginPath();
+    ctx.ellipse(0, 0, 10, 4, 0.4, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+
+    // Head Skull
+    ctx.fillStyle = '#FFFFFF';
+    ctx.strokeStyle = '#94A3B8';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.ellipse(0, -6, 20, 24, 0.1, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.stroke();
+
+    // Black Head Patch around Eye
+    ctx.fillStyle = '#0F172A';
+    ctx.beginPath();
+    ctx.ellipse(-6, -10, 12, 14, -0.2, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Happy Curved Dancing Eyes (^_^ joyful closed eyes!)
+    ctx.strokeStyle = '#0F172A';
+    ctx.lineWidth = 2.4;
+    ctx.beginPath();
+    ctx.arc(-7, -10, 5, Math.PI, Math.PI * 2);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.arc(7, -10, 5, Math.PI, Math.PI * 2);
+    ctx.stroke();
+
+    // Pink Cheeks (Blushing from dancing happiness!)
+    ctx.fillStyle = 'rgba(244, 114, 182, 0.6)';
+    ctx.beginPath();
+    ctx.arc(-13, -2, 4.5, 0, Math.PI * 2);
+    ctx.arc(13, -2, 4.5, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Pink Snout & Muzzle
+    ctx.fillStyle = '#FCE7F3';
+    ctx.strokeStyle = '#F472B6';
+    ctx.lineWidth = 1.4;
+    ctx.beginPath();
+    ctx.roundRect(-16, 4, 32, 20, 9);
+    ctx.fill();
+    ctx.stroke();
+
+    // Nostrils
+    ctx.fillStyle = '#BE185D';
+    ctx.beginPath();
+    ctx.ellipse(-6, 12, 3, 2, 0, 0, Math.PI * 2);
+    ctx.ellipse(6, 12, 3, 2, 0, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Joyful Big Smile!
+    ctx.strokeStyle = '#BE185D';
+    ctx.lineWidth = 2.2;
+    ctx.beginPath();
+    ctx.arc(0, 15, 6, 0.2, Math.PI - 0.2);
+    ctx.stroke();
+
+    ctx.restore(); // Restore head
+    ctx.restore(); // Restore dancing cow
+
+
+    // Cow Speech Bubble
+    const spX = cowBaseX - 30;
+    const spY = cowBaseY - 145;
+
+    // Rising speech dots
+    ctx.fillStyle = '#FFFFFF';
+    ctx.strokeStyle = '#94A3B8';
+    ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.arc(spX + 45, spY + 55, 4, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+    ctx.beginPath(); ctx.arc(spX + 35, spY + 42, 6, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+    ctx.beginPath(); ctx.arc(spX + 25, spY + 28, 8, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+
+    // Speech Bubble Box
+    const sbW = 280;
+    const sbH = 46;
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.98)';
+    ctx.strokeStyle = '#0284C7';
+    ctx.lineWidth = 1.8;
+    ctx.beginPath();
+    ctx.roundRect(spX - sbW / 2 + 30, spY - 14, sbW, sbH, 12);
+    ctx.fill();
+    ctx.stroke();
+
+    ctx.font = '800 10.5px "Plus Jakarta Sans", sans-serif';
+    ctx.fillStyle = '#0F172A';
+    ctx.textAlign = 'center';
+    ctx.fillText('“Moo! Thanks to recombinant CHO cells,', spX + 30, spY + 4);
+    ctx.fillText('cows are safe & CF lungs breathe freely! 🎉🐮”', spX + 30, spY + 20);
 
     ctx.restore();
   }

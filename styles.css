@@ -116,6 +116,9 @@ html, body {
   display: flex;
   align-items: center;
   gap: 10px;
+  min-width: 0;
+  max-width: calc(100vw - 360px);
+  overflow: hidden;
 }
 
 .stage-number {
@@ -127,13 +130,18 @@ html, body {
   padding: 3px 8px;
   border-radius: var(--radius-sm);
   letter-spacing: 0.04em;
+  flex-shrink: 0;
 }
 
 .stage-name {
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 700;
   color: var(--text-primary);
   letter-spacing: -0.01em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
 }
 
 .header-right {
