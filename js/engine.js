@@ -7270,462 +7270,725 @@ class PresentationEngine {
      ======================================================== */
   initStage15HostOrganismCho() {
     this.stage15Timer = 0;
-    // Bacterial inclusion body tangled polymer segments
-    this.s15InclusionNodes = [];
-    for (let i = 0; i < 28; i++) {
-      this.s15InclusionNodes.push({
-        x: -235 + (Math.random() - 0.5) * 55,
-        y: -10 + (Math.random() - 0.5) * 45,
-        r: 3 + Math.random() * 4
+
+    // E. coli Ribosomes (dense 70S macromolecular crowding in bacterial cytosol)
+    this.s15EcoliRibosomes = [];
+    for (let i = 0; i < 95; i++) {
+      this.s15EcoliRibosomes.push({
+        x: -242 + (Math.random() - 0.5) * 230,
+        y: -10 + (Math.random() - 0.5) * 95,
+        r: 1.1 + Math.random() * 0.9
       });
     }
 
-    // CHO cell secretory vesicles traveling from Golgi to membrane
-    this.s15ChoVesicles = [];
+    // E. coli Flagella (4 peritrichous sinusoidal helical filaments with basal motors)
+    this.s15Flagella = [
+      { startX: -375, startY: -35, baseAngle: Math.PI * 0.92, len: 120, freq: 3.5, amp: 12 },
+      { startX: -380, startY: 25, baseAngle: Math.PI * 1.05, len: 130, freq: 3.2, amp: 14 },
+      { startX: -260, startY: 65, baseAngle: Math.PI * 0.55, len: 110, freq: 3.8, amp: 11 },
+      { startX: -125, startY: 20, baseAngle: -Math.PI * 0.12, len: 115, freq: 3.4, amp: 13 }
+    ];
+
+    // Shedding LPS Outer Membrane Vesicles (OMVs) & endotoxins
+    this.s15Omvs = [];
+    for (let i = 0; i < 9; i++) {
+      this.s15Omvs.push({
+        angle: Math.random() * Math.PI * 2,
+        dist: 72 + Math.random() * 40,
+        speed: 10 + Math.random() * 14,
+        r: 2.5 + Math.random() * 2.5
+      });
+    }
+
+    // CHO Cell COPII Transport Vesicles (Rough ER -> cis-Golgi)
+    this.s15ChoCopVesicles = [];
+    for (let i = 0; i < 5; i++) {
+      this.s15ChoCopVesicles.push({
+        prog: i / 5,
+        speed: 0.22 + Math.random() * 0.08
+      });
+    }
+
+    // CHO Cell Secretory Vesicles (trans-Golgi -> Plasma Membrane Exocytosis)
+    this.s15ChoSecVesicles = [];
     for (let i = 0; i < 6; i++) {
-      this.s15ChoVesicles.push({
-        progress: i / 6,
-        speed: 0.12 + Math.random() * 0.05
+      this.s15ChoSecVesicles.push({
+        prog: i / 6,
+        speed: 0.16 + Math.random() * 0.05
+      });
+    }
+
+    // Active extracellular rhDNase 1 molecules secreted into medium
+    this.s15SecretedMolecules = [];
+    for (let i = 0; i < 18; i++) {
+      this.s15SecretedMolecules.push({
+        x: 385 + Math.random() * 70,
+        y: -65 + Math.random() * 130,
+        vx: 14 + Math.random() * 16,
+        vy: (Math.random() - 0.5) * 16,
+        phase: Math.random() * Math.PI * 2
       });
     }
   }
 
   updateStage15(dt) {
     this.stage15Timer += dt;
-    this.s15ChoVesicles.forEach(v => {
-      v.progress += v.speed * dt;
-      if (v.progress > 1.0) v.progress = 0;
+
+    // COPII vesicles ER -> Golgi
+    this.s15ChoCopVesicles.forEach(v => {
+      v.prog += v.speed * dt;
+      if (v.prog > 1.0) v.prog -= 1.0;
+    });
+
+    // Secretory vesicles Golgi -> Membrane
+    this.s15ChoSecVesicles.forEach(v => {
+      v.prog += v.speed * dt;
+      if (v.prog > 1.0) v.prog -= 1.0;
+    });
+
+    // OMVs shedding from E. coli
+    this.s15Omvs.forEach(o => {
+      o.dist += o.speed * dt;
+      if (o.dist > 130) o.dist = 72;
+    });
+
+    // Secreted rhDNase 1 molecules drifting in media
+    this.s15SecretedMolecules.forEach(m => {
+      m.x += m.vx * dt;
+      m.y += m.vy * dt;
+      if (m.x > 465) {
+        m.x = 385;
+        m.y = -60 + Math.random() * 120;
+      }
     });
   }
 
   drawStage15HostOrganismCho(ctx) {
     ctx.save();
-    ctx.fillStyle = '#FFFFFF';
+    // Neutral deep slate background (clean scientific canvas)
+    ctx.fillStyle = '#090D16';
     ctx.fillRect(-500, -260, 1000, 520);
 
-    ctx.fillStyle = '#E2E8F0';
+    // Subtle technical grid
+    ctx.fillStyle = '#1E293B';
     for (let gx = -460; gx <= 460; gx += 40) {
       for (let gy = -220; gy <= 220; gy += 40) {
         ctx.beginPath();
-        ctx.arc(gx, gy, 1.2, 0, Math.PI * 2);
+        ctx.arc(gx, gy, 1.0, 0, Math.PI * 2);
         ctx.fill();
       }
     }
 
-    // Header
-    ctx.fillStyle = '#F8FAFC';
-    ctx.strokeStyle = '#CBD5E1';
+    // Top Header Badge
+    ctx.fillStyle = '#0F172A';
+    ctx.strokeStyle = '#334155';
     ctx.lineWidth = 1;
     ctx.beginPath();
-    ctx.roundRect(-240, -252, 480, 26, 13);
+    ctx.roundRect(-275, -252, 550, 26, 13);
     ctx.fill();
     ctx.stroke();
 
-    ctx.font = '700 9.5px "JetBrains Mono", monospace';
-    ctx.fillStyle = '#4F46E5';
+    ctx.font = '700 9px "JetBrains Mono", monospace';
+    ctx.fillStyle = '#818CF8';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    ctx.fillText('● CELLULAR HOST SELECTION • MAMMALIAN vs. MICROBIAL SYSTEMS', 0, -239);
+    ctx.fillText('● CELLULAR BIOLOGY & HOST SELECTION • PROKARYOTIC vs. MAMMALIAN EXPRESSION', 0, -239);
 
-    ctx.font = '800 22px "Plus Jakarta Sans", sans-serif';
-    ctx.fillStyle = '#0F172A';
+    ctx.font = '800 21px "Plus Jakarta Sans", sans-serif';
+    ctx.fillStyle = '#F8FAFC';
     ctx.fillText('The Host Organism: Why CHO Cells (and Why Bacteria Fail)', 0, -210);
 
     ctx.font = '500 11.5px "Plus Jakarta Sans", sans-serif';
-    ctx.fillStyle = '#64748B';
-    ctx.fillText('Human DNase 1 requires mandatory eukaryotic post-translational modifications that only mammalian cells can perform.', 0, -188);
+    ctx.fillStyle = '#94A3B8';
+    ctx.fillText('Comparative cytology: Escherichia coli (Gram-negative prokaryote) vs. Chinese Hamster Ovary CHO-K1 (mammalian cell)', 0, -188);
 
-    const vpW = 450;
-    const vpH = 390;
-    const vpY = -170;
+    const vpW = 458;
+    const vpH = 398;
+    const vpY = -172;
 
     // ==========================================
-    // LEFT: PROKARYOTE FAILURE (E. COLI BACTERIUM CUTAWAY)
+    // LEFT PANEL: ESCHERICHIA COLI (BACTERIAL PROKARYOTE)
     // ==========================================
-    const leftX = -465;
+    const leftX = -470;
     ctx.save();
-    const lGrad = ctx.createLinearGradient(0, vpY, 0, vpY + vpH);
-    lGrad.addColorStop(0, '#2D0A0A');
-    lGrad.addColorStop(0.5, '#450A0A');
-    lGrad.addColorStop(1, '#1A0505');
-    ctx.fillStyle = lGrad;
+    
+    // Panel card in deep slate with sleek slate border (no generic red box)
+    ctx.fillStyle = '#0F172A';
+    ctx.strokeStyle = '#334155';
+    ctx.lineWidth = 1.4;
     ctx.beginPath();
-    ctx.roundRect(leftX, vpY, vpW, vpH, 12);
-    ctx.fill();
-
-    ctx.strokeStyle = '#DC2626';
-    ctx.lineWidth = 1.8;
-    ctx.stroke();
-
-    // Banner
-    ctx.fillStyle = 'rgba(239, 68, 68, 0.25)';
-    ctx.strokeStyle = '#EF4444';
-    ctx.lineWidth = 1.2;
-    ctx.beginPath();
-    ctx.roundRect(leftX + 14, vpY + 12, vpW - 28, 26, 6);
+    ctx.roundRect(leftX, vpY, vpW, vpH, 10);
     ctx.fill();
     ctx.stroke();
 
-    ctx.font = '800 10px "Plus Jakarta Sans", sans-serif';
-    ctx.fillStyle = '#FCA5A5';
-    ctx.textAlign = 'center';
-    ctx.fillText('❌ PROKARYOTIC FAILURE: E. COLI (BACTERIAL SYSTEM)', leftX + vpW / 2, vpY + 25);
-
-    // Large E. coli Bacterium Body Cutaway
-    const bactX = leftX + vpW / 2;
-    const bactY = vpY + 160;
-    const bactW = 340;
-    const bactH = 175;
-
-    // Outer Bacterial Capsule
-    ctx.fillStyle = '#3F1212';
-    ctx.strokeStyle = '#EF4444';
-    ctx.lineWidth = 3;
+    // Top Header Pill
+    ctx.fillStyle = '#1E293B';
+    ctx.strokeStyle = '#475569';
+    ctx.lineWidth = 1;
     ctx.beginPath();
-    ctx.roundRect(bactX - bactW / 2, bactY - bactH / 2, bactW, bactH, 45);
+    ctx.roundRect(leftX + 14, vpY + 12, vpW - 28, 28, 6);
     ctx.fill();
     ctx.stroke();
 
-    // Spiky LPS Endotoxin needles on outer membrane
-    ctx.strokeStyle = '#EF4444';
-    ctx.lineWidth = 2;
-    for (let th = 0; th < Math.PI * 2; th += 0.22) {
-      const sx = bactX + Math.cos(th) * (bactW / 2 - 20);
-      const sy = bactY + Math.sin(th) * (bactH / 2 - 15);
-      const ex = sx + Math.cos(th + Math.sin(this.time * 5 + th) * 0.2) * 14;
-      const ey = sy + Math.sin(th + Math.sin(this.time * 5 + th) * 0.2) * 14;
+    ctx.font = '800 10px "JetBrains Mono", monospace';
+    ctx.fillStyle = '#CBD5E1';
+    ctx.textAlign = 'left';
+    ctx.fillText('ESCHERICHIA COLI • BACTERIAL SYSTEM', leftX + 24, vpY + 26);
+    ctx.font = '700 8.5px "JetBrains Mono", monospace';
+    ctx.fillStyle = '#94A3B8';
+    ctx.textAlign = 'right';
+    ctx.fillText('[GRAM-NEGATIVE PROKARYOTE]', leftX + vpW - 24, vpY + 26);
+
+    // E. coli Bacterium Anatomy Center
+    const bX = leftX + vpW / 2;
+    const bY = vpY + 148;
+    const bW = 280;
+    const bH = 126;
+    const bR = 48; // Hemispherical rod poles
+
+    // 1. Peritrichous Flagella (Helical waves with basal motors)
+    this.s15Flagella.forEach(f => {
+      ctx.save();
+      ctx.strokeStyle = 'rgba(148, 163, 184, 0.75)';
+      ctx.lineWidth = 1.6;
+      ctx.beginPath();
+      for (let s = 0; s <= f.len; s += 4) {
+        const wave = Math.sin(s * 0.075 - this.stage15Timer * f.freq) * f.amp * (s / f.len);
+        const px = f.startX + Math.cos(f.baseAngle) * s - Math.sin(f.baseAngle) * wave;
+        const py = f.startY + Math.sin(f.baseAngle) * s + Math.cos(f.baseAngle) * wave;
+        if (s === 0) {
+          ctx.moveTo(px, py);
+        } else {
+          ctx.lineTo(px, py);
+        }
+      }
+      ctx.stroke();
+
+      // Basal body motor ring in cell envelope
+      ctx.fillStyle = '#64748B';
+      ctx.beginPath();
+      ctx.arc(f.startX, f.startY, 3.2, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+    });
+
+    // 2. Shedding LPS Outer Membrane Vesicles (OMVs)
+    this.s15Omvs.forEach(omv => {
+      const ox = bX + Math.cos(omv.angle) * (bW / 2 + omv.dist - 50);
+      const oy = bY + Math.sin(omv.angle) * (bH / 2 + omv.dist - 50);
+      ctx.fillStyle = 'rgba(217, 119, 6, 0.35)';
+      ctx.strokeStyle = '#D97706';
+      ctx.lineWidth = 1.2;
+      ctx.beginPath();
+      ctx.arc(ox, oy, omv.r, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.stroke();
+    });
+
+    // 3. Multi-Layered Gram-Negative Envelope
+    // A) Outer Membrane (Bilayer with LPS O-antigen surface bristles)
+    ctx.fillStyle = '#111827';
+    ctx.strokeStyle = '#64748B';
+    ctx.lineWidth = 2.2;
+    ctx.beginPath();
+    ctx.roundRect(bX - bW / 2, bY - bH / 2, bW, bH, bR);
+    ctx.fill();
+    ctx.stroke();
+
+    // LPS Surface Bristles (O-Antigen chains radiating from outer leaflet)
+    ctx.strokeStyle = '#D97706';
+    ctx.lineWidth = 1.1;
+    for (let th = 0; th < Math.PI * 2; th += 0.16) {
+      const cosT = Math.cos(th);
+      const sinT = Math.sin(th);
+      const sx = bX + cosT * (bW / 2 - 8);
+      const sy = bY + sinT * (bH / 2 - 8);
+      const bristLen = 5 + Math.sin(th * 6 + this.stage15Timer * 2) * 1.5;
+      const ex = sx + cosT * bristLen;
+      const ey = sy + sinT * bristLen;
       ctx.beginPath();
       ctx.moveTo(sx, sy);
       ctx.lineTo(ex, ey);
       ctx.stroke();
-
-      ctx.fillStyle = '#F87171';
-      ctx.beginPath();
-      ctx.arc(ex, ey, 2.5, 0, Math.PI * 2);
-      ctx.fill();
     }
 
-    // Callout for LPS
-    ctx.font = '800 8.5px "Plus Jakarta Sans", sans-serif';
-    ctx.fillStyle = '#FCA5A5';
-    ctx.textAlign = 'center';
-    ctx.fillText('⚠ Spiky LPS Endotoxins (Fatal Pulmonary Sepsis Risk)', bactX, bactY - bactH / 2 - 8);
-
-    // Interior: Reducing Cytosol (Misfolding Hazard)
-    ctx.font = '700 8.5px "JetBrains Mono", monospace';
-    ctx.fillStyle = '#F87171';
-    ctx.fillText('REDUCING CYTOSOL (NO ER / NO GOLGI)', bactX, bactY - 50);
-
-    // Giant Misfolded Inclusion Body (Tangled Knot of dead protein)
-    const incX = bactX - 45;
-    const incY = bactY + 10;
-    ctx.fillStyle = 'rgba(185, 28, 28, 0.4)';
+    // B) Periplasmic Space with Peptidoglycan mesh
+    ctx.strokeStyle = 'rgba(148, 163, 184, 0.4)';
+    ctx.lineWidth = 1;
+    ctx.setLineDash([3, 3]);
     ctx.beginPath();
-    ctx.arc(incX, incY, 48 + Math.sin(this.time * 4) * 3, 0, Math.PI * 2);
-    ctx.fill();
+    ctx.roundRect(bX - bW / 2 + 5, bY - bH / 2 + 5, bW - 10, bH - 10, bR - 4);
+    ctx.stroke();
+    ctx.setLineDash([]);
 
-    // Tangled polymer spaghetti strands
-    ctx.strokeStyle = '#DC2626';
-    ctx.lineWidth = 2.5;
+    // C) Inner Cytoplasmic Membrane
+    ctx.strokeStyle = '#475569';
+    ctx.lineWidth = 1.8;
     ctx.beginPath();
-    for (let i = 0; i < 24; i++) {
-      const ang = (i / 24) * Math.PI * 2;
-      const rx = incX + Math.cos(ang + this.time) * (20 + (i % 5) * 6);
-      const ry = incY + Math.sin(ang + this.time) * (18 + (i % 4) * 6);
-      if (i === 0) ctx.moveTo(rx, ry);
-      else ctx.lineTo(rx, ry);
+    ctx.roundRect(bX - bW / 2 + 9, bY - bH / 2 + 9, bW - 18, bH - 18, bR - 8);
+    ctx.stroke();
+
+    // 4. Cytosol Interior
+    // 70S Ribosomes (macromolecular crowding)
+    ctx.fillStyle = 'rgba(100, 116, 139, 0.55)';
+    this.s15EcoliRibosomes.forEach(rib => {
+      ctx.beginPath();
+      ctx.arc(rib.x, rib.y, rib.r, 0, Math.PI * 2);
+      ctx.fill();
+    });
+
+    // 5. Fibrous Bacterial Nucleoid (Non-membrane bound genomic DNA loops)
+    ctx.strokeStyle = 'rgba(245, 158, 11, 0.35)';
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    const nucPts = [
+      { x: bX - 50, y: bY - 20 }, { x: bX - 20, y: bY - 35 },
+      { x: bX + 25, y: bY - 25 }, { x: bX + 60, y: bY - 10 },
+      { x: bX + 45, y: bY + 20 }, { x: bX + 5, y: bY + 30 },
+      { x: bX - 35, y: bY + 25 }, { x: bX - 60, y: bY + 5 }
+    ];
+    ctx.moveTo(nucPts[0].x, nucPts[0].y);
+    for (let p = 1; p < nucPts.length; p++) {
+      ctx.quadraticCurveTo(
+        nucPts[p - 1].x + Math.sin(this.stage15Timer * 2 + p) * 4,
+        nucPts[p - 1].y + Math.cos(this.stage15Timer * 2 + p) * 4,
+        nucPts[p].x,
+        nucPts[p].y
+      );
     }
     ctx.closePath();
     ctx.stroke();
 
-    ctx.font = '900 9.5px "JetBrains Mono", monospace';
-    ctx.fillStyle = '#FFFFFF';
-    ctx.fillText('DEAD INCLUSION BODY', incX, incY - 4);
+    ctx.font = '600 7.5px "JetBrains Mono", monospace';
+    ctx.fillStyle = 'rgba(245, 158, 11, 0.8)';
+    ctx.textAlign = 'center';
+    ctx.fillText('Nucleoid (No Nuclear Envelope)', bX + 15, bY - 12);
+
+    // 6. Insoluble Inclusion Body (Misfolded rhDNase 1 aggregate)
+    const incX = bX - 70;
+    const incY = bY + 5;
+    // Dense electron-opaque shading
+    ctx.fillStyle = '#1E293B';
+    ctx.strokeStyle = '#64748B';
+    ctx.lineWidth = 1.8;
+    ctx.beginPath();
+    for (let i = 0; i < 12; i++) {
+      const ang = (i / 12) * Math.PI * 2;
+      const rad = 28 + (i % 2 === 0 ? 6 : -4) + Math.sin(ang * 3 + this.stage15Timer) * 1.5;
+      const ix = incX + Math.cos(ang) * rad;
+      const iy = incY + Math.sin(ang) * rad;
+      if (i === 0) ctx.moveTo(ix, iy);
+      else ctx.lineTo(ix, iy);
+    }
+    ctx.closePath();
+    ctx.fill();
+    ctx.stroke();
+
+    // Cross-hatched tangled amyloid-like fibrils
+    ctx.strokeStyle = 'rgba(148, 163, 184, 0.5)';
+    ctx.lineWidth = 1;
+    for (let l = -20; l <= 20; l += 8) {
+      ctx.beginPath();
+      ctx.moveTo(incX - 22, incY + l);
+      ctx.lineTo(incX + 22, incY + l - 6);
+      ctx.moveTo(incX + l, incY - 22);
+      ctx.lineTo(incX + l - 6, incY + 22);
+      ctx.stroke();
+    }
+
     ctx.font = '700 8px "JetBrains Mono", monospace';
-    ctx.fillText('0% Enzymatic Activity', incX, incY + 8);
-    ctx.fillText('(Misfolded & Aggregated)', incX, incY + 18);
+    ctx.fillStyle = '#F1F5F9';
+    ctx.textAlign = 'center';
+    ctx.fillText('INCLUSION BODY', incX, incY - 5);
+    ctx.font = '500 7px "JetBrains Mono", monospace';
+    ctx.fillStyle = '#94A3B8';
+    ctx.fillText('Misfolded Aggregates', incX, incY + 6);
+    ctx.fillText('(0% Enzymatic Titer)', incX, incY + 15);
 
-    // Linear unglycosylated polypeptide trying to fold on right side of bacterium
-    const pepX = bactX + 85;
-    const pepY = bactY + 10;
-    ctx.strokeStyle = '#F87171';
-    ctx.lineWidth = 2;
+    // 7. Linear Unfolded Polypeptide Chains with Reduced Thiols (-SH)
+    const pepX = bX + 65;
+    const pepY = bY + 5;
+    ctx.strokeStyle = '#CBD5E1';
+    ctx.lineWidth = 1.8;
     ctx.beginPath();
-    ctx.moveTo(pepX - 35, pepY - 25);
-    ctx.lineTo(pepX + 35, pepY - 25);
+    ctx.moveTo(pepX - 35, pepY - 15);
+    ctx.bezierCurveTo(pepX - 15, pepY - 30, pepX + 15, pepY, pepX + 35, pepY - 15);
     ctx.stroke();
 
-    ctx.font = '700 8px "Plus Jakarta Sans", sans-serif';
-    ctx.fillStyle = '#FCA5A5';
-    ctx.fillText('Linear DNase 1 Polypeptide', pepX, pepY - 32);
+    // Reduced Free -SH Cysteines tags
+    [-18, 18].forEach(ox => {
+      ctx.fillStyle = '#334155';
+      ctx.strokeStyle = '#94A3B8';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.roundRect(pepX + ox - 14, pepY - 4, 28, 14, 3);
+      ctx.fill();
+      ctx.stroke();
 
-    // Broken Disulfide Bond markers
-    ctx.strokeStyle = '#EF4444';
-    ctx.lineWidth = 1.5;
-    ctx.beginPath();
-    ctx.moveTo(pepX - 15, pepY - 25); ctx.lineTo(pepX - 15, pepY);
-    ctx.moveTo(pepX + 15, pepY - 25); ctx.lineTo(pepX + 15, pepY);
-    ctx.stroke();
-
-    // Red Cross on bond
-    ctx.font = '900 12px "Plus Jakarta Sans", sans-serif';
-    ctx.fillStyle = '#EF4444';
-    ctx.fillText('✕ S-S', pepX - 15, pepY + 12);
-    ctx.fillText('✕ S-S', pepX + 15, pepY + 12);
+      ctx.font = '700 7px "JetBrains Mono", monospace';
+      ctx.fillStyle = '#F8FAFC';
+      ctx.textAlign = 'center';
+      ctx.fillText('-SH Cys', pepX + ox, pepY + 6);
+    });
 
     ctx.font = '700 7.5px "Plus Jakarta Sans", sans-serif';
-    ctx.fillStyle = '#F87171';
-    ctx.fillText('Cannot Form Disulfides', pepX, pepY + 28);
-    ctx.fillText('0% N-Glycosylation', pepX, pepY + 38);
+    ctx.fillStyle = '#CBD5E1';
+    ctx.textAlign = 'center';
+    ctx.fillText('Nascent Polypeptide (Reduced -SH)', pepX, pepY - 22);
+    ctx.font = '500 7px "Plus Jakarta Sans", sans-serif';
+    ctx.fillStyle = '#94A3B8';
+    ctx.fillText('No ER: Cannot form S-S bonds', pepX, pepY + 22);
 
-    // Three Fatal Barrier Badges Bottom
-    ctx.fillStyle = '#450A0A';
-    ctx.strokeStyle = '#B91C1C';
+    // Callout badge for LPS on top of cell
+    ctx.font = '600 8px "JetBrains Mono", monospace';
+    ctx.fillStyle = '#D97706';
+    ctx.textAlign = 'center';
+    ctx.fillText('▲ Outer Membrane LPS (Endotoxin Inhalation Hazard)', bX, bY - bH / 2 - 12);
+
+    // Technical Bullet Points Card at bottom
+    ctx.fillStyle = '#111827';
+    ctx.strokeStyle = '#334155';
     ctx.lineWidth = 1;
     ctx.beginPath();
-    ctx.roundRect(leftX + 16, vpY + 275, vpW - 32, 60, 6);
+    ctx.roundRect(leftX + 14, vpY + 268, vpW - 28, 92, 6);
     ctx.fill();
     ctx.stroke();
 
-    ctx.font = '800 9px "Plus Jakarta Sans", sans-serif';
-    ctx.fillStyle = '#FCA5A5';
+    const eColiPoints = [
+      {
+        title: '1. No Endomembrane Glycosylation Machinery:',
+        desc: 'Bacteria completely lack endoplasmic reticulum & Golgi. rhDNase 1 requires dual N-glycans (Asn18, Asn106) to resist airway protease cleavage.'
+      },
+      {
+        title: '2. Highly Reducing Cytosolic Redox State:',
+        desc: 'Thioredoxin/glutaredoxin pathways prevent disulfide formation; Cys101-Cys104 & Cys173-Cys209 collapse into insoluble, inactive inclusion bodies.'
+      },
+      {
+        title: '3. Pyrogenic Endotoxin (LPS) Contamination:',
+        desc: 'Gram-negative outer membrane sheds toxic lipid A lipopolysaccharide; trace aerosol inhalation triggers lethal pulmonary inflammatory storm.'
+      }
+    ];
+
+    let ptY = vpY + 283;
+    eColiPoints.forEach(pt => {
+      ctx.font = '700 8.5px "Plus Jakarta Sans", sans-serif';
+      ctx.fillStyle = '#E2E8F0';
+      ctx.textAlign = 'left';
+      ctx.fillText(pt.title, leftX + 22, ptY);
+
+      ctx.font = '400 7.8px "Plus Jakarta Sans", sans-serif';
+      ctx.fillStyle = '#94A3B8';
+      ctx.fillText(pt.desc, leftX + 22, ptY + 11);
+      ptY += 27;
+    });
+
+    // Bottom Conclusion Pill
+    ctx.fillStyle = '#1E293B';
+    ctx.strokeStyle = '#475569';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.roundRect(leftX + 14, vpY + 368, vpW - 28, 20, 4);
+    ctx.fill();
+    ctx.stroke();
+
+    ctx.font = '700 8px "JetBrains Mono", monospace';
+    ctx.fillStyle = '#CBD5E1';
+    ctx.textAlign = 'center';
+    ctx.fillText('CONCLUSION: PROKARYOTIC SYSTEMS CANNOT YIELD FUNCTIONAL ACTIVE RH-DNASE 1', leftX + vpW / 2, vpY + 381);
+
+    ctx.restore();
+
+
+    // ==========================================
+    // RIGHT PANEL: CHINESE HAMSTER OVARY (CHO-K1 CELL)
+    // ==========================================
+    const rightX = 12;
+    ctx.save();
+
+    // Panel card in deep slate with subtle cyan/slate accent border
+    ctx.fillStyle = '#0F172A';
+    ctx.strokeStyle = '#334155';
+    ctx.lineWidth = 1.4;
+    ctx.beginPath();
+    ctx.roundRect(rightX, vpY, vpW, vpH, 10);
+    ctx.fill();
+    ctx.stroke();
+
+    // Top Header Pill
+    ctx.fillStyle = '#1E293B';
+    ctx.strokeStyle = '#475569';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.roundRect(rightX + 14, vpY + 12, vpW - 28, 28, 6);
+    ctx.fill();
+    ctx.stroke();
+
+    ctx.font = '800 10px "JetBrains Mono", monospace';
+    ctx.fillStyle = '#38BDF8';
     ctx.textAlign = 'left';
-    ctx.fillText('1. ZERO GLYCOSYLATION:', leftX + 26, vpY + 292);
-    ctx.font = '500 8.5px "Plus Jakarta Sans", sans-serif';
-    ctx.fillStyle = '#FECACA';
-    ctx.fillText('No ER/Golgi; unglycosylated DNase aggregates & is chewed by elastase.', leftX + 155, vpY + 292);
+    ctx.fillText('CHO-K1 MAMMALIAN CELL • EUKARYOTIC FACTORY', rightX + 24, vpY + 26);
+    ctx.font = '700 8.5px "JetBrains Mono", monospace';
+    ctx.fillStyle = '#94A3B8';
+    ctx.textAlign = 'right';
+    ctx.fillText('[COMMERCIAL GOLD STANDARD]', rightX + vpW - 24, vpY + 26);
 
-    ctx.font = '800 9px "Plus Jakarta Sans", sans-serif';
-    ctx.fillStyle = '#FCA5A5';
-    ctx.fillText('2. CYTOSOLIC REDUCTION:', leftX + 26, vpY + 308);
-    ctx.font = '500 8.5px "Plus Jakarta Sans", sans-serif';
-    ctx.fillStyle = '#FECACA';
-    ctx.fillText('Cys101-Cys104 & Cys173-Cys209 bonds collapse into dead inclusion bodies.', leftX + 155, vpY + 308);
+    // CHO Cell Anatomy Center
+    const cX = rightX + vpW / 2;
+    const cY = vpY + 148;
+    const cW = 320;
+    const cH = 150;
 
-    ctx.font = '800 9px "Plus Jakarta Sans", sans-serif';
-    ctx.fillStyle = '#FCA5A5';
-    ctx.fillText('3. TOXIC ENDOTOXINS:', leftX + 26, vpY + 324);
-    ctx.font = '500 8.5px "Plus Jakarta Sans", sans-serif';
-    ctx.fillStyle = '#FECACA';
-    ctx.fillText('LPS shedding causes fatal respiratory distress if inhaled.', leftX + 155, vpY + 324);
-
-    // Discontinued Stamp
-    ctx.save();
-    ctx.translate(leftX + vpW / 2, vpY + 360);
-    ctx.strokeStyle = '#EF4444';
-    ctx.lineWidth = 2;
+    // 1. Fluid Undulating Plasma Membrane with Microvilli
+    ctx.fillStyle = '#131D33';
+    ctx.strokeStyle = '#0284C7';
+    ctx.lineWidth = 2.2;
     ctx.beginPath();
-    ctx.roundRect(-125, -12, 250, 24, 6);
-    ctx.stroke();
-    ctx.font = '900 10.5px "JetBrains Mono", monospace';
-    ctx.fillStyle = '#EF4444';
-    ctx.textAlign = 'center';
-    ctx.fillText('★ BACTERIAL HOST ABANDONED ★', 0, 4);
-    ctx.restore();
-
-    ctx.restore();
-
-
-    // ==========================================
-    // RIGHT: MAMMALIAN PERFECTION (CHO-K1 CELL CUTAWAY)
-    // ==========================================
-    const rightX = 15;
-    ctx.save();
-    const rGrad = ctx.createLinearGradient(0, vpY, 0, vpY + vpH);
-    rGrad.addColorStop(0, '#042F2E');
-    rGrad.addColorStop(0.5, '#064E3B');
-    rGrad.addColorStop(1, '#022C22');
-    ctx.fillStyle = rGrad;
-    ctx.beginPath();
-    ctx.roundRect(rightX, vpY, vpW, vpH, 12);
-    ctx.fill();
-
-    ctx.strokeStyle = '#10B981';
-    ctx.lineWidth = 1.8;
-    ctx.stroke();
-
-    // Banner
-    ctx.fillStyle = 'rgba(16, 185, 129, 0.25)';
-    ctx.strokeStyle = '#10B981';
-    ctx.lineWidth = 1.2;
-    ctx.beginPath();
-    ctx.roundRect(rightX + 14, vpY + 12, vpW - 28, 26, 6);
+    const memSteps = 64;
+    for (let i = 0; i <= memSteps; i++) {
+      const th = (i / memSteps) * Math.PI * 2;
+      const rx = (cW / 2) + Math.sin(th * 9 + this.stage15Timer * 1.8) * 3.5;
+      const ry = (cH / 2) + Math.cos(th * 7 + this.stage15Timer * 1.5) * 3.0;
+      const px = cX + Math.cos(th) * rx;
+      const py = cY + Math.sin(th) * ry;
+      if (i === 0) ctx.moveTo(px, py);
+      else ctx.lineTo(px, py);
+    }
+    ctx.closePath();
     ctx.fill();
     ctx.stroke();
 
-    ctx.font = '800 10px "Plus Jakarta Sans", sans-serif';
-    ctx.fillStyle = '#A7F3D0';
-    ctx.textAlign = 'center';
-    ctx.fillText('✓ MAMMALIAN SUCCESS: CHO-K1 LIVING CELL BIO-FACTORY', rightX + vpW / 2, vpY + 25);
+    // 2. Double-Membrane Eukaryotic Nucleus with Nuclear Pore Complexes (NPCs)
+    const nX = cX - 95;
+    const nY = cY;
+    const nR = 38;
 
-    // Giant Mammalian Cell Cutaway
-    const choX = rightX + vpW / 2;
-    const choY = vpY + 160;
-
-    // Mammalian Wavy Plasma Membrane
-    ctx.fillStyle = '#064E3B';
-    ctx.strokeStyle = '#34D399';
-    ctx.lineWidth = 3;
-    ctx.beginPath();
-    ctx.roundRect(choX - 180, choY - 95, 360, 195, 48);
-    ctx.fill();
-    ctx.stroke();
-
-    // 1. Cell Nucleus on Left
-    const nucX = choX - 105;
-    const nucY = choY;
+    // Outer & Inner Nuclear Envelope
     ctx.fillStyle = '#1E1B4B';
     ctx.strokeStyle = '#6366F1';
     ctx.lineWidth = 2;
     ctx.beginPath();
-    ctx.ellipse(nucX, nucY, 52, 42, 0, 0, Math.PI * 2);
+    ctx.arc(nX, nY, nR, 0, Math.PI * 2);
     ctx.fill();
     ctx.stroke();
 
-    ctx.font = '800 8.5px "JetBrains Mono", monospace';
-    ctx.fillStyle = '#A5B4FC';
-    ctx.textAlign = 'center';
-    ctx.fillText('CHO NUCLEUS', nucX, nucY - 12);
-    ctx.font = '500 7.5px "Plus Jakarta Sans", sans-serif';
-    ctx.fillText('Human DNase 1', nucX, nucY + 4);
-    ctx.fillText('cDNA Plasmid', nucX, nucY + 15);
+    // Nuclear Pores (NPCs)
+    ctx.fillStyle = '#818CF8';
+    for (let th = 0; th < Math.PI * 2; th += Math.PI / 4) {
+      const nx = nX + Math.cos(th) * nR;
+      const ny = nY + Math.sin(th) * nR;
+      ctx.beginPath();
+      ctx.arc(nx, ny, 2.0, 0, Math.PI * 2);
+      ctx.fill();
+    }
 
-    // 2. Rough Endoplasmic Reticulum (RER) Stacks with Ribosomes
-    const erX = choX - 15;
-    const erY = choY - 35;
-    ctx.strokeStyle = '#0284C7';
-    ctx.lineWidth = 2.5;
+    // Nucleolus and Chromatin
+    ctx.fillStyle = '#312E81';
+    ctx.beginPath();
+    ctx.arc(nX - 8, nY - 6, 12, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.font = '700 7.5px "JetBrains Mono", monospace';
+    ctx.fillStyle = '#C7D2FE';
+    ctx.textAlign = 'center';
+    ctx.fillText('NUCLEUS', nX, nY - 8);
+    ctx.font = '500 6.5px "Plus Jakarta Sans", sans-serif';
+    ctx.fillText('DNase cDNA', nX, nY + 4);
+    ctx.fillText('Transcription', nX, nY + 13);
+
+    // Exporting mRNA Beaded Strand
+    ctx.strokeStyle = '#FDE047';
+    ctx.lineWidth = 1.2;
+    ctx.beginPath();
+    ctx.moveTo(nX + nR, nY);
+    ctx.quadraticCurveTo(nX + nR + 12, nY - 8, nX + nR + 24, nY);
+    ctx.stroke();
+
+    // 3. Rough Endoplasmic Reticulum (RER) Stacks with Ribosomes & PDI Chaperones
+    const erX = cX - 25;
+    const erY = cY - 25;
+    ctx.strokeStyle = '#38BDF8';
+    ctx.lineWidth = 2.4;
     for (let s = 0; s < 3; s++) {
       ctx.beginPath();
-      ctx.arc(erX, erY + s * 14, 22, -Math.PI * 0.4, Math.PI * 0.4);
+      ctx.arc(erX, erY + s * 16, 22, -Math.PI * 0.45, Math.PI * 0.45);
       ctx.stroke();
 
-      // Ribosomes (dots)
+      // Bound 80S Ribosomes on RER membrane
       ctx.fillStyle = '#F59E0B';
       for (let r = 0; r < 4; r++) {
         ctx.beginPath();
-        ctx.arc(erX + 16, erY + s * 14 - 12 + r * 8, 1.8, 0, Math.PI * 2);
+        ctx.arc(erX + 16, erY + s * 16 - 12 + r * 8, 1.4, 0, Math.PI * 2);
         ctx.fill();
       }
     }
 
-    // Flash spark on Disulfide formation in ER
-    ctx.fillStyle = '#FDE047';
+    // PDI Chaperone Disulfide Bridge Catalyst (Golden oxidative spark)
+    const pdiX = erX + 26;
+    const pdiY = erY + 16;
+    ctx.fillStyle = '#F59E0B';
     ctx.beginPath();
-    ctx.arc(erX + 28, erY + 14, 3.5 + Math.sin(this.time * 6) * 1.5, 0, Math.PI * 2);
+    ctx.arc(pdiX, pdiY, 3.2 + Math.sin(this.stage15Timer * 6) * 1.2, 0, Math.PI * 2);
     ctx.fill();
 
-    ctx.font = '800 7.5px "JetBrains Mono", monospace';
+    ctx.font = '700 7.5px "JetBrains Mono", monospace';
     ctx.fillStyle = '#38BDF8';
-    ctx.fillText('ER: Chaperone PDI', erX + 5, erY - 26);
-    ctx.font = '600 7px "Plus Jakarta Sans", sans-serif';
-    ctx.fillText('Forms Cys101-Cys104 & Cys173-Cys209 S-S', erX + 35, erY - 14);
+    ctx.textAlign = 'left';
+    ctx.fillText('ROUGH ER (PDI)', erX - 10, erY - 26);
+    ctx.font = '500 6.8px "Plus Jakarta Sans", sans-serif';
+    ctx.fillStyle = '#BAE6FD';
+    ctx.fillText('Catalyzes Cys101-104 & Cys173-209 S-S', erX - 10, erY - 16);
 
-    // 3. Golgi Apparatus Stacks (Adding N-Glycans)
-    const golX = choX + 55;
-    const golY = choY + 15;
-    ctx.strokeStyle = '#10B981';
+    // 4. COPII Transport Vesicles (ER -> Golgi)
+    this.s15ChoCopVesicles.forEach(cv => {
+      const vx = erX + 32 + cv.prog * 36;
+      const vy = erY + 16 + Math.sin(cv.prog * Math.PI) * 8;
+      ctx.fillStyle = 'rgba(56, 189, 248, 0.4)';
+      ctx.strokeStyle = '#38BDF8';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.arc(vx, vy, 4, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.stroke();
+    });
+
+    // 5. Polarized Golgi Apparatus Cisternae (N-Glycan Branching)
+    const golX = cX + 50;
+    const golY = cY + 10;
+    ctx.strokeStyle = '#14B8A6';
     ctx.lineWidth = 3;
     for (let g = 0; g < 4; g++) {
       ctx.beginPath();
-      ctx.arc(golX + g * 8, golY, 26, Math.PI * 0.6, Math.PI * 1.4);
+      ctx.arc(golX + g * 9, golY, 26, Math.PI * 0.6, Math.PI * 1.4);
       ctx.stroke();
     }
 
-    ctx.font = '800 7.5px "JetBrains Mono", monospace';
-    ctx.fillStyle = '#34D399';
-    ctx.fillText('GOLGI APPARATUS', golX + 15, golY - 32);
-    ctx.font = '600 7px "Plus Jakarta Sans", sans-serif';
-    ctx.fillText('Stacks N-Glycans on Asn18 & Asn106', golX + 25, golY - 20);
+    // Branched N-Glycan Antennae Illustration on Golgi
+    ctx.strokeStyle = '#2DD4BF';
+    ctx.lineWidth = 1.2;
+    ctx.beginPath();
+    ctx.moveTo(golX + 18, golY - 14);
+    ctx.lineTo(golX + 28, golY - 20);
+    ctx.lineTo(golX + 36, golY - 25);
+    ctx.moveTo(golX + 28, golY - 20);
+    ctx.lineTo(golX + 36, golY - 16);
+    ctx.stroke();
 
-    // 4. Secretory Vesicles Traveling to Membrane (Exocytosis Animation)
-    this.s15ChoVesicles.forEach((v, idx) => {
-      const vx = golX + 45 + v.progress * 65;
-      const vy = golY + Math.sin(v.progress * Math.PI) * 18 - 8;
+    ctx.font = '700 7.5px "JetBrains Mono", monospace';
+    ctx.fillStyle = '#2DD4BF';
+    ctx.textAlign = 'left';
+    ctx.fillText('GOLGI APPARATUS', golX + 10, golY - 32);
+    ctx.font = '500 6.8px "Plus Jakarta Sans", sans-serif';
+    ctx.fillStyle = '#99F6E4';
+    ctx.fillText('Adds N-Glycans (Asn18 & Asn106)', golX + 10, golY - 22);
 
-      ctx.fillStyle = 'rgba(56, 189, 248, 0.4)';
+    // 6. Secretory Vesicles & Omega-Pore Exocytosis at Plasma Membrane
+    this.s15ChoSecVesicles.forEach(sv => {
+      const sx = golX + 36 + sv.prog * 55;
+      const sy = golY - 5 + Math.sin(sv.prog * Math.PI) * 16;
+      ctx.fillStyle = 'rgba(14, 165, 233, 0.4)';
       ctx.strokeStyle = '#38BDF8';
       ctx.lineWidth = 1.2;
       ctx.beginPath();
-      ctx.arc(vx, vy, 7, 0, Math.PI * 2);
+      ctx.arc(sx, sy, 5.5, 0, Math.PI * 2);
       ctx.fill();
       ctx.stroke();
 
-      // Folded protein inside vesicle with branched glycan
-      ctx.fillStyle = '#0284C7';
+      // Internal folded rhDNase cargo dot
+      ctx.fillStyle = '#F8FAFC';
       ctx.beginPath();
-      ctx.arc(vx, vy, 3.5, 0, Math.PI * 2);
-      ctx.fill();
-
-      // Glycan antenna
-      ctx.fillStyle = '#10B981';
-      ctx.beginPath();
-      ctx.arc(vx - 2, vy - 2, 1.5, 0, Math.PI * 2);
+      ctx.arc(sx, sy, 2, 0, Math.PI * 2);
       ctx.fill();
     });
 
-    // Secreted Active rhDNase 1 outside cell in broth
-    const outX = choX + 155;
-    const outY = choY - 15;
-    ctx.save();
-    ctx.fillStyle = '#38BDF8';
+    // Omega Exocytic Pore on Right Membrane
+    const exoX = cX + cW / 2 - 2;
+    const exoY = cY + 12;
+    ctx.strokeStyle = '#0284C7';
+    ctx.lineWidth = 2.4;
     ctx.beginPath();
-    ctx.arc(outX, outY, 12, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.strokeStyle = '#FFFFFF';
-    ctx.lineWidth = 1.5;
+    ctx.arc(exoX, exoY, 8, -Math.PI * 0.5, Math.PI * 0.5);
     ctx.stroke();
 
-    ctx.font = '800 7.5px "Plus Jakarta Sans", sans-serif';
-    ctx.fillStyle = '#FFFFFF';
-    ctx.fillText('Active rhDNase', outX, outY - 16);
-    ctx.fillText('(Exocytosed)', outX, outY - 7);
-    ctx.restore();
+    // 7. Active Extracellular rhDNase 1 in Broth
+    this.s15SecretedMolecules.forEach(sm => {
+      ctx.save();
+      ctx.translate(sm.x, sm.y);
+      ctx.fillStyle = '#38BDF8';
+      ctx.shadowColor = '#38BDF8';
+      ctx.shadowBlur = 6;
+      ctx.beginPath();
+      ctx.arc(0, 0, 3.2, 0, Math.PI * 2);
+      ctx.fill();
 
-    // Three Core Mammalian Capabilities Bottom
-    ctx.fillStyle = '#064E3B';
-    ctx.strokeStyle = '#059669';
+      // Glycan branch marker
+      ctx.strokeStyle = '#2DD4BF';
+      ctx.lineWidth = 1;
+      ctx.shadowBlur = 0;
+      ctx.beginPath();
+      ctx.moveTo(2, -2); ctx.lineTo(6, -6);
+      ctx.moveTo(4, -4); ctx.lineTo(7, -3);
+      ctx.stroke();
+      ctx.restore();
+    });
+
+    ctx.font = '700 8px "JetBrains Mono", monospace';
+    ctx.fillStyle = '#38BDF8';
+    ctx.textAlign = 'right';
+    ctx.fillText('Secreted Active rhDNase 1 ⟶', rightX + vpW - 14, vpY + 70);
+    ctx.font = '500 7px "JetBrains Mono", monospace';
+    ctx.fillStyle = '#94A3B8';
+    ctx.fillText('(37 kDa Glycoprotein in Media)', rightX + vpW - 14, vpY + 82);
+
+    // Technical Bullet Points Card at bottom
+    ctx.fillStyle = '#111827';
+    ctx.strokeStyle = '#334155';
     ctx.lineWidth = 1;
     ctx.beginPath();
-    ctx.roundRect(rightX + 16, vpY + 275, vpW - 32, 60, 6);
+    ctx.roundRect(rightX + 14, vpY + 268, vpW - 28, 92, 6);
     ctx.fill();
     ctx.stroke();
 
-    ctx.font = '800 9px "Plus Jakarta Sans", sans-serif';
-    ctx.fillStyle = '#6EE7B7';
-    ctx.textAlign = 'left';
-    ctx.fillText('1. AUTHENTIC N-GLYCANS:', rightX + 26, vpY + 292);
-    ctx.font = '500 8.5px "Plus Jakarta Sans", sans-serif';
-    ctx.fillStyle = '#D1FAE5';
-    ctx.fillText('Branches sugars onto Asn18 & Asn106, shielding from protease attack.', rightX + 165, vpY + 292);
+    const choPoints = [
+      {
+        title: '1. Complex Human-Compatible N-Glycosylation:',
+        desc: 'Golgi attaches complex bi-antennary oligosaccharides to Asn18 and Asn106, shielding the enzyme from degradation by neutrophil elastase.'
+      },
+      {
+        title: '2. Oxidative ER Chaperone Machinery (PDI & BiP):',
+        desc: 'Endoplasmic reticulum environment catalyzes native disulfide pairs (Cys101-Cys104 & Cys173-Cys209), achieving 100% active stereospecific fold.'
+      },
+      {
+        title: '3. High-Titer Extracellular Secretion (>1.8 g/L):',
+        desc: 'Native signal peptide directs continuous vesicle exocytosis into culture medium, avoiding cell lysis and eliminating toxic endotoxins.'
+      }
+    ];
 
-    ctx.font = '800 9px "Plus Jakarta Sans", sans-serif';
-    ctx.fillStyle = '#6EE7B7';
-    ctx.fillText('2. CHAPERONE S-S FOLDING:', rightX + 26, vpY + 308);
-    ctx.font = '500 8.5px "Plus Jakarta Sans", sans-serif';
-    ctx.fillStyle = '#D1FAE5';
-    ctx.fillText('Oxidizing ER locks Cys101-Cys104 & Cys173-Cys209 active catalytic cleft.', rightX + 165, vpY + 308);
+    let cPtY = vpY + 283;
+    choPoints.forEach(pt => {
+      ctx.font = '700 8.5px "Plus Jakarta Sans", sans-serif';
+      ctx.fillStyle = '#E2E8F0';
+      ctx.textAlign = 'left';
+      ctx.fillText(pt.title, rightX + 22, cPtY);
 
-    ctx.font = '800 9px "Plus Jakarta Sans", sans-serif';
-    ctx.fillStyle = '#6EE7B7';
-    ctx.fillText('3. ACTIVE SECRETION:', rightX + 26, vpY + 324);
-    ctx.font = '500 8.5px "Plus Jakarta Sans", sans-serif';
-    ctx.fillStyle = '#D1FAE5';
-    ctx.fillText('Signal peptide cleaved; secretes pure folded protein into media (no lysis!).', rightX + 165, vpY + 324);
+      ctx.font = '400 7.8px "Plus Jakarta Sans", sans-serif';
+      ctx.fillStyle = '#94A3B8';
+      ctx.fillText(pt.desc, rightX + 22, cPtY + 11);
+      cPtY += 27;
+    });
 
-    // Approved Seal
-    ctx.save();
-    ctx.translate(rightX + vpW / 2, vpY + 360);
-    ctx.strokeStyle = '#10B981';
-    ctx.lineWidth = 2;
+    // Bottom Conclusion Pill
+    ctx.fillStyle = '#1E293B';
+    ctx.strokeStyle = '#475569';
+    ctx.lineWidth = 1;
     ctx.beginPath();
-    ctx.roundRect(-140, -12, 280, 24, 6);
+    ctx.roundRect(rightX + 14, vpY + 368, vpW - 28, 20, 4);
+    ctx.fill();
     ctx.stroke();
-    ctx.font = '900 10.5px "JetBrains Mono", monospace';
-    ctx.fillStyle = '#10B981';
+
+    ctx.font = '700 8px "JetBrains Mono", monospace';
+    ctx.fillStyle = '#38BDF8';
     ctx.textAlign = 'center';
-    ctx.fillText('★ CHO-K1 IS THE PROVEN GLOBAL GOLD STANDARD ★', 0, 4);
-    ctx.restore();
+    ctx.fillText('OUTCOME: CHO-K1 IS THE EXCLUSIVE REGULATORY-APPROVED FACTORY FOR PULMOZYME®', rightX + vpW / 2, vpY + 381);
 
     ctx.restore();
 
@@ -7744,38 +8007,64 @@ class PresentationEngine {
      ======================================================== */
   initStage16BioreactorProcess() {
     this.stage16Timer = 0;
-    // Micro-bubbles rising from the sintered sparger
+
+    // Submerged sintered micro-sparger rising micro-bubble plume (DO 45%)
     this.s16Bubbles = [];
-    for (let i = 0; i < 55; i++) {
+    for (let i = 0; i < 75; i++) {
       this.s16Bubbles.push({
-        x: -180 + (Math.random() - 0.5) * 160,
-        y: 60 + Math.random() * 80,
-        vy: 35 + Math.random() * 45,
-        r: 1.5 + Math.random() * 2.2,
-        wobble: Math.random() * Math.PI * 2
+        x: -180 + (Math.random() - 0.5) * 120,
+        y: 80 + Math.random() * 50,
+        vy: 38 + Math.random() * 45,
+        r: 1.2 + Math.random() * 1.8,
+        wobble: Math.random() * Math.PI * 2,
+        phase: Math.random() * Math.PI * 2
       });
     }
 
-    // Suspended mammalian CHO cells tumbling in media
+    // Suspended mammalian CHO-K1 cells tumbling in low-shear streamlines
     this.s16ChoCells = [];
-    for (let i = 0; i < 32; i++) {
+    for (let i = 0; i < 34; i++) {
       this.s16ChoCells.push({
         x: -180 + (Math.random() - 0.5) * 170,
-        y: -50 + (Math.random() - 0.5) * 180,
-        vx: (Math.random() - 0.5) * 12,
-        vy: (Math.random() - 0.5) * 12,
-        r: 4.5 + Math.random() * 2.5,
-        angle: Math.random() * Math.PI * 2
+        y: -45 + (Math.random() - 0.5) * 175,
+        vx: (Math.random() - 0.5) * 14,
+        vy: (Math.random() - 0.5) * 14,
+        r: 4.8 + Math.random() * 2.2,
+        angle: Math.random() * Math.PI * 2,
+        rotSpeed: 0.5 + (Math.random() - 0.5) * 1.2,
+        secreteTimer: Math.random() * 2
       });
     }
 
-    // Nutrient feed drops entering from top manifold
+    // Secreted rhDNase 1 micro-droplets in culture broth
+    this.s16ProductDroplets = [];
+    for (let i = 0; i < 35; i++) {
+      this.s16ProductDroplets.push({
+        x: -180 + (Math.random() - 0.5) * 180,
+        y: -40 + (Math.random() - 0.5) * 180,
+        vx: (Math.random() - 0.5) * 18,
+        vy: (Math.random() - 0.5) * 18,
+        phase: Math.random() * Math.PI * 2
+      });
+    }
+
+    // Coolant flow circulation particles in thermal jacket
+    this.s16JacketFlow = [];
+    for (let i = 0; i < 14; i++) {
+      this.s16JacketFlow.push({
+        side: i % 2 === 0 ? -1 : 1, // left or right jacket
+        y: -100 + (i / 14) * 230,
+        speed: 32 + Math.random() * 18
+      });
+    }
+
+    // Nutrient feed drops entering from top sterile manifold
     this.s16FeedDrops = [];
-    for (let i = 0; i < 8; i++) {
+    for (let i = 0; i < 6; i++) {
       this.s16FeedDrops.push({
-        x: -240 + (i % 3) * 60,
-        y: -140 + Math.random() * 50,
-        speed: 60 + Math.random() * 30
+        x: -225 + (i % 2) * 90,
+        y: -135 + Math.random() * 45,
+        speed: 65 + Math.random() * 25
       });
     }
   }
@@ -7783,170 +8072,280 @@ class PresentationEngine {
   updateStage16(dt) {
     this.stage16Timer += dt;
 
-    // Bubbles rising
+    // Bubbles rising from sintered sparger ring
     this.s16Bubbles.forEach(b => {
       b.y -= b.vy * dt;
-      b.x += Math.sin(this.stage16Timer * 3 + b.wobble) * 0.4;
-      if (b.y < -90) {
-        b.y = 110;
-        b.x = -180 + (Math.random() - 0.5) * 160;
+      b.x += Math.sin(this.stage16Timer * 4 + b.wobble) * 0.45;
+      if (b.y < -95) {
+        b.y = 118;
+        b.x = -180 + (Math.random() - 0.5) * 110;
       }
     });
 
-    // CHO cells tumbling in low-shear flow
+    // CHO cells tumbling in low-shear toroidal streamlines
     this.s16ChoCells.forEach(c => {
       c.x += c.vx * dt;
       c.y += c.vy * dt;
-      c.angle += dt * 0.8;
+      c.angle += c.rotSpeed * dt;
+      c.secreteTimer += dt;
+
+      // Gentle boundary restitution inside reactor broth
       if (c.x < -275) c.vx = Math.abs(c.vx);
       if (c.x > -85) c.vx = -Math.abs(c.vx);
-      if (c.y < -100) c.vy = Math.abs(c.vy);
-      if (c.y > 105) c.vy = -Math.abs(c.vy);
+      if (c.y < -92) c.vy = Math.abs(c.vy);
+      if (c.y > 115) c.vy = -Math.abs(c.vy);
     });
 
-    // Nutrient feeds dripping
+    // Secreted rhDNase 1 droplets drifting
+    this.s16ProductDroplets.forEach(p => {
+      p.x += p.vx * dt;
+      p.y += p.vy * dt;
+      if (p.x < -280) p.vx = Math.abs(p.vx);
+      if (p.x > -80) p.vx = -Math.abs(p.vx);
+      if (p.y < -95) p.vy = Math.abs(p.vy);
+      if (p.y > 120) p.vy = -Math.abs(p.vy);
+    });
+
+    // Jacket coolant flow
+    this.s16JacketFlow.forEach(j => {
+      j.y += j.speed * dt;
+      if (j.y > 130) j.y = -105;
+    });
+
+    // Top sterile feed drops dripping
     this.s16FeedDrops.forEach(d => {
       d.y += d.speed * dt;
-      if (d.y > -80) d.y = -140;
+      if (d.y > -80) d.y = -135;
     });
   }
 
   drawStage16BioreactorProcess(ctx) {
     ctx.save();
-    ctx.fillStyle = '#FFFFFF';
+    // Neutral deep slate background
+    ctx.fillStyle = '#090D16';
     ctx.fillRect(-500, -260, 1000, 520);
 
-    ctx.fillStyle = '#E2E8F0';
+    // Subtle technical grid
+    ctx.fillStyle = '#1E293B';
     for (let gx = -460; gx <= 460; gx += 40) {
       for (let gy = -220; gy <= 220; gy += 40) {
         ctx.beginPath();
-        ctx.arc(gx, gy, 1.2, 0, Math.PI * 2);
+        ctx.arc(gx, gy, 1.0, 0, Math.PI * 2);
         ctx.fill();
       }
     }
 
-    // Header
-    ctx.fillStyle = '#F8FAFC';
-    ctx.strokeStyle = '#CBD5E1';
+    // Top Header Badge
+    ctx.fillStyle = '#0F172A';
+    ctx.strokeStyle = '#334155';
     ctx.lineWidth = 1;
     ctx.beginPath();
-    ctx.roundRect(-240, -252, 480, 26, 13);
+    ctx.roundRect(-275, -252, 550, 26, 13);
     ctx.fill();
     ctx.stroke();
 
-    ctx.font = '700 9.5px "JetBrains Mono", monospace';
-    ctx.fillStyle = '#0284C7';
+    ctx.font = '700 9px "JetBrains Mono", monospace';
+    ctx.fillStyle = '#38BDF8';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    ctx.fillText('● UPSTREAM BIOPROCESSING • INDUSTRIAL BIOREACTOR DESIGN', 0, -239);
+    ctx.fillText('● UPSTREAM BIOPROCESSING & CHEMICAL ENGINEERING • 10,000L STIRRED TANK BIOREACTOR', 0, -239);
 
-    ctx.font = '800 22px "Plus Jakarta Sans", sans-serif';
-    ctx.fillStyle = '#0F172A';
+    ctx.font = '800 21px "Plus Jakarta Sans", sans-serif';
+    ctx.fillStyle = '#F8FAFC';
     ctx.fillText('Fed-Batch Bioreactor Engineering & Closed-Loop Control', 0, -210);
 
     ctx.font = '500 11.5px "Plus Jakarta Sans", sans-serif';
-    ctx.fillStyle = '#64748B';
-    ctx.fillText('10,000-liter scale cultivation of shear-sensitive mammalian cells with low-shear agitation and temperature shift.', 0, -188);
+    ctx.fillStyle = '#94A3B8';
+    ctx.fillText('Low-shear hydrodynamics, micro-bubble oxygen transfer, and automated biphasic temperature shift in industrial synthesis', 0, -188);
 
     // ==========================================
-    // LEFT: FULL-SCALE 10,000L BIOREACTOR SIMULATION (ANIMATED CUTAWAY)
+    // LEFT PANEL: 10,000L STAINLESS STEEL BIOREACTOR CUTAWAY
     // ==========================================
-    const rX = -465;
-    const rY = -170;
-    const rW = 550;
-    const rH = 410;
+    const rX = -472;
+    const rY = -172;
+    const rW = 492;
+    const rH = 398;
 
     ctx.save();
+    // Panel Chassis
     ctx.fillStyle = '#0F172A';
-    ctx.strokeStyle = '#38BDF8';
-    ctx.lineWidth = 1.8;
+    ctx.strokeStyle = '#334155';
+    ctx.lineWidth = 1.4;
     ctx.beginPath();
-    ctx.roundRect(rX, rY, rW, rH, 12);
+    ctx.roundRect(rX, rY, rW, rH, 10);
     ctx.fill();
     ctx.stroke();
 
-    // Vessel Cutaway Dimensions
-    const vCenter = -180;
-    const vMiddle = 0;
-    const vWidth = 240;
-    const vHeight = 270;
-
-    // Outer Stainless Steel Thermal Water Jacket
-    ctx.fillStyle = '#334155';
-    ctx.strokeStyle = '#64748B';
-    ctx.lineWidth = 3;
-    ctx.beginPath();
-    ctx.roundRect(vCenter - vWidth / 2 - 12, vMiddle - vHeight / 2 - 12, vWidth + 24, vHeight + 24, 30);
-    ctx.fill();
-    ctx.stroke();
-
-    // Culture Broth (Glowing Golden-Amber Nutrient Suspension)
-    const mediaGrad = ctx.createLinearGradient(0, vMiddle - vHeight / 2, 0, vMiddle + vHeight / 2);
-    mediaGrad.addColorStop(0, 'rgba(250, 204, 21, 0.4)');
-    mediaGrad.addColorStop(0.5, 'rgba(234, 179, 8, 0.55)');
-    mediaGrad.addColorStop(1, 'rgba(161, 98, 7, 0.7)');
-    ctx.fillStyle = mediaGrad;
-    ctx.beginPath();
-    ctx.roundRect(vCenter - vWidth / 2, vMiddle - vHeight / 2, vWidth, vHeight, 22);
-    ctx.fill();
-
-    // Top Agitator Drive Motor (Heavy Duty Stainless)
+    // Panel Header Pill
     ctx.fillStyle = '#1E293B';
-    ctx.strokeStyle = '#0284C7';
-    ctx.lineWidth = 2;
-    ctx.fillRect(vCenter - 30, vMiddle - vHeight / 2 - 50, 60, 38);
-    ctx.strokeRect(vCenter - 30, vMiddle - vHeight / 2 - 50, 60, 38);
-
-    ctx.font = '800 8px "JetBrains Mono", monospace';
-    ctx.fillStyle = '#38BDF8';
-    ctx.textAlign = 'center';
-    ctx.fillText('AGITATOR MOTOR', vCenter, vMiddle - vHeight / 2 - 34);
-    ctx.fillText('60 RPM (LOW SHEAR)', vCenter, vMiddle - vHeight / 2 - 22);
-
-    // Central Drive Shaft
-    ctx.strokeStyle = '#E2E8F0';
-    ctx.lineWidth = 6;
+    ctx.strokeStyle = '#475569';
+    ctx.lineWidth = 1;
     ctx.beginPath();
-    ctx.moveTo(vCenter, vMiddle - vHeight / 2 - 12);
-    ctx.lineTo(vCenter, vMiddle + vHeight / 2 - 25);
+    ctx.roundRect(rX + 14, rY + 12, rW - 28, 28, 6);
+    ctx.fill();
     ctx.stroke();
 
-    // Dual-Tier Rotating Marine Pitched-Blade Impellers
+    ctx.font = '800 10px "JetBrains Mono", monospace';
+    ctx.fillStyle = '#E2E8F0';
+    ctx.textAlign = 'left';
+    ctx.fillText('316L ELECTROPOLISHED STAINLESS VESSEL • 10,000 LITERS', rX + 24, rY + 26);
+    ctx.font = '700 8.5px "JetBrains Mono", monospace';
+    ctx.fillStyle = '#38BDF8';
+    ctx.textAlign = 'right';
+    ctx.fillText('[SHEAR-SENSITIVE MAMMALIAN VESSEL]', rX + rW - 24, rY + 26);
+
+    // Vessel Dimensions & Coordinates
+    const vCenter = rX + rW / 2 + 10;
+    const vMiddle = rY + 205;
+    const vWidth = 230;
+    const vHeight = 250;
+
+    // 1. External Thermal Dimple Jacket (Steel Jacket with Circulating Coolant)
+    ctx.fillStyle = '#1E293B';
+    ctx.strokeStyle = '#475569';
+    ctx.lineWidth = 2.4;
+    ctx.beginPath();
+    ctx.roundRect(vCenter - vWidth / 2 - 14, vMiddle - vHeight / 2 - 10, vWidth + 28, vHeight + 20, 28);
+    ctx.fill();
+    ctx.stroke();
+
+    // Circulating Coolant in Jacket (Blue Chevron Glycol Streamlines)
+    this.s16JacketFlow.forEach(jf => {
+      const jx = jf.side === -1 ? vCenter - vWidth / 2 - 7 : vCenter + vWidth / 2 + 7;
+      ctx.fillStyle = 'rgba(56, 189, 248, 0.7)';
+      ctx.beginPath();
+      ctx.arc(jx, vMiddle + (jf.y - 12), 2.2, 0, Math.PI * 2);
+      ctx.fill();
+    });
+
+    // 2. 316L Stainless Steel Internal Vessel Wall
+    const steelGrad = ctx.createLinearGradient(vCenter - vWidth / 2, 0, vCenter + vWidth / 2, 0);
+    steelGrad.addColorStop(0, '#334155');
+    steelGrad.addColorStop(0.15, '#64748B');
+    steelGrad.addColorStop(0.5, '#1E293B');
+    steelGrad.addColorStop(0.85, '#64748B');
+    steelGrad.addColorStop(1, '#334155');
+    ctx.fillStyle = steelGrad;
+    ctx.strokeStyle = '#94A3B8';
+    ctx.lineWidth = 2.0;
+    ctx.beginPath();
+    ctx.roundRect(vCenter - vWidth / 2 - 4, vMiddle - vHeight / 2 - 4, vWidth + 8, vHeight + 8, 22);
+    ctx.fill();
+    ctx.stroke();
+
+    // 3. Culture Broth Liquid (Translucent Golden-Amber Nutrient Suspension)
+    const brothGrad = ctx.createLinearGradient(0, vMiddle - vHeight / 2, 0, vMiddle + vHeight / 2);
+    brothGrad.addColorStop(0, 'rgba(217, 119, 6, 0.22)');
+    brothGrad.addColorStop(0.5, 'rgba(180, 83, 9, 0.32)');
+    brothGrad.addColorStop(1, 'rgba(120, 53, 15, 0.45)');
+    ctx.fillStyle = brothGrad;
+    ctx.beginPath();
+    ctx.roundRect(vCenter - vWidth / 2, vMiddle - vHeight / 2 + 18, vWidth, vHeight - 20, 18);
+    ctx.fill();
+
+    // Liquid Surface Meniscus & Anti-Foam Layer
+    ctx.strokeStyle = 'rgba(245, 158, 11, 0.6)';
+    ctx.lineWidth = 2.2;
+    ctx.beginPath();
+    ctx.moveTo(vCenter - vWidth / 2 + 4, vMiddle - vHeight / 2 + 18);
+    ctx.lineTo(vCenter + vWidth / 2 - 4, vMiddle - vHeight / 2 + 18);
+    ctx.stroke();
+
+    ctx.font = '600 7px "JetBrains Mono", monospace';
+    ctx.fillStyle = '#D97706';
+    ctx.textAlign = 'right';
+    ctx.fillText('Liquid Meniscus & Anti-Foam Line', vCenter + vWidth / 2 - 8, vMiddle - vHeight / 2 + 14);
+
+    // 4. Four Internal 316L Vertical Anti-Vortex Baffles
+    [-vWidth / 2 + 6, vWidth / 2 - 12].forEach(bx => {
+      ctx.fillStyle = '#475569';
+      ctx.strokeStyle = '#64748B';
+      ctx.lineWidth = 1;
+      ctx.fillRect(vCenter + bx, vMiddle - vHeight / 2 + 25, 6, vHeight - 45);
+      ctx.strokeRect(vCenter + bx, vMiddle - vHeight / 2 + 25, 6, vHeight - 45);
+    });
+
+    // 5. Agitator Top Drive Motor & Double Mechanical Seal
+    ctx.fillStyle = '#1E293B';
+    ctx.strokeStyle = '#64748B';
+    ctx.lineWidth = 1.8;
+    ctx.fillRect(vCenter - 28, vMiddle - vHeight / 2 - 42, 56, 32);
+    ctx.strokeRect(vCenter - 28, vMiddle - vHeight / 2 - 42, 56, 32);
+
+    ctx.fillStyle = '#38BDF8';
+    ctx.font = '700 7px "JetBrains Mono", monospace';
+    ctx.textAlign = 'center';
+    ctx.fillText('A310 DRIVE', vCenter, vMiddle - vHeight / 2 - 28);
+    ctx.fillText('55 RPM (LOW SHEAR)', vCenter, vMiddle - vHeight / 2 - 18);
+
+    // Central Polished Stainless Shaft
+    ctx.strokeStyle = '#E2E8F0';
+    ctx.lineWidth = 5.0;
+    ctx.beginPath();
+    ctx.moveTo(vCenter, vMiddle - vHeight / 2 - 10);
+    ctx.lineTo(vCenter, vMiddle + vHeight / 2 - 18);
+    ctx.stroke();
+
+    // Shaft Steady Bearing at Vessel Dish Base
+    ctx.fillStyle = '#64748B';
+    ctx.fillRect(vCenter - 8, vMiddle + vHeight / 2 - 20, 16, 8);
+
+    // 6. Dual-Tier Low-Shear Axial Hydrofoil Impellers (Lightnin A310 / Elephant Ear)
     for (let tier = 0; tier < 2; tier++) {
-      const iy = vMiddle - 40 + tier * 95;
+      const iy = vMiddle - 35 + tier * 90;
       ctx.save();
       ctx.translate(vCenter, iy);
 
-      const rot = this.stage15Timer * 4;
-      const bladeW = Math.cos(rot + tier * 1.2) * 65;
+      // Smooth impeller rotation driven by stage16Timer
+      const rot = this.stage16Timer * 3.5;
+      const bladeW1 = Math.cos(rot + tier * 1.4) * 62;
+      const bladeW2 = Math.cos(rot + tier * 1.4 + (Math.PI * 2) / 3) * 62;
+      const bladeW3 = Math.cos(rot + tier * 1.4 + (Math.PI * 4) / 3) * 62;
 
-      ctx.fillStyle = '#F8FAFC';
+      ctx.fillStyle = '#CBD5E1';
       ctx.strokeStyle = '#0284C7';
-      ctx.lineWidth = 2;
+      ctx.lineWidth = 1.8;
 
-      // Curved low-shear hydrofoil blade
-      ctx.beginPath();
-      ctx.ellipse(0, 0, Math.abs(bladeW), 10, 0, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.stroke();
+      // 3-blade hydrofoil profile
+      [bladeW1, bladeW2, bladeW3].forEach(bw => {
+        ctx.beginPath();
+        ctx.ellipse(bw * 0.45, 0, Math.abs(bw) * 0.55, 6.5, 0, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.stroke();
+      });
 
-      // Fluid Flow Streamlines around blade
-      ctx.strokeStyle = 'rgba(56, 189, 248, 0.6)';
-      ctx.lineWidth = 1.5;
+      // Toroidal Circulation Streamlines (Curved velocity loops)
+      ctx.strokeStyle = 'rgba(56, 189, 248, 0.4)';
+      ctx.lineWidth = 1.2;
       ctx.setLineDash([4, 4]);
       ctx.beginPath();
-      ctx.arc(0, 0, Math.abs(bladeW) + 14, 0, Math.PI * 2);
+      // Flow drawn down along shaft and up at walls
+      ctx.ellipse(0, 0, 78, 22, 0, 0, Math.PI * 2);
       ctx.stroke();
       ctx.setLineDash([]);
 
       ctx.restore();
     }
 
-    // Micro-Sparger Ring at bottom
-    ctx.fillStyle = '#64748B';
-    ctx.fillRect(vCenter - 45, vMiddle + vHeight / 2 - 22, 90, 8);
+    // 7. Submerged Porous Sintered Micro-Sparger Ring
+    const spargeY = vMiddle + vHeight / 2 - 24;
+    ctx.fillStyle = '#475569';
+    ctx.strokeStyle = '#94A3B8';
+    ctx.lineWidth = 1.2;
+    ctx.beginPath();
+    ctx.roundRect(vCenter - 48, spargeY, 96, 7, 3);
+    ctx.fill();
+    ctx.stroke();
 
-    // Rising Micro-Bubbles (DO 45%)
+    // Sintered Micro-Pore Dots on Sparger
+    ctx.fillStyle = '#38BDF8';
+    for (let px = -40; px <= 40; px += 8) {
+      ctx.beginPath();
+      ctx.arc(vCenter + px, spargeY + 3.5, 1.2, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    // Rising Micro-Bubbles Plume (DO 45% Saturation)
     this.s16Bubbles.forEach(b => {
       ctx.fillStyle = 'rgba(255, 255, 255, 0.85)';
       ctx.beginPath();
@@ -7954,215 +8353,379 @@ class PresentationEngine {
       ctx.fill();
     });
 
-    // Suspended Tumbling CHO Cells
+    // 8. Suspended Mammalian CHO-K1 Cells Tumbling in Broth
     this.s16ChoCells.forEach(c => {
       ctx.save();
       ctx.translate(c.x, c.y);
       ctx.rotate(c.angle);
 
       // Cell Membrane
-      ctx.fillStyle = '#10B981';
-      ctx.strokeStyle = '#6EE7B7';
+      ctx.fillStyle = 'rgba(56, 189, 248, 0.25)';
+      ctx.strokeStyle = '#38BDF8';
       ctx.lineWidth = 1.2;
       ctx.beginPath();
-      ctx.ellipse(0, 0, c.r * 1.2, c.r, 0, 0, Math.PI * 2);
+      ctx.ellipse(0, 0, c.r * 1.15, c.r * 0.95, 0, 0, Math.PI * 2);
       ctx.fill();
       ctx.stroke();
 
       // Nucleus
-      ctx.fillStyle = '#065F46';
+      ctx.fillStyle = 'rgba(99, 102, 241, 0.7)';
       ctx.beginPath();
-      ctx.arc(0, 0, c.r * 0.45, 0, Math.PI * 2);
+      ctx.arc(0, 0, c.r * 0.42, 0, Math.PI * 2);
       ctx.fill();
 
-      // Secreted rhDNase 1 droplet budding off cell
-      ctx.fillStyle = '#38BDF8';
-      ctx.beginPath();
-      ctx.arc(c.r + 3, 0, 1.8, 0, Math.PI * 2);
-      ctx.fill();
+      // rhDNase 1 droplet actively budding off
+      if (Math.sin(c.secreteTimer * 3) > 0.4) {
+        ctx.fillStyle = '#F59E0B';
+        ctx.beginPath();
+        ctx.arc(c.r + 2.5, 0, 1.5, 0, Math.PI * 2);
+        ctx.fill();
+      }
 
       ctx.restore();
     });
 
-    // Top Inflow Feed Lines & Drips
-    this.s16FeedDrops.forEach(d => {
-      ctx.fillStyle = '#38BDF8';
+    // Secreted rhDNase 1 Molecules Diffusing in Broth
+    this.s16ProductDroplets.forEach(p => {
+      ctx.fillStyle = 'rgba(56, 189, 248, 0.85)';
       ctx.beginPath();
-      ctx.arc(d.x, d.y, 2.5, 0, Math.PI * 2);
+      ctx.arc(p.x, p.y, 1.4, 0, Math.PI * 2);
       ctx.fill();
     });
 
-    // Inflow Pipes from top
-    ctx.strokeStyle = '#0284C7';
-    ctx.lineWidth = 3;
+    // 9. Process Analytical Technology (PAT) Probes
+    // A) Dissolved Oxygen Optical Sensor (Left port)
+    const doY = vMiddle - 10;
+    ctx.strokeStyle = '#38BDF8';
+    ctx.lineWidth = 2.5;
     ctx.beginPath();
-    ctx.moveTo(-240, vMiddle - vHeight / 2 - 45); ctx.lineTo(-240, vMiddle - vHeight / 2);
-    ctx.moveTo(-180, vMiddle - vHeight / 2 - 45); ctx.lineTo(-180, vMiddle - vHeight / 2);
-    ctx.moveTo(-120, vMiddle - vHeight / 2 - 45); ctx.lineTo(-120, vMiddle - vHeight / 2);
+    ctx.moveTo(vCenter - vWidth / 2 - 38, doY - 8);
+    ctx.lineTo(vCenter - vWidth / 2 + 18, doY);
     ctx.stroke();
 
-    // Callout Labels on Bioreactor Features
-    ctx.font = '700 8.5px "JetBrains Mono", monospace';
+    ctx.fillStyle = '#38BDF8';
+    ctx.beginPath();
+    ctx.arc(vCenter - vWidth / 2 + 18, doY, 2.8, 0, Math.PI * 2);
+    ctx.fill();
+
+    // B) Pressurized Gel pH Probe (Left lower port)
+    const phY = vMiddle + 45;
+    ctx.strokeStyle = '#2DD4BF';
+    ctx.lineWidth = 2.5;
+    ctx.beginPath();
+    ctx.moveTo(vCenter - vWidth / 2 - 38, phY - 6);
+    ctx.lineTo(vCenter - vWidth / 2 + 18, phY);
+    ctx.stroke();
+
+    ctx.fillStyle = '#2DD4BF';
+    ctx.beginPath();
+    ctx.arc(vCenter - vWidth / 2 + 18, phY, 2.8, 0, Math.PI * 2);
+    ctx.fill();
+
+    // C) Pt100 RTD Temperature Probe (Right port)
+    const tY = vMiddle - 20;
+    ctx.strokeStyle = '#F59E0B';
+    ctx.lineWidth = 2.5;
+    ctx.beginPath();
+    ctx.moveTo(vCenter + vWidth / 2 + 38, tY - 8);
+    ctx.lineTo(vCenter + vWidth / 2 - 18, tY);
+    ctx.stroke();
+
+    // D) Capacitance Biomass Probe (Right lower port)
+    const bioY = vMiddle + 40;
+    ctx.strokeStyle = '#A855F7';
+    ctx.lineWidth = 2.5;
+    ctx.beginPath();
+    ctx.moveTo(vCenter + vWidth / 2 + 38, bioY - 6);
+    ctx.lineTo(vCenter + vWidth / 2 - 18, bioY);
+    ctx.stroke();
+
+    // 10. Top Sterile Feed Lines & Drops
+    this.s16FeedDrops.forEach(fd => {
+      ctx.fillStyle = '#38BDF8';
+      ctx.beginPath();
+      ctx.arc(fd.x, fd.y, 2.2, 0, Math.PI * 2);
+      ctx.fill();
+    });
+
+    // Top Inflow Pipes
+    ctx.strokeStyle = '#475569';
+    ctx.lineWidth = 2.2;
+    ctx.beginPath();
+    ctx.moveTo(-280, vMiddle - vHeight / 2 - 40); ctx.lineTo(-280, vMiddle - vHeight / 2 + 5);
+    ctx.moveTo(-170, vMiddle - vHeight / 2 - 40); ctx.lineTo(-170, vMiddle - vHeight / 2 + 5);
+    ctx.stroke();
+
+    // Bottom Sanitary Diaphragm Drain Valve
+    ctx.strokeStyle = '#64748B';
+    ctx.lineWidth = 3.5;
+    ctx.beginPath();
+    ctx.moveTo(vCenter, vMiddle + vHeight / 2 + 8);
+    ctx.lineTo(vCenter, vMiddle + vHeight / 2 + 28);
+    ctx.stroke();
+
+    // Visual Feature Annotations
+    ctx.font = '600 7.5px "JetBrains Mono", monospace';
     ctx.fillStyle = '#38BDF8';
     ctx.textAlign = 'left';
-    ctx.fillText('⟵ Glucose & Amino Acid Feed', vCenter - vWidth / 2 - 150, vMiddle - 85);
-    ctx.fillText('⟵ Automated pH Control (CO₂/Base)', vCenter - vWidth / 2 - 150, vMiddle - 20);
-    ctx.fillText('⟵ Continuous Ca²⁺ Stabilizer Feed', vCenter - vWidth / 2 - 150, vMiddle + 45);
+    ctx.fillText('⟵ Optical DO Probe (45%)', rX + 16, doY - 10);
+    ctx.fillText('⟵ Gel pH Sensor (7.00)', rX + 16, phY - 8);
+    ctx.fillText('⟵ Sintered Sparger Ring', rX + 16, spargeY - 6);
 
     ctx.textAlign = 'right';
-    ctx.fillText('Water Jacket (37°C ⟶ 32.5°C) ⟶', vCenter + vWidth / 2 + 155, vMiddle - 60);
-    ctx.fillText('Marine Impeller (Low-Shear) ⟶', vCenter + vWidth / 2 + 155, vMiddle + 10);
-    ctx.fillText('Micro-Sparger (DO = 45%) ⟶', vCenter + vWidth / 2 + 155, vMiddle + 85);
+    ctx.fillStyle = '#CBD5E1';
+    ctx.fillText('Pt100 Temp Probe ⟶', rX + rW - 16, tY - 10);
+    ctx.fillText('Biomass Probe ⟶', rX + rW - 16, bioY - 8);
+    ctx.fillText('Thermal Water Jacket ⟶', rX + rW - 16, vMiddle + 85);
 
     ctx.restore();
 
 
     // ==========================================
-    // RIGHT: PARAMETRIC ENGINEERING SCADA TELEMETRY & BIPHASIC SHIFT
+    // RIGHT PANEL: SCADA DCS AUTOMATION & TELEMETRY
     // ==========================================
-    const dbX = 100;
-    const dbY = -170;
-    const dbW = 370;
-    const dbH = 410;
+    const scX = 30;
+    const scY = -172;
+    const scW = 442;
+    const scH = 398;
 
     ctx.save();
-    ctx.fillStyle = '#FFFFFF';
-    ctx.strokeStyle = '#CBD5E1';
-    ctx.lineWidth = 1.2;
+    // Panel Chassis
+    ctx.fillStyle = '#0F172A';
+    ctx.strokeStyle = '#334155';
+    ctx.lineWidth = 1.4;
     ctx.beginPath();
-    ctx.roundRect(dbX, dbY, dbW, dbH, 10);
+    ctx.roundRect(scX, scY, scW, scH, 10);
     ctx.fill();
     ctx.stroke();
 
-    // Header
-    ctx.fillStyle = '#F8FAFC';
-    ctx.strokeStyle = '#E2E8F0';
+    // Panel Header Pill
+    ctx.fillStyle = '#1E293B';
+    ctx.strokeStyle = '#475569';
     ctx.lineWidth = 1;
     ctx.beginPath();
-    ctx.roundRect(dbX + 12, dbY + 12, dbW - 24, 24, 6);
+    ctx.roundRect(scX + 14, scY + 12, scW - 28, 28, 6);
     ctx.fill();
     ctx.stroke();
 
-    ctx.font = '800 10px "Plus Jakarta Sans", sans-serif';
-    ctx.fillStyle = '#0F172A';
-    ctx.textAlign = 'center';
-    ctx.fillText('WHY THIS REACTOR PROCESS IS USED • REAL-TIME HUD', dbX + dbW / 2, dbY + 24);
-
-    // 1. BIPHASIC TEMPERATURE SHIFT DISPLAY
-    const tempY = dbY + 46;
-    ctx.fillStyle = '#F0F9FF';
-    ctx.strokeStyle = '#BAE6FD';
-    ctx.lineWidth = 1.2;
-    ctx.beginPath();
-    ctx.roundRect(dbX + 12, tempY, dbW - 24, 88, 8);
-    ctx.fill();
-    ctx.stroke();
-
-    ctx.font = '800 9.5px "JetBrains Mono", monospace';
-    ctx.fillStyle = '#0369A1';
+    ctx.font = '800 10px "JetBrains Mono", monospace';
+    ctx.fillStyle = '#38BDF8';
     ctx.textAlign = 'left';
-    ctx.fillText('★ BIPHASIC TEMPERATURE-SHIFT STRATEGY:', dbX + 22, tempY + 18);
+    ctx.fillText('SCADA AUTOMATION & DCS CONTROL CONSOLE', scX + 24, scY + 26);
+    ctx.font = '700 8.5px "JetBrains Mono", monospace';
+    ctx.fillStyle = '#94A3B8';
+    ctx.textAlign = 'right';
+    ctx.fillText('BATCH: DAY 12.4 / 18.0', scX + scW - 24, scY + 26);
 
-    // Phase 1 Box
-    ctx.fillStyle = '#FEF3C7';
+    // 1. BIPHASIC TEMPERATURE SHIFT GRAPH
+    const gX = scX + 22;
+    const gY = scY + 52;
+    const gW = scW - 44;
+    const gH = 92;
+
+    // Graph Frame
+    ctx.fillStyle = '#111827';
+    ctx.strokeStyle = '#334155';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.roundRect(gX, gY, gW, gH, 6);
+    ctx.fill();
+    ctx.stroke();
+
+    // Graph Gridlines
+    ctx.strokeStyle = 'rgba(51, 65, 85, 0.4)';
+    ctx.lineWidth = 0.8;
+    for (let gy = gY + 18; gy < gY + gH; gy += 18) {
+      ctx.beginPath();
+      ctx.moveTo(gX, gy); ctx.lineTo(gX + gW, gy);
+      ctx.stroke();
+    }
+    for (let gx = gX + 50; gx < gX + gW; gx += 50) {
+      ctx.beginPath();
+      ctx.moveTo(gx, gY); ctx.lineTo(gx, gY + gH);
+      ctx.stroke();
+    }
+
+    // Graph Title
+    ctx.font = '700 8px "JetBrains Mono", monospace';
+    ctx.fillStyle = '#38BDF8';
+    ctx.textAlign = 'left';
+    ctx.fillText('★ BIPHASIC TEMPERATURE SHIFT: 37.0°C (GROWTH) ⟶ 32.5°C (PRODUCTION)', gX + 10, gY + 14);
+
+    // Shift Day 6.5 dividing line
+    const shiftX = gX + gW * 0.38;
+    ctx.strokeStyle = '#F59E0B';
+    ctx.lineWidth = 1.2;
+    ctx.setLineDash([3, 3]);
+    ctx.beginPath();
+    ctx.moveTo(shiftX, gY + 18);
+    ctx.lineTo(shiftX, gY + gH - 6);
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    ctx.font = '700 7px "JetBrains Mono", monospace';
+    ctx.fillStyle = '#F59E0B';
+    ctx.textAlign = 'center';
+    ctx.fillText('Day 6.5 Cold Shift', shiftX, gY + gH - 10);
+
+    // Temperature Curve (Amber to Cyan)
+    ctx.strokeStyle = '#F59E0B';
+    ctx.lineWidth = 2.2;
+    ctx.beginPath();
+    ctx.moveTo(gX + 12, gY + 30);
+    ctx.lineTo(shiftX - 6, gY + 30);
+    ctx.stroke();
+
+    // Transition slope
+    ctx.strokeStyle = '#38BDF8';
+    ctx.lineWidth = 2.2;
+    ctx.beginPath();
+    ctx.moveTo(shiftX - 6, gY + 30);
+    ctx.lineTo(shiftX + 10, gY + 62);
+    ctx.lineTo(gX + gW - 12, gY + 62);
+    ctx.stroke();
+
+    // Viable Cell Density (VCD) Curve (Green dash)
+    ctx.strokeStyle = '#10B981';
+    ctx.lineWidth = 1.6;
+    ctx.beginPath();
+    ctx.moveTo(gX + 12, gY + 78);
+    ctx.quadraticCurveTo(shiftX - 20, gY + 34, shiftX + 20, gY + 34);
+    ctx.lineTo(gX + gW - 12, gY + 38);
+    ctx.stroke();
+
+    // Titer Accumulation Curve (Magenta dash)
+    ctx.strokeStyle = '#C084FC';
+    ctx.lineWidth = 1.8;
+    ctx.beginPath();
+    ctx.moveTo(gX + 12, gY + 84);
+    ctx.lineTo(shiftX, gY + 76);
+    ctx.quadraticCurveTo(gX + gW * 0.7, gY + 48, gX + gW - 12, gY + 22);
+    ctx.stroke();
+
+    // Curve Legend
+    ctx.font = '600 7px "JetBrains Mono", monospace';
+    ctx.fillStyle = '#F59E0B'; ctx.fillText('● Temp (°C)', gX + gW - 165, gY + 14);
+    ctx.fillStyle = '#10B981'; ctx.fillText('● VCD (10⁶/mL)', gX + gW - 105, gY + 14);
+    ctx.fillStyle = '#C084FC'; ctx.fillText('● Titer (g/L)', gX + gW - 40, gY + 14);
+
+    // Dynamic Time Scrubber Cursor
+    const scrubX = shiftX + 18 + Math.sin(this.stage16Timer * 0.8) * 20;
+    ctx.strokeStyle = '#FFFFFF';
+    ctx.lineWidth = 1.4;
+    ctx.beginPath();
+    ctx.moveTo(scrubX, gY + 18);
+    ctx.lineTo(scrubX, gY + gH);
+    ctx.stroke();
+
+    // 2. TWO STRATEGY PHASE SUMMARY CARDS
+    const phaseY = gY + gH + 10;
+    const pW = (gW - 10) / 2;
+
+    // Phase 1 Card (Days 0-6: Growth)
+    ctx.fillStyle = '#1E293B';
     ctx.strokeStyle = '#D97706';
     ctx.lineWidth = 1;
     ctx.beginPath();
-    ctx.roundRect(dbX + 20, tempY + 28, 150, 48, 6);
+    ctx.roundRect(gX, phaseY, pW, 46, 5);
     ctx.fill();
     ctx.stroke();
 
-    ctx.font = '800 9px "JetBrains Mono", monospace';
-    ctx.fillStyle = '#B45309';
-    ctx.textAlign = 'center';
-    ctx.fillText('DAYS 0–6: 37.0°C', dbX + 95, tempY + 43);
-    ctx.font = '500 8px "Plus Jakarta Sans", sans-serif';
-    ctx.fillText('Rapid Cell Division & Growth', dbX + 95, tempY + 56);
-    ctx.fillText('(Biomass >15 × 10⁶ cells/mL)', dbX + 95, tempY + 68);
+    ctx.font = '700 8px "JetBrains Mono", monospace';
+    ctx.fillStyle = '#F59E0B';
+    ctx.textAlign = 'left';
+    ctx.fillText('PHASE 1: DAYS 0–6 (37.0°C)', gX + 10, phaseY + 14);
+    ctx.font = '400 7.2px "Plus Jakarta Sans", sans-serif';
+    ctx.fillStyle = '#CBD5E1';
+    ctx.fillText('Rapid logarithmic cell proliferation.', gX + 10, phaseY + 26);
+    ctx.fillText('Builds biomass to >18 × 10⁶ cells/mL.', gX + 10, phaseY + 37);
 
-    // Arrow to Phase 2
-    ctx.font = '900 12px "Plus Jakarta Sans", sans-serif';
-    ctx.fillStyle = '#0284C7';
-    ctx.fillText('⟶', dbX + 180, tempY + 54);
-
-    // Phase 2 Box
-    ctx.fillStyle = '#DCFCE7';
-    ctx.strokeStyle = '#16A34A';
+    // Phase 2 Card (Days 7-18: Production)
+    ctx.fillStyle = '#1E293B';
+    ctx.strokeStyle = '#0284C7';
     ctx.lineWidth = 1;
     ctx.beginPath();
-    ctx.roundRect(dbX + 192, tempY + 28, 150, 48, 6);
+    ctx.roundRect(gX + pW + 10, phaseY, pW, 46, 5);
     ctx.fill();
     ctx.stroke();
 
-    ctx.font = '800 9px "JetBrains Mono", monospace';
-    ctx.fillStyle = '#15803D';
-    ctx.textAlign = 'center';
-    ctx.fillText('DAYS 7–18: 32.5°C', dbX + 267, tempY + 43);
-    ctx.font = '500 8px "Plus Jakarta Sans", sans-serif';
-    ctx.fillText('Cell Division Arrest (G1)', dbX + 267, tempY + 56);
-    ctx.fillText('Hyper-Secretion of rhDNase', dbX + 267, tempY + 68);
+    ctx.font = '700 8px "JetBrains Mono", monospace';
+    ctx.fillStyle = '#38BDF8';
+    ctx.fillText('PHASE 2: DAYS 7–18 (32.5°C)', gX + pW + 20, phaseY + 14);
+    ctx.font = '400 7.2px "Plus Jakarta Sans", sans-serif';
+    ctx.fillStyle = '#CBD5E1';
+    ctx.fillText('Cell cycle arrest in G1; stops division.', gX + pW + 20, phaseY + 26);
+    ctx.fillText('Channel all ATP to rhDNase secretion.', gX + pW + 20, phaseY + 37);
 
-    // 2. LIVE PARAMETRIC TELEMETRY GAUGES
-    const teleY = tempY + 98;
-    const telemetryItems = [
+    // 3. FIVE REAL-TIME CRITICAL PROCESS PARAMETERS (CPPs)
+    const cppY = phaseY + 54;
+    const cppItems = [
       {
-        label: 'Dissolved Oxygen (DO):',
-        val: '45.2% ± 1.5%',
-        note: 'Micro-sparged without bubble-shear damage',
-        color: '#0284C7'
+        param: 'Dissolved Oxygen (DO):',
+        val: '45.0% ± 1.2%',
+        unit: 'Air Sat.',
+        desc: 'Sintered micro-sparge cascade; zero bubble shear rupture',
+        color: '#38BDF8'
       },
       {
-        label: 'pH Regulation:',
-        val: '7.00 ± 0.05',
-        note: 'Automated CO₂ sparge & base pumping',
-        color: '#10B981'
+        param: 'Vessel pH Regulation:',
+        val: '7.00 ± 0.03',
+        unit: 'pH units',
+        desc: 'Automated CO₂ sparge (acidification) & 0.5M NaHCO₃ base feed',
+        color: '#2DD4BF'
       },
       {
-        label: 'Agitation Shear Rate:',
-        val: '60 RPM (Low-Shear)',
-        note: 'Pitched marine impellers protect wall-less CHO',
-        color: '#D97706'
+        param: 'Hydrofoil Impeller Agitation:',
+        val: '55 RPM (Low-Shear)',
+        unit: 'Tip 1.2 m/s',
+        desc: 'A310 hydrofoil axial pump keeps shear stress < 1.0 Pa',
+        color: '#F59E0B'
       },
       {
-        label: 'Calcium (Ca²⁺) Feed:',
+        param: 'Calcium (Ca²⁺) Enrichment:',
         val: '1.2 mM CaCl₂',
-        note: 'Stabilizes nascent DNase tertiary catalytic fold',
-        color: '#6366F1'
+        unit: 'Cofactor',
+        desc: 'Chelates into catalytic cleft, stabilizing active 3D conformation',
+        color: '#A855F7'
       },
       {
-        label: 'Secreted Product Titer:',
-        val: '1.85 g/L (Active)',
-        note: 'Commercial yield for tens of thousands of doses',
-        color: '#059669'
+        param: 'Harvest rhDNase 1 Titer:',
+        val: '1.85 g/L',
+        unit: '>99% Monomer',
+        desc: 'Commercial pharmaceutical yield (>70,000 doses per 10kL batch)',
+        color: '#10B981'
       }
     ];
 
-    let curTY = teleY;
-    telemetryItems.forEach(t => {
-      ctx.fillStyle = '#F8FAFC';
-      ctx.strokeStyle = '#E2E8F0';
+    let curCY = cppY;
+    cppItems.forEach(item => {
+      ctx.fillStyle = '#111827';
+      ctx.strokeStyle = '#334155';
       ctx.lineWidth = 1;
       ctx.beginPath();
-      ctx.roundRect(dbX + 12, curTY, dbW - 24, 48, 6);
+      ctx.roundRect(gX, curCY, gW, 33, 5);
       ctx.fill();
       ctx.stroke();
 
-      ctx.font = '700 9.5px "Plus Jakarta Sans", sans-serif';
-      ctx.fillStyle = '#1E293B';
+      // Parameter Name
+      ctx.font = '700 8.5px "Plus Jakarta Sans", sans-serif';
+      ctx.fillStyle = '#F8FAFC';
       ctx.textAlign = 'left';
-      ctx.fillText(t.label, dbX + 22, curTY + 18);
+      ctx.fillText(item.param, gX + 10, curCY + 13);
 
-      ctx.font = '800 10.5px "JetBrains Mono", monospace';
-      ctx.fillStyle = t.color;
+      // Parameter Value Tag
+      ctx.font = '800 9.5px "JetBrains Mono", monospace';
+      ctx.fillStyle = item.color;
       ctx.textAlign = 'right';
-      ctx.fillText(t.val, dbX + dbW - 24, curTY + 18);
+      ctx.fillText(`${item.val} [${item.unit}]`, gX + gW - 10, curCY + 13);
 
-      ctx.font = '400 8.5px "Plus Jakarta Sans", sans-serif';
-      ctx.fillStyle = '#64748B';
+      // Engineering Context Subtitle
+      ctx.font = '400 7.5px "Plus Jakarta Sans", sans-serif';
+      ctx.fillStyle = '#94A3B8';
       ctx.textAlign = 'left';
-      ctx.fillText(t.note, dbX + 22, curTY + 35);
+      ctx.fillText(item.desc, gX + 10, curCY + 25);
 
-      curTY += 52;
+      curCY += 37;
     });
 
     ctx.restore();
