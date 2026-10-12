@@ -1003,15 +1003,15 @@ class PresentationEngine {
   initStage0Title() {
     this.stage0Timer = 0;
     this.s0Particles = [];
-    for (let i = 0; i < 48; i++) {
+    for (let i = 0; i < 24; i++) {
       this.s0Particles.push({
         x: (Math.random() - 0.5) * 940,
         y: (Math.random() - 0.5) * 460,
-        vx: (Math.random() - 0.5) * 14,
-        vy: (Math.random() - 0.5) * 14,
-        radius: 1.5 + Math.random() * 2.8,
-        alpha: 0.25 + Math.random() * 0.65,
-        color: ['#38BDF8', '#818CF8', '#34D399', '#F59E0B', '#C084FC'][i % 5]
+        vx: (Math.random() - 0.5) * 10,
+        vy: -4 - Math.random() * 8,
+        radius: 1.2 + Math.random() * 2.0,
+        alpha: 0.08 + Math.random() * 0.16,
+        color: Math.random() > 0.5 ? '#38BDF8' : '#818CF8'
       });
     }
   }
@@ -1030,29 +1030,19 @@ class PresentationEngine {
 
   drawStage0Title(ctx) {
     ctx.save();
-    // 1. Deep Space Slate / Medical Navy Background
+    // Deep Space Slate Background
     ctx.fillStyle = '#070C18';
     ctx.fillRect(-500, -260, 1000, 520);
 
-    // Ambient radial glow behind title
-    const glow = ctx.createRadialGradient(0, -50, 40, 0, -50, 440);
-    glow.addColorStop(0, 'rgba(2, 132, 199, 0.24)');
-    glow.addColorStop(0.5, 'rgba(99, 102, 241, 0.11)');
+    // Soft ambient radial glow
+    const glow = ctx.createRadialGradient(0, 0, 30, 0, 0, 380);
+    glow.addColorStop(0, 'rgba(2, 132, 199, 0.16)');
+    glow.addColorStop(0.6, 'rgba(99, 102, 241, 0.05)');
     glow.addColorStop(1, 'rgba(7, 12, 24, 0.0)');
     ctx.fillStyle = glow;
     ctx.fillRect(-500, -260, 1000, 520);
 
-    // Subtle technical grid
-    ctx.fillStyle = '#1E293B';
-    for (let gx = -460; gx <= 460; gx += 40) {
-      for (let gy = -220; gy <= 220; gy += 40) {
-        ctx.beginPath();
-        ctx.arc(gx, gy, 1.0, 0, Math.PI * 2);
-        ctx.fill();
-      }
-    }
-
-    // Floating buoyant molecular particles
+    // Subtle atmospheric buoyant particles
     this.s0Particles.forEach(p => {
       ctx.fillStyle = p.color;
       ctx.globalAlpha = p.alpha;
@@ -1062,201 +1052,51 @@ class PresentationEngine {
     });
     ctx.globalAlpha = 1.0;
 
-    // Top Header Badge
-    ctx.fillStyle = '#0F172A';
-    ctx.strokeStyle = '#38BDF8';
-    ctx.lineWidth = 1.2;
-    ctx.beginPath();
-    ctx.roundRect(-270, -242, 540, 26, 13);
-    ctx.fill();
-    ctx.stroke();
-
-    ctx.font = '800 9.5px "JetBrains Mono", monospace';
-    ctx.fillStyle = '#38BDF8';
+    // 1. TOPIC NAME (Clean, bold, prominent)
+    ctx.font = '800 36px "Plus Jakarta Sans", sans-serif';
+    ctx.fillStyle = '#FFFFFF';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    ctx.fillText('● MOLECULAR THERAPEUTICS & BIOPROCESS ENGINEERING • DEGREE PRESENTATION', 0, -229);
+    ctx.fillText('Recombinant DNase 1 for Cystic Fibrosis', 0, -50);
 
-    // MAIN TITLE
-    ctx.font = '800 29px "Plus Jakarta Sans", sans-serif';
-    ctx.fillStyle = '#FFFFFF';
-    ctx.textAlign = 'center';
-    ctx.fillText('Recombinant DNase 1 for Cystic Fibrosis', 0, -192);
+    // Elegant minimal cyan accent line
+    const lineGrad = ctx.createLinearGradient(-130, 0, 130, 0);
+    lineGrad.addColorStop(0, 'rgba(56, 189, 248, 0)');
+    lineGrad.addColorStop(0.5, 'rgba(56, 189, 248, 0.85)');
+    lineGrad.addColorStop(1, 'rgba(56, 189, 248, 0)');
+    ctx.strokeStyle = lineGrad;
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(-130, -14);
+    ctx.lineTo(130, -14);
+    ctx.stroke();
 
-    // SUBTITLE
-    ctx.font = '500 12px "Plus Jakarta Sans", sans-serif';
-    ctx.fillStyle = '#94A3B8';
-    ctx.fillText('Pathophysiological Mechanism, Extracellular DNA Lysis, and Industrial Biosynthesis in CHO Cells', 0, -165);
+    // 2. PRESENTER NAME
+    ctx.font = '600 22px "Plus Jakarta Sans", sans-serif';
+    ctx.fillStyle = '#E2E8F0';
+    ctx.fillText('Presented by P.YuvaRaj', 0, 32);
 
-    // PRESENTER IDENTITY CARD (Centered & Prominent)
-    const presW = 560;
-    const presH = 68;
-    const presY = -148;
-
-    ctx.fillStyle = 'rgba(15, 23, 42, 0.90)';
-    ctx.strokeStyle = '#334155';
+    // 3. ROLL NUMBER
+    const rollW = 210;
+    const rollH = 34;
+    const rollY = 74;
+    ctx.fillStyle = 'rgba(15, 23, 42, 0.8)';
+    ctx.strokeStyle = 'rgba(56, 189, 248, 0.45)';
     ctx.lineWidth = 1.2;
     ctx.beginPath();
-    ctx.roundRect(-presW / 2, presY, presW, presH, 10);
+    ctx.roundRect(-rollW / 2, rollY, rollW, rollH, 17);
     ctx.fill();
     ctx.stroke();
 
-    // Top accent bar on presenter card
-    ctx.fillStyle = '#0284C7';
-    ctx.beginPath();
-    ctx.roundRect(-presW / 2 + 1, presY + 1, presW - 2, 3, [9, 9, 0, 0]);
-    ctx.fill();
-
-    // Presenter Name
-    ctx.font = '700 9px "JetBrains Mono", monospace';
+    ctx.font = '700 14px "JetBrains Mono", monospace';
     ctx.fillStyle = '#38BDF8';
-    ctx.textAlign = 'left';
-    ctx.fillText('PRESENTED BY:', -presW / 2 + 22, presY + 23);
+    ctx.fillText('Roll number 124116', 0, rollY + rollH / 2);
 
-    ctx.font = '800 18px "Plus Jakarta Sans", sans-serif';
-    ctx.fillStyle = '#FFFFFF';
-    ctx.fillText('P.YuvaRaj', -presW / 2 + 22, presY + 47);
-
-    // Roll Number Pill Badge
-    const rollBadgeX = presW / 2 - 200;
-    const rollBadgeY = presY + 19;
-    const rollBadgeW = 180;
-    const rollBadgeH = 32;
-
-    ctx.fillStyle = 'rgba(16, 185, 129, 0.16)';
-    ctx.strokeStyle = '#10B981';
-    ctx.lineWidth = 1.4;
-    ctx.beginPath();
-    ctx.roundRect(rollBadgeX, rollBadgeY, rollBadgeW, rollBadgeH, 6);
-    ctx.fill();
-    ctx.stroke();
-
-    ctx.font = '800 12.5px "JetBrains Mono", monospace';
-    ctx.fillStyle = '#34D399';
-    ctx.textAlign = 'center';
-    ctx.fillText('Roll number 124116', rollBadgeX + rollBadgeW / 2, rollBadgeY + rollBadgeH / 2);
-
-    // 3 SCIENTIFIC FOUNDATION PILLARS
-    const cardY = -62;
-    const cardW = 296;
-    const cardH = 162;
-    const cardGap = 16;
-    const startX = -(cardW * 3 + cardGap * 2) / 2;
-
-    const pillars = [
-      {
-        badge: 'STAGE 01 — 06',
-        badgeColor: '#0284C7',
-        badgeBg: '#082F49',
-        title: 'Clinical Genetics & NETosis',
-        sub: 'CFTR Gene (7q31.2) & DNA Viscoelastic Gel',
-        items: [
-          '• Autosomal recessive carrier genetics (Hi Nanna)',
-          '• Airway ciliary collapse & Pseudomonas infection',
-          '• Dying WBCs extrude sticky eDNA polymer nets'
-        ]
-      },
-      {
-        badge: 'STAGE 07 — 13',
-        badgeColor: '#818CF8',
-        badgeBg: '#1E1B4B',
-        title: 'The Recombinant Solution',
-        sub: 'Dr. Shak & Levinson (Genentech 1988–1993)',
-        items: [
-          '• Bovine 1950s dead-end: Severe animal allergies',
-          '• Human DNase 1 cDNA cloned in CHO cells',
-          '• 800× viscosity drop: Cleaves eDNA (FEV₁ +15.8%)'
-        ]
-      },
-      {
-        badge: 'STAGE 14 — 17',
-        badgeColor: '#34D399',
-        badgeBg: '#064E3B',
-        title: 'Industrial Bioprocessing',
-        sub: 'Fed-Batch Bioreactors & Downstream cGMP',
-        items: [
-          '• Why CHO cells? Mandatory dual N-glycosylation',
-          '• 10,000L low-shear stirred tank & cold shift',
-          '• 3-stage chromatography & sterile BFS ampules'
-        ]
-      }
-    ];
-
-    pillars.forEach((pil, pIdx) => {
-      const px = startX + pIdx * (cardW + cardGap);
-      ctx.fillStyle = '#0F172A';
-      ctx.strokeStyle = '#334155';
-      ctx.lineWidth = 1.2;
-      ctx.beginPath();
-      ctx.roundRect(px, cardY, cardW, cardH, 8);
-      ctx.fill();
-      ctx.stroke();
-
-      // Top colored badge
-      ctx.fillStyle = pil.badgeBg;
-      ctx.strokeStyle = pil.badgeColor;
-      ctx.lineWidth = 1;
-      ctx.beginPath();
-      ctx.roundRect(px + 14, cardY + 12, 100, 18, 4);
-      ctx.fill();
-      ctx.stroke();
-
-      ctx.font = '800 8px "JetBrains Mono", monospace';
-      ctx.fillStyle = pil.badgeColor;
-      ctx.textAlign = 'center';
-      ctx.fillText(pil.badge, px + 64, cardY + 21);
-
-      // Card Title & Sub
-      ctx.font = '800 12.5px "Plus Jakarta Sans", sans-serif';
-      ctx.fillStyle = '#FFFFFF';
-      ctx.textAlign = 'left';
-      ctx.fillText(pil.title, px + 14, cardY + 48);
-
-      ctx.font = '500 8.5px "JetBrains Mono", monospace';
-      ctx.fillStyle = '#94A3B8';
-      ctx.fillText(pil.sub, px + 14, cardY + 63);
-
-      // Divider
-      ctx.strokeStyle = '#1E293B';
-      ctx.lineWidth = 1;
-      ctx.beginPath();
-      ctx.moveTo(px + 14, cardY + 74);
-      ctx.lineTo(px + cardW - 14, cardY + 74);
-      ctx.stroke();
-
-      // Bullet items
-      ctx.font = '400 8.5px "Plus Jakarta Sans", sans-serif';
-      ctx.fillStyle = '#CBD5E1';
-      pil.items.forEach((it, itIdx) => {
-        ctx.fillText(it, px + 14, cardY + 93 + itIdx * 18);
-      });
-    });
-
-    // BOTTOM INTERACTIVE ENTER PROMPT PILL (Pulsing glow)
-    const btnPulse = 1.0 + Math.sin(this.stage0Timer * 4.5) * 0.035;
-    const btnW = 390 * btnPulse;
-    const btnH = 36 * btnPulse;
-    const btnY = 126;
-
-    ctx.save();
-    ctx.shadowColor = 'rgba(2, 132, 199, 0.45)';
-    ctx.shadowBlur = 16;
-    ctx.fillStyle = '#0284C7';
-    ctx.beginPath();
-    ctx.roundRect(-btnW / 2, btnY - btnH / 2, btnW, btnH, 18);
-    ctx.fill();
-    ctx.restore();
-
-    ctx.strokeStyle = '#38BDF8';
-    ctx.lineWidth = 1.5;
-    ctx.beginPath();
-    ctx.roundRect(-btnW / 2, btnY - btnH / 2, btnW, btnH, 18);
-    ctx.stroke();
-
-    ctx.font = '800 11.5px "Plus Jakarta Sans", sans-serif';
-    ctx.fillStyle = '#FFFFFF';
-    ctx.textAlign = 'center';
-    ctx.fillText('▶ Click anywhere or press [Space / →] to Enter Presentation', 0, btnY);
+    // Subtle unobtrusive hint to begin
+    const pulseAlpha = 0.4 + Math.sin(this.stage0Timer * 3.0) * 0.2;
+    ctx.font = '500 12px "Plus Jakarta Sans", sans-serif';
+    ctx.fillStyle = `rgba(148, 163, 184, ${pulseAlpha.toFixed(2)})`;
+    ctx.fillText('Click anywhere or press [Space / →] to begin', 0, 165);
 
     ctx.restore();
   }
