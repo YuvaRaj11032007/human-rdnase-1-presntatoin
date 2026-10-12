@@ -43,8 +43,11 @@ class PresentationEngine {
     this.stage0Timer = 0;
     this.initStage0Title();
 
-    // Stage 18 Citations State
+        // Stage 18 Citations State
     this.stage18Timer = 0;
+    this.hoveredCitationIndex = null;
+    this.stageScale = 1.0;
+    this.initCitationsData();
     this.initStage18Citations();
 
     // Stage 19 Thank You Dancing Cow State
@@ -324,8 +327,9 @@ class PresentationEngine {
 
     this.canvas.addEventListener('mousemove', (e) => {
       const rect = this.canvas.getBoundingClientRect();
-      const mx = e.clientX - rect.left - (this.width / 2);
-      const my = e.clientY - rect.top - (this.height / 2);
+      const scale = this.stageScale || 1.0;
+      const mx = (e.clientX - rect.left - (this.width / 2)) / scale;
+      const my = (e.clientY - rect.top - (this.height / 2)) / scale;
       this.mouse = { x: mx, y: my };
 
       if (this.currentStage === 7 && !this.transition.active) {
@@ -345,8 +349,23 @@ class PresentationEngine {
         const inBtn = (mx >= -455 && mx <= -290 && my >= -242 && my <= -204);
         this.backButtonHovered = inBtn;
         this.canvas.style.cursor = 'pointer';
+      } else if (this.currentStage === 18 && !this.transition.active && this.citationsData) {
+        let hovCite = null;
+        const colW = 458, cardH = 96, gapX = 20, gapY = 12, startX = -468, startY = -165;
+        for (let i = 0; i < this.citationsData.length; i++) {
+          const c = this.citationsData[i];
+          const cx = startX + c.col * (colW + gapX);
+          const cy = startY + c.row * (cardH + gapY);
+          if (mx >= cx && mx <= cx + colW && my >= cy && my <= cy + cardH) {
+            hovCite = i;
+            break;
+          }
+        }
+        this.hoveredCitationIndex = hovCite;
+        this.canvas.style.cursor = (hovCite !== null) ? 'pointer' : 'default';
       } else {
         this.hoveredTimelineNode = null;
+        this.hoveredCitationIndex = null;
         this.backButtonHovered = false;
         this.replayBtnHovered = false;
         this.canvas.style.cursor = 'pointer';
@@ -364,29 +383,28 @@ class PresentationEngine {
       }
 
       const rect = this.canvas.getBoundingClientRect();
-      const mx = e.clientX - rect.left - (this.width / 2);
-      const my = e.clientY - rect.top - (this.height / 2);
+      const scale = this.stageScale || 1.0;
+      const mx = (e.clientX - rect.left - (this.width / 2)) / scale;
+      const my = (e.clientY - rect.top - (this.height / 2)) / scale;
 
       // 1. Stage 1 Hi Nanna Genetics Interactivity:
-      // First click reveals inheritance trace; subsequent click advances to Slide 2
       if (this.currentStage === 1) {
         if (this.geneticsStep === 0) {
           this.triggerGeneticsAnimation();
           return;
         }
         if (this.geneticsAnimProgress < 0.95) {
-          // If clicked while animating, fast-forward to full reveal immediately
           this.geneticsAnimProgress = 1.0;
           return;
         }
         if (window.soundEngine) window.soundEngine.playClick();
         if (window.slideManager) {
-          window.slideManager.goToSlide(2); // Advance to Stage 2 (Slide index 2)
+          window.slideManager.goToSlide(2);
         }
         return;
       }
 
-      // 2. Stage 7 Timeline Node Clicking (Optical Zoom to specific era)
+      // 2. Stage 7 Timeline Node Clicking
       if (this.currentStage === 7) {
         for (let i = 0; i < this.timelineNodes.length; i++) {
           const node = this.timelineNodes[i];
@@ -408,22 +426,28 @@ class PresentationEngine {
         if (inBtn) {
           if (window.soundEngine) window.soundEngine.playClick();
           if (window.slideManager) {
-            window.slideManager.goToSlide(7); // Stage 7 Timeline Hub is slide index 7
+            window.slideManager.goToSlide(7);
           }
           return;
         }
       }
 
-      // 4. Stage 11 Inhale Aerosolized rhDNase 1 Button
-      if (this.currentStage === 11) {
-        const inNebBtn = (mx >= 190 && mx <= 460 && my >= -242 && my <= -204);
-        if (inNebBtn) {
-          this.triggerNebulizerPulse();
-          return;
+      // 4. Stage 18 Click Citation Redirection
+      if (this.currentStage === 18 && this.citationsData) {
+        const colW = 458, cardH = 96, gapX = 20, gapY = 12, startX = -468, startY = -165;
+        for (let i = 0; i < this.citationsData.length; i++) {
+          const c = this.citationsData[i];
+          const cx = startX + c.col * (colW + gapX);
+          const cy = startY + c.row * (cardH + gapY);
+          if (mx >= cx && mx <= cx + colW && my >= cy && my <= cy + cardH) {
+            if (window.soundEngine) window.soundEngine.playClick();
+            window.open(c.url, '_blank');
+            return;
+          }
         }
       }
 
-      // 5. Regular slide advancement: Clicking anywhere on the slide goes to next slide
+      // 5. Regular slide advancement
       if (window.soundEngine) window.soundEngine.playClick();
       if (window.slideManager) {
         window.slideManager.nextSlide();
@@ -454,7 +478,11 @@ class PresentationEngine {
     this.canvas.style.width = `${this.width}px`;
     this.canvas.style.height = `${this.height}px`;
 
-    this.ctx.scale(this.dpr, this.dpr);
+    // Dynamic scale to fit ~1000px wide, ~540px high virtual design space into viewport
+    const scaleX = this.width / 1000;
+    const scaleY = this.height / 540;
+    this.stageScale = Math.min(scaleX, scaleY);
+    if (this.stageScale < 0.6) this.stageScale = 0.6;
   }
 
   setStage(stageNum) {
@@ -756,10 +784,12 @@ class PresentationEngine {
 
     const centerX = this.width / 2;
     const centerY = this.height / 2;
+    const scale = this.stageScale || 1.0;
 
     if (!this.transition.active) {
       ctx.save();
       ctx.translate(centerX, centerY);
+      ctx.scale(scale, scale);
       this.renderStage(ctx, this.currentStage);
       ctx.restore();
     } else {
@@ -767,9 +797,9 @@ class PresentationEngine {
       const isZoomIn = (this.transition.direction === 1);
 
       if (isZoomIn) {
-        const fromScale = 1.0 + p * 1.4;
+        const fromScale = (1.0 + p * 1.4) * scale;
         const fromAlpha = Math.max(0, 1.0 - p * 1.2);
-        const toScale = 0.42 + p * 0.58;
+        const toScale = (0.42 + p * 0.58) * scale;
         const toAlpha = Math.min(1.0, p * 1.3);
 
         if (fromAlpha > 0.01) {
@@ -790,9 +820,9 @@ class PresentationEngine {
           ctx.restore();
         }
       } else {
-        const fromScale = 1.0 - p * 0.58;
+        const fromScale = (1.0 - p * 0.58) * scale;
         const fromAlpha = Math.max(0, 1.0 - p * 1.2);
-        const toScale = 2.4 - p * 1.4;
+        const toScale = (2.4 - p * 1.4) * scale;
         const toAlpha = Math.min(1.0, p * 1.3);
 
         if (toAlpha > 0.01) {
@@ -9426,6 +9456,77 @@ class PresentationEngine {
      STAGE 18: Scientific Citations & Primary Academic Literature
      Peer-reviewed papers, clinical trials, and regulatory approvals
      ======================================================== */
+    initCitationsData() {
+    this.citationsData = [
+      {
+        col: 0, row: 0,
+        badge: 'PNAS • 1990',
+        badgeColor: '#0284C7',
+        badgeBg: '#E0F2FE',
+        authors: 'Shak S, Capon DJ, Hellmiss R, Marsters SA, Baker CL.',
+        title: 'Recombinant human DNase I reduces the viscosity of cystic fibrosis sputum.',
+        journal: 'Proc. Natl. Acad. Sci. U.S.A. 1990; 87(23): 9188–9192.',
+        keyFinding: '★ Seminal Discovery: Cloned human DNase 1 in CHO cells; proved 800× viscosity drop in purulent CF sputum.',
+        url: 'https://pubmed.ncbi.nlm.nih.gov/2251263/'
+      },
+      {
+        col: 1, row: 0,
+        badge: 'NEJM • 1994',
+        badgeColor: '#059669',
+        badgeBg: '#D1FAE5',
+        authors: 'Fuchs HJ, Borowitz DS, Christiansen DH, et al.',
+        title: 'Effect of aerosolized rhDNase on exacerbations of respiratory symptoms & lung function in CF.',
+        journal: 'N. Engl. J. Med. 1994; 331(10): 637–642.',
+        keyFinding: '★ Landmark Phase III Trial: 968 CF patients; +15.8% FEV₁ gain and 28–37% reduction in infectious exacerbations.',
+        url: 'https://www.nejm.org/doi/full/10.1056/NEJM199409083311003'
+      },
+      {
+        col: 0, row: 1,
+        badge: 'US FDA NDA • 1993',
+        badgeColor: '#D97706',
+        badgeBg: '#FEF3C7',
+        authors: 'U.S. Food and Drug Administration (FDA)',
+        title: 'Pulmozyme® (dornase alfa) Inhalation Solution NDA 20-229 Approval Dossier.',
+        journal: 'Rockville, MD: Center for Biologics Evaluation & Research; Approved Dec 30, 1993.',
+        keyFinding: '★ First Recombinant Therapeutic: Licensed as the first cystic fibrosis medicine approved in over 30 years.',
+        url: 'https://www.accessdata.fda.gov/drugsatfda_docs/label/2014/103371s5120lbl.pdf'
+      },
+      {
+        col: 1, row: 1,
+        badge: 'J. BIOL. CHEM. • 1995',
+        badgeColor: '#7C3AED',
+        badgeBg: '#EDE9FE',
+        authors: 'Wong LTK, Shak S, Levinson AD.',
+        title: 'Biochemical & structural characterization of rhDNase I produced in Chinese hamster ovary cells.',
+        journal: 'J. Biol. Chem. 1995; 270(18): 10817–10824.',
+        keyFinding: '★ Structural Biochemistry: Essential Asn18/Asn106 N-glycans, dual disulfide bridges, and Ca²⁺/Mg²⁺ pocket.',
+        url: 'https://pubmed.ncbi.nlm.nih.gov/7737976/'
+      },
+      {
+        col: 0, row: 2,
+        badge: 'AJRCCM • 1996',
+        badgeColor: '#0D9488',
+        badgeBg: '#CCFBF1',
+        authors: 'Wanner A, Salathé M, O\'Riordan TG.',
+        title: 'Mucociliary clearance and airway surface liquid dynamics in pulmonary cystic fibrosis.',
+        journal: 'Am. J. Respir. Crit. Care Med. 1996; 154(6): 1868–1902.',
+        keyFinding: '★ Aerosol Physics: 2.1–2.8 µm MMAD ensures deep bronchial deposition, mucus liquefaction, and ciliary rescue.',
+        url: 'https://www.atsjournals.org/doi/10.1164/ajrccm.154.6.8970383'
+      },
+      {
+        col: 1, row: 2,
+        badge: 'SCIENCE • 1989',
+        badgeColor: '#DB2777',
+        badgeBg: '#FCE7F3',
+        authors: 'Riordan JR, Rommens JM, Kerem B, et al.',
+        title: 'Identification of the cystic fibrosis gene: cloning and characterization of complementary DNA.',
+        journal: 'Science 1989; 245(4922): 1066–1073.',
+        keyFinding: '★ Genetic Etiology: Discovered the CFTR ABC transporter gene on chromosome 7q31.2 that causes Cystic Fibrosis.',
+        url: 'https://www.science.org/doi/10.1126/science.2475911'
+      }
+    ];
+  }
+
   initStage18Citations() {
     this.stage18Timer = 0;
   }
