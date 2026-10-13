@@ -5157,14 +5157,14 @@ class PresentationEngine {
     this.nebTimer = 0;
     this.nebBreathRate = 1.6;
 
-    // Bubbling aerosol mist inside nebulizer chamber
+    // Bubbling aerosol mist inside nebulizer reservoir cup (u in [0.530, 0.558], v in [0.390, 0.490])
     this.s11CupMist = [];
     for (let i = 0; i < 40; i++) {
       this.s11CupMist.push({
-        u: 0.540 + Math.random() * 0.035,
-        v: 0.360 + Math.random() * 0.085,
-        vy: -0.018 - Math.random() * 0.025,
-        vx: (Math.random() - 0.5) * 0.010,
+        u: 0.530 + Math.random() * 0.028,
+        v: 0.380 + Math.random() * 0.105,
+        vy: -0.022 - Math.random() * 0.025,
+        vx: (Math.random() - 0.5) * 0.008,
         r: 1.2 + Math.random() * 1.6,
         alpha: 0.35 + Math.random() * 0.60
       });
@@ -5192,13 +5192,13 @@ class PresentationEngine {
       });
     }
 
-    // Inset Alveolar Level droplets
+    // Inset Alveolar Level droplets (calibrated to inset circle radius ~68px)
     this.s11AlveolarDroplets = [];
-    for (let i = 0; i < 28; i++) {
+    for (let i = 0; i < 36; i++) {
       this.s11AlveolarDroplets.push({
         angle: Math.random() * Math.PI * 2,
-        dist: 4 + Math.random() * 26,
-        r: 1.2 + Math.random() * 1.5,
+        dist: 6 + Math.random() * 52,
+        r: 1.3 + Math.random() * 1.6,
         alpha: 0.35 + Math.random() * 0.65
       });
     }
@@ -5209,13 +5209,13 @@ class PresentationEngine {
     const breath = Math.sin(this.nebTimer * this.nebBreathRate);
     const flowMult = breath > 0 ? 1.4 : 0.75;
 
-    // Update cup mist
+    // Update cup mist rising into T-piece connector (v = 0.367)
     this.s11CupMist.forEach(m => {
       m.v += m.vy * dt;
       m.u += m.vx * dt;
-      if (m.v < 0.360) {
-        m.v = 0.445;
-        m.u = 0.540 + Math.random() * 0.035;
+      if (m.v < 0.367) {
+        m.v = 0.485;
+        m.u = 0.530 + Math.random() * 0.028;
       }
     });
 
@@ -5319,47 +5319,49 @@ class PresentationEngine {
     });
 
     // Airway Path Interpolation Helper
-    // Returns interpolated (u, v) position along respiratory tract for prog in [0, 1]
+    // Calibrated to exact pixel coordinates of nebulizer_inhalation.png (1024x765):
+    // - T-piece & horizontal mouthpiece into mouth: u=0.535 -> 0.415 -> 0.380 at v=0.367 (Y=281px)
+    // - Smooth C1 Bezier curve down posterior pharynx: (0.380, 0.367) -> (0.356, 0.367) -> (0.356, 0.435)
+    // - Vertical Trachea: (0.356, 0.435) -> (0.356, 0.530) -> Carina (0.347, 0.647)
+    // - Right & Left Main Bronchi: C1 Bezier curves passing through (0.315, 0.723) and (0.395, 0.711)
     const getAirwayPos = (prog, branch) => {
       if (prog < 0.20) {
-        // Segment 1: Mouthpiece (u ~ 0.515 to 0.435, v ~ 0.285)
+        // Segment 1: Horizontal Mouthpiece directly through lips into oral cavity (v = 0.367)
         const t = prog / 0.20;
         return {
-          u: 0.515 + t * (0.435 - 0.515),
-          v: 0.285 + Math.sin(t * Math.PI) * 0.005
+          u: 0.535 + t * (0.380 - 0.535),
+          v: 0.367
         };
-      } else if (prog < 0.40) {
-        // Segment 2: Oral cavity curving down into pharynx
-        const t = (prog - 0.20) / 0.20;
+      } else if (prog < 0.38) {
+        // Segment 2: Smooth quadratic Bezier curve around posterior pharynx into upper trachea
+        const t = (prog - 0.20) / 0.18;
+        const invT = 1 - t;
         return {
-          u: 0.435 + t * (0.362 - 0.435),
-          v: 0.285 + t * (0.335 - 0.285)
+          u: invT * invT * 0.380 + 2 * invT * t * 0.356 + t * t * 0.356,
+          v: invT * invT * 0.367 + 2 * invT * t * 0.367 + t * t * 0.435
         };
       } else if (prog < 0.65) {
-        // Segment 3: Straight down the vertical Trachea (Windpipe)
-        const t = (prog - 0.40) / 0.25;
+        // Segment 3: Straight down the vertical Trachea (Windpipe) to Carina
+        const t = (prog - 0.38) / 0.27;
         return {
-          u: 0.362 + t * (0.350 - 0.362),
-          v: 0.335 + t * (0.505 - 0.335)
+          u: 0.356 + t * (0.347 - 0.356),
+          v: 0.435 + t * (0.647 - 0.435)
         };
       } else {
-        // Segment 4: Bifurcating at Carina into Bronchial Trees
+        // Segment 4: Bifurcating at Carina into Right and Left Main Bronchi
         const t = (prog - 0.65) / 0.35;
+        const invT = 1 - t;
         if (branch === 0) {
-          // Right lung (anatomical right, left side of image)
-          const targetU = 0.265;
-          const targetV = 0.680;
+          // Right Lung (anatomical right, left side of diagram: passes through u=0.315, v=0.723)
           return {
-            u: 0.350 + t * (targetU - 0.350) + Math.sin(t * Math.PI) * -0.015,
-            v: 0.505 + t * (targetV - 0.505)
+            u: invT * invT * 0.347 + 2 * invT * t * 0.319 + t * t * 0.275,
+            v: invT * invT * 0.647 + 2 * invT * t * 0.725 + t * t * 0.795
           };
         } else {
-          // Left lung (anatomical left, right side of image)
-          const targetU = 0.420;
-          const targetV = 0.680;
+          // Left Lung (anatomical left, right side of diagram: passes through u=0.395, v=0.711)
           return {
-            u: 0.350 + t * (targetU - 0.350) + Math.sin(t * Math.PI) * 0.015,
-            v: 0.505 + t * (targetV - 0.505)
+            u: invT * invT * 0.347 + 2 * invT * t * 0.399 + t * t * 0.435,
+            v: invT * invT * 0.647 + 2 * invT * t * 0.705 + t * t * 0.795
           };
         }
       }
@@ -5368,7 +5370,12 @@ class PresentationEngine {
     // B. Shimmering Aerosol Particle Stream traversing the airway
     this.s11AerosolStream.forEach((p, idx) => {
       const pos = getAirwayPos(p.prog, p.branch);
-      const s = toScreen(pos.u, pos.v);
+      // Add slight natural aerosol width dispersion perpendicular to path
+      const lateralWobble = Math.sin(this.nebTimer * 3.0 + p.wobble) * 0.004;
+      const s = toScreen(
+        pos.u + (p.prog >= 0.28 ? lateralWobble : 0),
+        pos.v + (p.prog < 0.28 ? lateralWobble : 0)
+      );
 
       ctx.fillStyle = (idx % 6 === 0) ? '#FFFFFF' : ((idx % 3 === 0) ? '#0284C7' : 'rgba(56, 189, 248, 0.88)');
       ctx.shadowColor = '#38BDF8';
@@ -5379,10 +5386,10 @@ class PresentationEngine {
     });
     ctx.shadowBlur = 0;
 
-    // C. Glowing Directional Chevron Flow Pulses (matching blue arrows)
+    // C. Glowing Directional Chevron Flow Pulses (matching blue reference arrows)
     this.s11FlowPulses.forEach(fp => {
       const pos = getAirwayPos(fp.prog, fp.branch);
-      const nextPos = getAirwayPos(Math.min(1.0, fp.prog + 0.03), fp.branch);
+      const nextPos = getAirwayPos(Math.min(1.0, fp.prog + 0.025), fp.branch);
       const s = toScreen(pos.u, pos.v);
       const sNext = toScreen(nextPos.u, nextPos.v);
 
@@ -5397,21 +5404,21 @@ class PresentationEngine {
       ctx.shadowColor = '#38BDF8';
       ctx.shadowBlur = 8;
       ctx.beginPath();
-      ctx.moveTo(5, 0);
-      ctx.lineTo(-4, -4);
-      ctx.lineTo(-1, 0);
-      ctx.lineTo(-4, 4);
+      ctx.moveTo(5.5, 0);
+      ctx.lineTo(-4.5, -4.2);
+      ctx.lineTo(-1.2, 0);
+      ctx.lineTo(-4.5, 4.2);
       ctx.closePath();
       ctx.fill();
       ctx.stroke();
       ctx.restore();
     });
 
-    // D. "Alveolar Level" Inset Circle Animation (Bottom-Right)
-    const insetCenter = toScreen(0.892, 0.825);
-    const insetR = 0.088 * imgW; // ~58px
+    // D. "Alveolar Level" Inset Circle Animation (Bottom-Right: center u=0.8853, v=0.7895, r=0.1040*imgW)
+    const insetCenter = toScreen(0.8853, 0.7895);
+    const insetR = 0.1040 * imgW; // ~68.6px
 
-    // Pulsing highlight aura around inset
+    // Pulsing highlight aura around inset circle
     const pulseAlpha = 0.35 + Math.sin(this.nebTimer * 3.0) * 0.25;
     ctx.strokeStyle = `rgba(2, 132, 199, ${pulseAlpha.toFixed(2)})`;
     ctx.lineWidth = 2.5;
